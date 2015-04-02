@@ -145,19 +145,34 @@ ns.init = function (grunt) {
             build: {
                 plugins: webpackConfig.plugins.concat(
                     new webpack.DefinePlugin({
+                        MOCK_APIS: false,
                         'process.env': {
                             // This has effect on the react lib size
                             'NODE_ENV': JSON.stringify('production')
-                        }
+                        },
                     }),
                     new webpack.optimize.DedupePlugin(),
                     new webpack.optimize.UglifyJsPlugin()
-                )
+                ),
             },
 
             'build-dev': {
-                debug: true
-            }
+                plugins: webpackConfig.plugins.concat(
+                    new webpack.DefinePlugin({
+                        MOCK_APIS: false,
+                    })
+                ),
+                debug: true,
+            },
+
+            'build-mock': {
+                plugins: webpackConfig.plugins.concat(
+                    new webpack.DefinePlugin({
+                        MOCK_APIS: true,
+                    })
+                ),
+                debug: true,
+            },
         },
 
         'webpack-dev-server': {
@@ -204,6 +219,10 @@ ns.init = function (grunt) {
     // Disadvantage: Requests are not blocked until bundle is available,
     //               can serve an old app on too fast refresh
     grunt.registerTask('dev', ['webpack:build-dev', 'watch:app']);
+
+    // Build with the MOCK_APIS flag set to true, this allows faking backend
+    // APIs for e2e UI testing, etc.
+    grunt.registerTask('build-mock', ['webpack:build-mock']);
 
     // Production build
     grunt.registerTask('build', ['webpack:build']);
