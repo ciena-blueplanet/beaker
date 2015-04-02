@@ -1,7 +1,7 @@
 {
   "name": "{{ projectName }}",
   "version": "0.0.1",
-  "main": "src/main.js",
+  "main": "src/index.6.js",
   "repository": {
     "type": "git",
     "url": "git@{{ githubHost }}:{{ githubUser }}/{{ projectName }}.git"

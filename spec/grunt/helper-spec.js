@@ -91,7 +91,7 @@ describe('grunt helper', function () {
         it('gives post-coverage task a call to moveCoverageUp', function () {
             spyOn(helper, 'moveCoverageUp');
 
-            var callback = grunt.registerTask.calls.argsFor(5)[2];
+            var callback = grunt.registerTask.calls.argsFor(6)[2];
             callback();
 
             var coverageDir = path.join(process.cwd(), 'coverage');

@@ -27,7 +27,14 @@ install:
 clean:
 	$(HIDE)rm -rf demo/bundle
 
-test: webpack-test e2e-test
+start-selenium:
+	$(ENV)webdriver-manager start &
+
+stop-selenium:
+	$(ENV)kill -9 $$(lsof -t -i:4444) || echo 'nothing to kill'
+	$(HIDE)ps aux | grep webdriver | grep -v grep | awk '{ print $$2; }' | xargs kill -9
+
+test: webpack-test start-selenium e2e-test stop-selenium
 
 coverage: webpack-coverage
 
