@@ -1,0 +1,8 @@
+{
+  "name": "baz",
+  "version": "0.3.2",
+  "dependencies": {
+    "foo": "1.0",
+    "bar": "2.3"
+  }
+}

@@ -1,0 +1,39 @@
+Usage: beaker github COMMAND [options]
+
+Description:
+
+    Interact with the our GitHub Enterprise API
+
+    COMMAND                 - the command to issue
+
+
+Commands:
+
+    bump-version            - bump version in JSON files and commit changes to remote
+    release                 - create a new release for a repository
+    version-bumped          - determine if a pull request has version bump comment
+
+
+Command Options:
+
+    bump-version:
+
+      Required:
+        --repo REPO             - The repository including the GitHub user/organization (e.g. 'cyaninc/beaker')
+        --sha SHA               - The commit hash of desired pull requests HEAD
+
+    release:
+
+      Required:
+        --repo REPO             - The repository including the GitHub user/organization (e.g. 'cyaninc/beaker')
+        --version VERSION       - The version of the release (used for 'name' and 'tag_name', e.g. '0.3.2')
+
+      Optional:
+        --branch BRANCH         - The branch to tag from (used for 'target_commitish', default: 'master')
+        --description DESC      - A description of the release (used for 'body', default: '')
+
+    version-bumped:
+
+      Required:
+        --repo REPO             - The repository including the GitHub user/organization (e.g. 'cyaninc/beaker')
+        --sha SHA               - The commit hash of desired pull requests HEAD

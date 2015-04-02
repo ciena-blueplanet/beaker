@@ -1,0 +1,24 @@
+{
+  "name": "{{ projectName }}",
+  "version": "0.0.1",
+  "main": "src/index.6.js",
+  "repository": {
+    "type": "git",
+    "url": "git@{{ githubHost }}:{{ githubUser }}/{{ projectName }}.git"
+  },
+  "devDependencies": {
+    "beaker": "^{{ toolkitVersion }}",
+    "bootstrap": "^3.3.2",
+    "webdriver": "^0.0.1",
+    "webdriver-manager": "^2.0.0",
+    "webdrivercss": "^1.0.6",
+    "webdriverio": "^2.4.5"
+  },
+  "dependencies": {
+    "jquery": "^2.1.3",
+    "lodash": "^3.2.0"
+  },
+  "publishConfig": {
+    "registry": "{{ npmRegistry }}"
+  }
+}

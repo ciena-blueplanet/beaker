@@ -1,0 +1,17 @@
+{
+  "name": "{{ projectName }}",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git@{{ githubHost }}:{{ githubUser }}/{{ projectName }}.git"
+  },
+  "devDependencies": {
+    "beaker": "^{{ toolkitVersion }}"
+  },
+  "dependencies": {
+    "lodash": "^3.2.0"
+  },
+  "publishConfig": {
+    "registry": "{{ npmRegistry }}"
+  }
+}
