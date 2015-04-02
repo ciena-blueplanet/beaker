@@ -1,11 +1,30 @@
+
+
+
 {
   "name": "beaker",
   "version": "1.0.0",
+  "description": "Toolkit for building web interfaces",
   "main": "src/index.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:cyaninc/beaker.git"
   },
+  "keywords": [
+    "tools",
+    "webpack",
+    "grunt",
+    "karma"
+  ],
+  "author": {
+    "name": "Adam Meadows",
+    "email": "adam.meadows@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cyaninc/beaker/issues"
+  },
+  "homepage": "https://github.com/cyaninc/beaker",
   "devDependencies": {
     "eslint": "^0.15.1",
     "grunt": "^0.4.5",
