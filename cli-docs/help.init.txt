@@ -1,0 +1,62 @@
+Usage: beaker [options] init
+
+Description:
+
+    Initialize a new project with some default files/folders:
+
+    webpack-project:
+        .eslintrc           - our common linting rules
+        .npmrc              - configure npm to use proper registry
+        env.sh              - setup environment for running locally installed npm binaries
+        Gruntfile.js        - grunt task definitions needed for a webpack project
+        package.json        - define the npm package (and dependencies)
+        docs/               - JSDoc documentation, etc.
+        demo/               - live demo directory
+        src/                - holder for all source files
+            main.js                     - example source file
+            style/                      - holder for less/image files
+                main.less                       - example LESS file
+            tmpl/                       - holder for all jade templates
+                main.jade                       - example JADE template
+        spec/               - parallel tree to src/ for all jasmine specs
+            .eslintrc                   - special lint rules for specs
+            karma/                      - holder for all karma specs
+                main-spec.js                    - example spec for main module file
+
+    app-project:
+        .eslintrc           - our common linting rules
+        .npmrc              - configure npm to use proper registry
+        env.sh              - setup environment for running locally installed npm binaries
+        Gruntfile.js        - grunt task definitions needed for an app project
+        package.json        - define the npm package (and dependencies)
+        docs/               - JSDoc documentation, etc.
+        demo/               - live demo directory
+        src/                - holder for all source files
+            main.js                     - example app source file
+            style/                      - holder for less/image files
+                main.less                       - example LESS file
+            tmpl/                       - holder for all jade templates
+                main.jade                       - example JADE template
+        spec/               - parallel tree to src/ for all jasmine specs
+            .eslintrc                   - special lint rules for specs
+            karma/                      - holder for all karma specs
+                main-spec.js                    - example spec for main module file
+
+
+    node-project:
+        .eslintrc           - our common linting rules
+        .npmrc              - configure npm to use proper registry
+        env.sh              - setup environment for running locally installed npm binaries
+        Gruntfile.js        - grunt task definitions needed for a nodejs module
+        package.json        - define the npm package (and dependencies)
+        docs/               - JSDoc documentation, etc.
+        src/                - holder for all source files
+            foo.js          - example node module source file
+        spec/               - parallel tree to src/ for all jasmine specs
+            .eslintrc                   - special lint rules for specs
+            foo-spec.js     - example jasmine spec for the foo.js source file
+
+
+Options:
+
+    --type TYPE     - specifies the project type valid values: [ webpack, app, node ]

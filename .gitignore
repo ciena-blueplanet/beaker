@@ -1,0 +1,25 @@
+# External Dependencies
+node_modules
+
+# Generated Directories
+/bundle
+/coverage
+
+# Generated Files
+demo/**/*.html
+spec/e2e/test-config.json
+/beaker.json
+
+# WebdriverCSS comparisons
+spec/e2e/screenshots/**/*.png
+!spec/e2e/screenshots/*.baseline.png
+
+# OSX Temporary Files
+.DS_Store
+
+# IDE/Editor Files
+.*.swp
+*~
+.idea
+
+# Project-specific Ignores

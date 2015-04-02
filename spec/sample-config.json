@@ -1,0 +1,11 @@
+{
+    "github": {
+        "email": "buildbot@example.com",
+        "host": "github.com",
+        "token": "correcthorsebatterystaple",
+        "user": "cyaninc"
+    },
+    "npm": {
+        "registry": "http://npmjs.org"
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "author": "First Last <first.last@example.com>",
+    "company": "",
+    "github": {
+        "email": "",
+        "host": "github.com",
+        "token": "",
+        "user": ""
+    },
+    "npm": {
+        "registry": "https://registry.npmjs.com"
+    }
+}

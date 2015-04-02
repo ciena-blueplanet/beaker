@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <script src="bundle/demo-entry.js"></script>
+    </head>
+    <body>
+        <div class="navbar navbar-inverse navbar-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">{{ projectName }}</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" aria-expanded="false" data-toggle="dropdown"
+                               href="#" role="button">More Info</a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="../coverage/">Code Coverage</a>
+                                </li>
+                                <li>
+                                    <a href="https://{{ githubHost }}:{{ githubUser }}/{{ projectName }}#readme">README</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

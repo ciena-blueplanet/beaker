@@ -1,0 +1,11 @@
+{
+  "bowerDeps": {
+    "bar": {},
+    "foo": {
+      "path": "dist/foo",
+      "shim": {
+        "exports": "foo"
+      }
+    }
+  }
+}
