@@ -1,5 +1,5 @@
 #
-# Makefile to define some common toolkit make targets for working with gh-pages
+# Makefile to define some common beaker make targets for working with gh-pages
 # Copyright (c) 2015 Cyan, Inc. All rights reserved.
 #
 

@@ -19,7 +19,7 @@ var helper = t.require('./helper');
 describe('grunt helper', function () {
 
     describe('.init()', function () {
-        var grunt, toolkitTasks, localTasks;
+        var grunt, beakerTasks, localTasks;
         beforeEach(function () {
             spyOn(process, 'cwd').and.returnValue(path.join(__dirname, '_cwd'));
             grunt = jasmine.createSpyObj('grunt', ['loadNpmTasks', 'initConfig', 'registerTask']);
@@ -27,26 +27,26 @@ describe('grunt helper', function () {
                 writeln: jasmine.createSpy('grunt.log.writeln'),
             };
 
-            toolkitTasks = ['toolkit-task-1', 'grunt-cli', 'toolkit-task-2'];
+            beakerTasks = ['beaker-task-1', 'grunt-cli', 'beaker-task-2'];
             localTasks = ['local-task-1', 'local-task-2'];
             spyOn(matchdep, 'filterAll').and.callFake(function (pattern, pkg) {
                 if (pkg) {
                     return localTasks;
                 }
 
-                return toolkitTasks;
+                return beakerTasks;
             });
 
             helper.init(grunt);
         });
 
-        it('calls matchdep for toolkit packages', function () {
+        it('calls matchdep for beaker packages', function () {
             expect(matchdep.filterAll).toHaveBeenCalledWith('grunt-*');
         });
 
-        it('loads the npm tasks from toolkit', function () {
-            expect(grunt.loadNpmTasks).toHaveBeenCalledWith('toolkit-task-1', 0, ['toolkit-task-1', 'toolkit-task-2']);
-            expect(grunt.loadNpmTasks).toHaveBeenCalledWith('toolkit-task-2', 1, ['toolkit-task-1', 'toolkit-task-2']);
+        it('loads the npm tasks from beaker', function () {
+            expect(grunt.loadNpmTasks).toHaveBeenCalledWith('beaker-task-1', 0, ['beaker-task-1', 'beaker-task-2']);
+            expect(grunt.loadNpmTasks).toHaveBeenCalledWith('beaker-task-2', 1, ['beaker-task-1', 'beaker-task-2']);
         });
 
         it('calls matchdep for local packages', function () {

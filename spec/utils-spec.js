@@ -39,7 +39,7 @@ describe('utils', function () {
             githubUser: config.github.user,
             npmRegistry: config.npm.registry,
             projectType: 'app',
-            toolkitVersion: require('../package.json').version,
+            beakerVersion: require('../package.json').version,
             cruftlessName: 'NON-APP',
             templateDir: path.join(CWD, 'files/project-templates'),
         };

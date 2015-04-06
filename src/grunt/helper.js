@@ -51,7 +51,7 @@ ns.moveCoverageUp = function (coverageDir, logFn) {
  */
 ns.init = function (grunt) {
 
-    // load toolkit tasks
+    // load beaker tasks
     var gruntTasks = matchdep.filterAll('grunt-*');
     _.without(gruntTasks, 'grunt-cli').forEach(grunt.loadNpmTasks);
 

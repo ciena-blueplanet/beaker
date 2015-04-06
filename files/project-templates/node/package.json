@@ -6,7 +6,7 @@
     "url": "git@{{ githubHost }}:{{ githubUser }}/{{ projectName }}.git"
   },
   "devDependencies": {
-    "beaker": "^{{ toolkitVersion }}"
+    "beaker": "^{{ beakerVersion }}"
   },
   "dependencies": {
     "lodash": "^3.2.0"

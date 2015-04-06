@@ -66,7 +66,7 @@ ns.command = function (argv) {
         githubHost: _config.github.host,
         githubUser: _config.github.user,
         npmRegistry: _config.npm.registry,
-        toolkitVersion: utils.pkg.version,
+        beakerVersion: utils.pkg.version,
         cruftlessName: cruftlessName,
         templateDir: _config.templateDir || FILES_DIR,
     };

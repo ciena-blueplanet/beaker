@@ -25,7 +25,7 @@ install:
 
 
 clean:
-	$(HIDE)rm -rf demo/bundle
+	$(HIDE)rm -rf coverage demo/bundle
 
 start-selenium:
 	$(ENV)webdriver-manager start &

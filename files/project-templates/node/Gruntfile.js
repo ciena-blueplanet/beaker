@@ -41,7 +41,7 @@ module.exports = function (grunt) {
             ],
 
             options: {
-                valid: /^_?[a-z0-9\-\.]+\.([^\.]+)$/,
+                valid: /^[a-z0-9\-\.]+\.([^\.]+)$/,
             },
         },
     });

@@ -7,7 +7,7 @@
     "url": "git@{{ githubHost }}:{{ githubUser }}/{{ projectName }}.git"
   },
   "devDependencies": {
-    "beaker": "^{{ toolkitVersion }}"
+    "beaker": "^{{ beakerVersion }}"
   },
   "dependencies": {
     "jquery": "^2.1.3",
