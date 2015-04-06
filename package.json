@@ -1,6 +1,6 @@
 {
   "name": "beaker",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Toolkit for building web interfaces",
   "main": "src/index.js",
   "repository": {
@@ -84,7 +84,8 @@
   },
   "scripts": {
     "prepublish": "bin/pre-publish.sh",
-    "postpublish": "bin/post-publish.sh"
+    "postpublish": "bin/post-publish.sh",
+    "test": "make node-test"
   },
   "bin": {
     "beaker": "./bin/beaker.js",

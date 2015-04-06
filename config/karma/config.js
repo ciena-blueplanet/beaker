@@ -6,6 +6,7 @@
 'use strict';
 
 var path = require('path');
+var webpack = require('webpack');
 var loaders = require('../webpack/loaders');
 var resolve = require('../webpack/resolve');
 
@@ -75,6 +76,11 @@ module.exports = function (config) {
                 }],
                 loaders: loaders,
             },
+            plugins: [
+                new webpack.DefinePlugin({
+                    MOCK_APIS: false,
+                })
+            ],
             resolve: resolve,
             devtool: 'inline-source-map',
         },
