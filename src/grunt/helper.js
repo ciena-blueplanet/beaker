@@ -135,6 +135,12 @@ ns.init = function (grunt) {
                         }],
                     },
 
+                    plugins: [
+                        new webpack.DefinePlugin({
+                            MOCK_APIS: false,
+                        })
+                    ],
+
                     resolve: webpackResolve,
                 },
             },
