@@ -2,14 +2,14 @@ Usage: beaker command [arguments] [options]
 
 Description:
 
-    Toolkit command-line tool.
+    Beaker command-line tool.
 
 Commands:
 
     github              Interact with the our GitHub Enterprise API
     help [command]      Output usage information
     init                Initialize a new project with some default files
-    newConfig           Create a ne cy-toolkit.json configuration file
+    newConfig           Create a new beaker.json configuration file
 
 Options:
     -v --version        Output version information

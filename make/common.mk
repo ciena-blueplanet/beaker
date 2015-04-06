@@ -1,5 +1,5 @@
 #
-# Makefile to define some common toolkit make targets
+# Makefile to define some common beaker make targets
 # Copyright (c) 2015 Cyan, Inc. All rights reserved.
 #
 

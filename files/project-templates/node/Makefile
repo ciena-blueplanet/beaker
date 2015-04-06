@@ -16,6 +16,9 @@ NODE_COVERAGE_DIR := coverage
 install:
 	$(HIDE)npm install
 
+clean:
+	$(HIDE)rm -rf coverage
+
 test: node-test
 
 coverage: node-coverage

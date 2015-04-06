@@ -3,7 +3,7 @@
 # Copyright {{year}} {{ company }}. All rights reserved.
 #
 
-# Source the base environment from the toolkit
+# Source the base environment from beaker
 source node_modules/beaker/files/base_env.sh
 
 # Environment variables needed to build cairo, a dependency of webdrivercss
