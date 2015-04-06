@@ -84,7 +84,8 @@
   },
   "scripts": {
     "prepublish": "bin/pre-publish.sh",
-    "postpublish": "bin/post-publish.sh"
+    "postpublish": "bin/post-publish.sh",
+    "test": "make node-test"
   },
   "bin": {
     "beaker": "./bin/beaker.js",
