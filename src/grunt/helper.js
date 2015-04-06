@@ -193,6 +193,11 @@ ns.init = function (grunt) {
                 webpack: {
                     devtool: 'eval-source-map',
                     debug: true,
+                    plugins: [
+                        new webpack.DefinePlugin({
+                            MOCK_APIS: false,
+                        })
+                    ],
                 }
             }
         },
