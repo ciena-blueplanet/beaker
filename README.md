@@ -1,5 +1,8 @@
 # beaker
 
+[![npm version](https://badge.fury.io/js/beaker.svg)](http://badge.fury.io/js/beaker)
+[![build status](https://travis-ci.org/cyaninc/beaker.svg?branch=master)](https://travis-ci.org/cyaninc/beaker)
+
 If you want to create a new web interface or web interface component, and you don't want to have to
 manually install all the dependencies to get the project going (`grunt`, `karma`, `webpack`, etc.), this is for you.
 
