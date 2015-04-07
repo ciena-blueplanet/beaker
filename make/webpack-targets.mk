@@ -42,8 +42,8 @@ do-e2e-test:
 	$(ENV)jasmine-node $(JASMINE_NODE_OPTS) $(NODE_SPECS) || ($(ENV)kill $$(lsof -t -i:$(TEST_PORT)) && false)
 	$(ENV)kill $$(lsof -t -i:$(TEST_PORT)) || echo 'nothing to kill'
 
-e2e-test: kill-httpserver build start-httpserver create-config do-e2e-test
-e2e-test-local: kill-httpserver build start-httpserver create-config-local do-e2e-test
+e2e-test: kill-httpserver build-mock start-httpserver create-config do-e2e-test
+e2e-test-local: kill-httpserver build-mock start-httpserver create-config-local do-e2e-test
 
 #######################################################################
 #                         normal test targets                         #

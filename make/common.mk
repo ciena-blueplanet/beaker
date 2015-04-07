@@ -13,6 +13,7 @@ BEAKER_BIN ?= beaker
 
 .PHONY: \
 	build \
+	build-mock \
 	lint \
 	package-test \
 	update-eslintrc \
@@ -21,6 +22,9 @@ BEAKER_BIN ?= beaker
 
 build:
 	$(ENV)grunt build
+
+build-mock:
+	$(ENV)grunt build-mock
 
 lint:
 ifeq ($(IS_BEAKER), 1)
