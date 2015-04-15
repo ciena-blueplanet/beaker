@@ -544,7 +544,7 @@ describe('github', function () {
     });
 
     describe('.specifiesVersionBumpLevel()', function () {
-        _.each(['MAJOR', 'MINOR', 'PATCH'], function (level) {
+        _.forEach(['MAJOR', 'MINOR', 'PATCH'], function (level) {
             it('returns true if ' + level + ' bump comment', function () {
                 var pr = {body: '#' + level + '#'};
                 expect(github.specifiesVersionBumpLevel(pr)).toBeTruthy();

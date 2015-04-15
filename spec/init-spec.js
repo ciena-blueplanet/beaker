@@ -92,7 +92,7 @@ describe('init', function () {
             });
         });
 
-        _.each(['app', 'node', 'webpack'], function (projectType) {
+        _.forEach(['app', 'node', 'webpack'], function (projectType) {
             describe(projectType + ' project', function () {
                 beforeEach(function () {
                     templateData.projectType = projectType;
@@ -116,7 +116,7 @@ describe('init', function () {
                 });
 
                 it('checks for symlinks', function () {
-                    _.each(originalSymlinks, function (symlink) {
+                    _.forEach(originalSymlinks, function (symlink) {
                         expect(fs.existsSync).toHaveBeenCalledWith(symlink);
                         expect(fs.unlink).not.toHaveBeenCalledWith(symlink);
                     });

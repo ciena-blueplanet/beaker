@@ -91,7 +91,7 @@ describe('utils', function () {
                 spyOn(fs, 'createWriteStream').and.returnValue(outStr);
             });
 
-            _.each(IMAGE_FILES, function (imageFilename) {
+            _.forEach(IMAGE_FILES, function (imageFilename) {
                 describe('copying ' + imageFilename, function () {
                     var srcPath, dstPath;
 
@@ -293,7 +293,7 @@ describe('utils', function () {
             expect(utils.removeHeadDir('head/or/tail')).toEqual('or/tail');
         });
 
-        _.each(['gitattributes', 'gitignore', 'gitfat'], function (fileName) {
+        _.forEach(['gitattributes', 'gitignore', 'gitfat'], function (fileName) {
             it('adds . to filename if filename is ' + fileName, function () {
                 expect(utils.removeHeadDir('path/to/' + fileName)).toEqual('to/.' + fileName);
             });

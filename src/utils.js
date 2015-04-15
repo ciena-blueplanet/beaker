@@ -146,7 +146,7 @@ ns.copyDir = function (dir, destination, data) {
     ns.mkdirSync(destPath);
 
     // Iterate contents of directory
-    _.each(fs.readdirSync(srcPath), function (relPath) {
+    _.forEach(fs.readdirSync(srcPath), function (relPath) {
         var fullPath = path.join(srcPath, relPath);
         ns.processPath(fullPath, destination, data);
     });

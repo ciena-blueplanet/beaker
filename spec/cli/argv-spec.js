@@ -17,7 +17,7 @@ var cli = t.require('./index');
  * @returns {Object} an argv object appropriate to pass to a CLI command method
 */
 function constructArgv(args, options) {
-    return _.extend({
+    return _.assign({
         _: args || [],
     }, options);
 }

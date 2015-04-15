@@ -1,22 +1,22 @@
 /**
- * @file spec for indent eslint rule
+ * @file spec for no-lodash-alias eslint rule
  * @copyright 2014-2015 Cyan, Inc. All rights reserved
 */
 
 'use strict';
 
 var t = require('../../src/transplant')(__dirname);
-var indent = t.require('./indent');
+var noAliases = t.require('./no-lodash-aliases');
 
-describe('indent', function () {
+describe('noAliases', function () {
     // NOTE: We don't have a proper test for the indent rule
     // because we did not write it, but rather took it from
-    // https://github.com/nodeca/eslint-plugin-nodeca/blob/master/lib/indent.js
+    // https://github.com/nodeca/eslint-plugin-nodeca/blob/master/lib/no-lodash-aliases.js
     it('exists', function () {
-        expect(indent).not.toBeUndefined();
+        expect(noAliases).not.toBeUndefined();
     });
 
     it('is a function', function () {
-        expect(typeof indent).toBe('function');
+        expect(typeof noAliases).toBe('function');
     });
 });
