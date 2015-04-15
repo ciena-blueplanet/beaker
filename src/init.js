@@ -75,7 +75,7 @@ ns.command = function (argv) {
     utils.copyDir(projectType, CWD, templateData);
 
     // clean up symlinks, if they exist
-    _.each(['src', 'spec', 'node-spec'], function (pathElement) {
+    _.forEach(['src', 'spec', 'node-spec'], function (pathElement) {
         var fullPath = path.join(CWD, pathElement, 'project-name');
         if (fs.existsSync(fullPath)) {
             fs.unlink(fullPath);

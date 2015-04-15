@@ -143,7 +143,7 @@ describe('grunt helper', function () {
 
             var files = dirContents['coverage-dir/sub-dir'];
 
-            _.each(files, function (filename) {
+            _.forEach(files, function (filename) {
                 expect(rimraf.sync).toHaveBeenCalledWith(dest(filename));
                 expect(fs.renameSync).toHaveBeenCalledWith(src(filename), dest(filename));
             });

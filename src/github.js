@@ -174,7 +174,7 @@ ns.getPullRequestForSHA = function (repo, sha, searchAll) {
     var pullRequests = ns.getPullRequests(repo, searchAll);
 
     // Iterate over all open pull requests
-    _.each(pullRequests, function (pr) {
+    _.forEach(pullRequests, function (pr) {
         // If pull request is at specific commit
         if (pr.head.sha === sha || pr.merge_commit_sha === sha) {
             console.log('Found PR at commit: ' + pr.id);
@@ -220,7 +220,7 @@ ns.specifiesVersionBumpLevel = function (pr) {
 ns.missingArgs = function (argv, required) {
     var argsMissing = false;
 
-    _.each(required, function (arg) {
+    _.forEach(required, function (arg) {
         if (!_.has(argv, arg)) {
             console.error(arg + ' argument is required');
             argsMissing = true;
@@ -321,7 +321,7 @@ ns.pushChanges = function () {
  * @returns {Boolean} whether or not commit succeeded
  */
 ns.commitBumpedFiles = function () {
-    _.each(['bower.json', 'package.json'], function (file) {
+    _.forEach(['bower.json', 'package.json'], function (file) {
         var filePath = path.join(CWD, file);
 
         // If file exists make sure to add it to git
@@ -357,7 +357,7 @@ ns.bumpVersion = function (argv) {
 
     var bumps = [];
 
-    _.each(commits, function (commitObj) {
+    _.forEach(commits, function (commitObj) {
         // If commit was made by buildbot we can ignore all previous commits
         if (commitObj.commit.author.email === getConfig().github.email) {
             return false;
@@ -385,7 +385,7 @@ ns.bumpVersion = function (argv) {
         }
     });
 
-    _.each(bumps, function (bump) {
+    _.forEach(bumps, function (bump) {
         // If failed to bump files
         if (!ns.bumpFiles(bump)) {
             error = true;

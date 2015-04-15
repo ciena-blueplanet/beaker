@@ -74,7 +74,7 @@ ns.waitForPromise = function (done, promise, callback) {
 ns.cssCallback = function (screenshots) {
     return function (err, res) {
         expect(err).toBeFalsy();
-        _.each(screenshots, function (screenshot) {
+        _.forEach(screenshots, function (screenshot) {
             expect(res[screenshot.name][0].isWithinMisMatchTolerance).toBeTruthy();
         });
     };

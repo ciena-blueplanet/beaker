@@ -32,7 +32,7 @@ ns.moveCoverageUp = function (coverageDir, logFn) {
         logFn('found coverage directory at: ' + fullSubDir);
     }
 
-    _.each(fs.readdirSync(fullSubDir), function (file) {
+    _.forEach(fs.readdirSync(fullSubDir), function (file) {
         var dest = path.join(coverageDir, file);
         rimraf.sync(dest);
         fs.renameSync(path.join(fullSubDir, file), dest);
