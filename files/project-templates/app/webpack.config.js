@@ -13,6 +13,8 @@ module.exports = {
         app: './src/index.6.js',
     },
 
+    devtool: 'source-map',
+
     output: {
         path: 'bundle',
         publicPath: 'bundle/',

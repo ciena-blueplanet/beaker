@@ -14,6 +14,8 @@ module.exports = {
         demo: './demo/js/demo.6.js',
     },
 
+    devtool: 'source-map',
+
     output: {
         path: 'demo/bundle',
         publicPath: 'bundle/',
