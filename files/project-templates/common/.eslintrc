@@ -62,6 +62,8 @@
         "no-native-reassign": 2,
         "no-new": 2,
         "no-new-wrappers": 2,
+        "no-redeclare": 2,
+        "no-redeclare-func": 2,
         "no-space-before-semi": 2,
         "no-trailing-spaces": 2,
         "no-unused-vars": [2, {"vars": "all", "args": "after-used"}],
