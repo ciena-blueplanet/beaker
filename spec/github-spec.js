@@ -104,17 +104,20 @@ describe('github', function () {
             beforeEach(function () {
                 version = '1.0.0';
 
-                commits = [{
-                    commit: {
-                        author: {email: 'not-' + config.github.email},
-                        message: 'Merge pull request #2',
+                commits = [
+                    {
+                        commit: {
+                            author: {email: 'not-' + config.github.email},
+                            message: 'Merge pull request #2',
+                        },
                     },
-                }, {
-                    commit: {
-                        author: {email: 'not-' + config.github.email},
-                        message: 'Merge pull request #1',
+                    {
+                        commit: {
+                            author: {email: 'not-' + config.github.email},
+                            message: 'Merge pull request #1',
+                        },
                     },
-                }];
+                ];
 
                 prs = {
                     1: {body: '#MINOR#'},
@@ -350,15 +353,17 @@ describe('github', function () {
     });
 
     describe('.getPullRequestForSHA()', function () {
-        var pullRequests = [{
-            head: {
-                sha: 'aabea989b5ebfa181f55f6593c5b814cc8da45e2',
+        var pullRequests = [
+            {
+                head: {
+                    sha: 'aabea989b5ebfa181f55f6593c5b814cc8da45e2',
+                },
+            }, {
+                head: {
+                    sha: '6541f8f8bdea1c5e4a180d6fccfde4809e38da76',
+                },
             },
-        }, {
-            head: {
-                sha: '6541f8f8bdea1c5e4a180d6fccfde4809e38da76',
-            },
-        }];
+        ];
 
         it('returns pull request with commit hash', function () {
             spyOn(github, 'getPullRequests').and.returnValue(pullRequests);

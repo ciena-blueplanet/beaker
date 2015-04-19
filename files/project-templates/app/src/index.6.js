@@ -13,9 +13,9 @@ let $ = require('jquery');
 let ns = {
     render: function (element) {
         $(element).append(template({
-            content: 'This is my first webpack project!'
+            content: 'This is my first webpack project!',
         }));
-    }
+    },
 };
 
 window.main = ns;

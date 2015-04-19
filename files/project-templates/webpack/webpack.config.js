@@ -26,10 +26,12 @@ module.exports = {
     plugins: [],
 
     module: {
-        preLoaders: [{
-            test: /demo/,
-            loader: path.join(process.cwd(), 'node_modules/beaker/config/karma/self-loader.js'),
-        }],
+        preLoaders: [
+            {
+                test: /demo/,
+                loader: path.join(process.cwd(), 'node_modules/beaker/config/karma/self-loader.js'),
+            },
+        ],
         loaders: loaders,
     },
 

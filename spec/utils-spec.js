@@ -181,13 +181,13 @@ describe('utils', function () {
         beforeEach(function () {
             var fakeProcess = {
                 stdout: {
-                    on: function () {}
+                    on: function () {},
                 },
                 on: function (evtName, callback) {
                     if (evtName === 'exit') {
                         callback(0);
                     }
-                }
+                },
             };
 
             spyOn(childProcess, 'spawn').and.returnValue(fakeProcess);
