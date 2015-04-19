@@ -27,7 +27,7 @@ module.exports = function (config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'node_modules/beaker/config/karma/test-main.js': ['webpack', 'sourcemap']
+            'node_modules/beaker/config/karma/test-main.js': ['webpack', 'sourcemap'],
         },
 
         // test results reporter to use
@@ -70,16 +70,18 @@ module.exports = function (config) {
 
         webpack: {
             module: {
-                preLoaders: [{
-                    test: /spec/,
-                    loader: path.join(__dirname, 'self-loader.js')
-                }],
+                preLoaders: [
+                    {
+                        test: /spec/,
+                        loader: path.join(__dirname, 'self-loader.js'),
+                    },
+                ],
                 loaders: loaders,
             },
             plugins: [
                 new webpack.DefinePlugin({
                     MOCK_APIS: false,
-                })
+                }),
             ],
             resolve: resolve,
             devtool: 'inline-source-map',
