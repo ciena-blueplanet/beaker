@@ -36,10 +36,6 @@ ns.cleanupCruft = function (projectName) {
     return match[1];
 };
 
-function foo() {
-
-}
-
 /**
  * Actual functionality of the 'init' command
  * @param {Ojbect} argv - the minimist arguments object
@@ -47,7 +43,6 @@ function foo() {
 */
 ns.command = function (argv) {
     var _config = config.load(CWD);
-    foo();
     if (!_config) {
         console.error('beaker.json missing');
         console.info('To create a default beaker.json file run the following command: beaker newConfig');
