@@ -43,6 +43,7 @@ ns.cleanupCruft = function (projectName) {
 */
 ns.command = function (argv) {
     var _config = config.load(CWD);
+
     if (!_config) {
         console.error('beaker.json missing');
         console.info('To create a default beaker.json file run the following command: beaker newConfig');
