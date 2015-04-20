@@ -75,7 +75,7 @@ ns.init = function (grunt) {
             options: {
                 config: '.eslintrc',
                 rulesdir: ['node_modules/beaker/src/eslint-rules'],
-            }
+            },
         },
 
         filenames: {
@@ -89,7 +89,7 @@ ns.init = function (grunt) {
 
             options: {
                 valid: /^_?[a-z0-9\-\.]+\.([^\.]+)$/,
-            }
+            },
         },
 
         karma: {
@@ -111,34 +111,41 @@ ns.init = function (grunt) {
                 reporters: ['progress', 'coverage'],
 
                 coverageReporter: {
-                    reporters: [{
-                        type: 'text-summary'
-                    }, {
-                        type: 'html',
-                        dir: path.join(process.cwd(), 'coverage'),
-                    }],
+                    reporters: [
+                        {
+                            type: 'text-summary',
+                        },
+                        {
+                            type: 'html',
+                            dir: path.join(process.cwd(), 'coverage'),
+                        },
+                    ],
                 },
 
                 webpack: {
                     module: {
                         loaders: webpackLoaders,
 
-                        preLoaders: [{
-                            test: /\.js$/,
-                            loader: path.join(process.cwd(), 'node_modules/beaker/config/karma/self-loader.js'),
-                        }],
+                        preLoaders: [
+                            {
+                                test: /\.js$/,
+                                loader: path.join(process.cwd(), 'node_modules/beaker/config/karma/self-loader.js'),
+                            },
+                        ],
 
-                        postLoaders: [{
-                            test: /\.js$/,
-                            exclude: /(spec|node_modules|karma)/,
-                            loader: 'istanbul-instrumenter'
-                        }],
+                        postLoaders: [
+                            {
+                                test: /\.js$/,
+                                exclude: /(spec|node_modules|karma)/,
+                                loader: 'istanbul-instrumenter',
+                            },
+                        ],
                     },
 
                     plugins: [
                         new webpack.DefinePlugin({
                             MOCK_APIS: false,
-                        })
+                        }),
                     ],
 
                     resolve: webpackResolve,
@@ -154,7 +161,7 @@ ns.init = function (grunt) {
                         MOCK_APIS: false,
                         'process.env': {
                             // This has effect on the react lib size
-                            'NODE_ENV': JSON.stringify('production')
+                            'NODE_ENV': JSON.stringify('production'),
                         },
                     }),
                     new webpack.optimize.DedupePlugin(),
@@ -184,7 +191,7 @@ ns.init = function (grunt) {
         'webpack-dev-server': {
             options: {
                 webpack: webpackConfig,
-                publicPath: '/' + webpackConfig.output.publicPath
+                publicPath: '/' + webpackConfig.output.publicPath,
             },
 
             start: {
@@ -196,10 +203,10 @@ ns.init = function (grunt) {
                     plugins: [
                         new webpack.DefinePlugin({
                             MOCK_APIS: false,
-                        })
+                        }),
                     ],
-                }
-            }
+                },
+            },
         },
 
         watch: {
@@ -208,13 +215,13 @@ ns.init = function (grunt) {
                 tasks: ['webpack:build-dev'],
                 options: {
                     spawn: false,
-                }
+                },
             },
 
             karma: {
                 files: ['src/**/*', 'spec/**/*'],
                 tasks: ['karma:unit:run'],
-            }
+            },
         },
     });
 

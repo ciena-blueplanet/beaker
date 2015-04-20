@@ -15,5 +15,5 @@ module.exports = {
         $(element).append(template({
             content: 'This is my first webpack project!',
         }));
-    }
+    },
 };
