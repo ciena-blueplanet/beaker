@@ -17,7 +17,7 @@ install:
 	$(HIDE)npm install
 
 clean:
-	$(HIDE)rm -rf coverage
+	$(HIDE)rm -rf $(NODE_COVERAGE_DIR)
 
 test: node-test
 
