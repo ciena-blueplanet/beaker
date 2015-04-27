@@ -1,5 +1,6 @@
 /**
- * Gruntfile for {{ projectName }}
+ * @file Gruntfile.js
+ * @author {{ author }}
  * @copyright {{ year }} {{ company }}. All rights reserved.
  */
 
@@ -17,11 +18,8 @@ module.exports = function (grunt) {
             files: [
                 './Gruntfile.js',
                 'bin/**/*.js',
-                'config/**/*.js',
-                'files/**/*.js',
                 'src/**/*.js',
                 'spec/**/*.js',
-                '!src/eslint-rules/indent.js',
             ],
 
             options: {
@@ -32,10 +30,8 @@ module.exports = function (grunt) {
 
         filenames: {
             src: [
-                'config/**/*.*',
                 'src/**/*.*',
                 'spec/**/*.*',
-                'demo/**/*.*',
                 '!**/Gruntfile.js',
                 '!node_modules/**',
             ],
