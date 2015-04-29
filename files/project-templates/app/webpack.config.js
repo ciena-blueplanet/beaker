@@ -13,7 +13,7 @@ module.exports = {
         app: './src/index.6.js',
     },
 
-    devtool: 'source-map',
+    devtool: 'cheap-module-source-map',
 
     output: {
         path: 'bundle',

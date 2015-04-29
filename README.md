@@ -91,7 +91,15 @@ directory. An example of what to add to your `.vimrc` can be found
 
 ## Development
 
-The following `grunt` tasks and `make` targets have been provided to allow for rapid development
+The following `grunt` tasks and `make` targets have been provided to allow for rapid development. By default no
+source-maps are generated, since it affects build-time quite a bit, especially for large projects. However, if you
+would like to generate source-maps, simply set the `MAPS` environment variable to `on`. You can do so per command
+by simply adding `MAPS=on` before the command.
+
+    MAPS=on grunt
+    MAPS=on make webpack-watch-test
+
+This can be useful if you're not sure where a test is failing, or where an exception is being raised.
 
 ### `grunt`
 The default `grunt` task will launch the `webpack-dev-server` in
@@ -193,16 +201,33 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
 `npm install`.
 
 
-## Packages Installed
+## Components
+`beaker` works with (or depends on) the following tools/packages.
 
-When you install this npm package it will include all of the following npm packages as dependencies:
+### Webpack
+`beaker` primarily helps you set up [`webpack`](http://webpack.github.io) projects.
 
-### Style Sheets
-* [grunt-contrib-less](https://github.com/gruntjs/grunt-contrib-less)
+### Loaders
+`beaker` automatically configures the following `webpack` loaders:
 
-### JavaScript
-* [nconf](https://github.com/flatiron/nconf)
-* [lodash](https://github.com/lodash/lodash)
+#### Styles
+
+ * [less-loader](https://github.com/webpack/less-loader) so you can use [LESS](http://lesscss.org)
+ * [autoprefixer-loader](https://github.com/passy/autoprefixer-loader) so you never have to use browser prefixes.
+ * [css-loader](https://github.com/webpack/css-loader) how else are you gonna deliver your styles?
+ * [style-loader](https://github.com/webpack/style-loader) so you never have to add another `<link>` tag
+ * [file-loader](https://github.com/webpack/file-loader) so you can bundle images and get reference to their URLs.
+
+#### Data
+ * [json-loader](https://github.com/webpack/json-loade://github.com/webpack/json-loader) so you can keep your `.js`
+   files cleaner and keep data where it belongs.
+ * [yaml-loader](https://github.com/okonet/yaml-loader) in case you're lazy and don't wanna write full JSON.
+
+#### Code
+ * [jade-loader](https://github.com/webpack/jade-loader) so you can use client-side
+   [`jade` templates](http://jade-lang.com)
+ * [babel-loader](https://github.com/babel/babel-loade://github.com/babel/babel-loader) so you can write the code of
+   tomorrow, today with [`babel`](https://github.com/babel/babel)
 
 ### Task Management
 * [grunt](https://github.com/gruntjs/grunt)
@@ -211,11 +236,13 @@ When you install this npm package it will include all of the following npm packa
 
 ### Testing / Linting
 * [grunt-karma](https://github.com/karma-runner/grunt-karma)
-* [grunt-eslint](https://github.com/sindresorhus/grunt-eslint)
+* [grunt-eslint](https://github.com/sindresorhus/grunt-eslint) so you can, you guessed it,
+  use [`eslint`](http://eslint.org)
 * [grunt-filenames](https://github.com/bahmutov/grunt-filenames)
 * [karma](https://github.com/karma-runner/karma)
 * [karma-chrome-launcher](https://github.com/karma-runner/karma-chrome-launcher)
 * [karma-cli](https://github.com/karma-runner/karma-cli)
+* [karma-firefox-launcher](https://github.com/karma-runner/karma-firefox-launcher)
 * [karma-js-coverage](https://github.com/danielflower/karma-js-coverage)
 * [karma-jasmine](https://github.com/karma-runner/karma-jasmine)
 * [karma-spec-reporter](https://github.com/mlex/karma-spec-reporter)
@@ -224,5 +251,5 @@ When you install this npm package it will include all of the following npm packa
 We also include code from the following sources.
 
 * [nodeca](https://github.com/nodeca/nodeca/)
-(some [eslint rules](https://github.com/nodeca/nodeca/tree/master/support/eslint_plugins))
+(some [eslint rules](https://github.com/nodeca/eslint-plugin-nodeca/tree/master/lib))`
 

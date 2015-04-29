@@ -9,8 +9,8 @@
 
 var webdriverio = require('webdriverio');
 var webdrivercss = require('webdrivercss');
-var NORMAL_VIEWPORT_WIDTH = 1300;
-var NORMAL_VIEWPORT_HEIGHT = 600;
+var NORMAL_VIEWPORT_WIDTH = 1280;
+var NORMAL_VIEWPORT_HEIGHT = 800;
 var SMALL_VIEWPORT_WIDTH = 900;
 
 var testConfig = require('./test-config.json');
@@ -22,7 +22,10 @@ describe('{{ projectName }} e2e tests using ' + testConfig.url, function () {
 
     beforeEach(function () {
         var wdIoOptions = {
-            desiredCapabilities: {browserName: 'chrome'},
+            desiredCapabilities: {browserName: testConfig.selenium.browser},
+            host: testConfig.selenium.host,
+            port: testConfig.selenium.port,
+            logLevel: 'silent',
         };
         client = webdriverio.remote(wdIoOptions);
         client.init();

@@ -67,6 +67,9 @@ ns.command = function (argv) {
         githubUser: _config.github.user,
         npmRegistry: _config.npm.registry,
         beakerVersion: utils.pkg.version,
+        seleniumHost: _config.selenium.host,
+        seleniumPort: _config.selenium.port,
+        seleniumBrowser: _config.selenium.browser,
         cruftlessName: cruftlessName,
         templateDir: _config.templateDir || FILES_DIR,
     };

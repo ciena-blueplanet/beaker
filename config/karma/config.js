@@ -10,6 +10,9 @@ var webpack = require('webpack');
 var loaders = require('../webpack/loaders');
 var resolve = require('../webpack/resolve');
 
+var USE_SOURCE_MAPS = process.env.MAPS === 'on';
+var KARMA_BROWSER = process.env.KARMA_BROWSER || 'Chrome';
+
 module.exports = function (config) {
     config.set({
         // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -56,7 +59,7 @@ module.exports = function (config) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome'],
+        browsers: [KARMA_BROWSER],
 
 
         // Continuous Integration mode
@@ -84,7 +87,7 @@ module.exports = function (config) {
                 }),
             ],
             resolve: resolve,
-            devtool: 'inline-source-map',
+            devtool: USE_SOURCE_MAPS ? 'inline-cheap-module-source-map' : 'eval',
         },
 
         webpackMiddleware: {
@@ -93,6 +96,7 @@ module.exports = function (config) {
 
         plugins: [
             require('karma-chrome-launcher'),
+            require('karma-firefox-launcher'),
             require('karma-jasmine-jquery'),
             require('karma-jasmine'),
             require('karma-js-coverage'),
