@@ -6,5 +6,5 @@ before_script:
     - "sh -e /etc/init.d/xvfb start"
 env:
     global:
-        - TRAVIS=1
+        - KARMA_BROWSER=Firefox
         - SELENIUM_BROWSER=firefox

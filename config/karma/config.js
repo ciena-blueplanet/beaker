@@ -11,7 +11,7 @@ var loaders = require('../webpack/loaders');
 var resolve = require('../webpack/resolve');
 
 var USE_SOURCE_MAPS = process.env.MAPS === 'on';
-var TRAVIS = process.env.TRAVIS === '1';
+var KARMA_BROWSER = process.env.KARMA_BROWSER || 'Chrome';
 
 module.exports = function (config) {
     config.set({
@@ -59,7 +59,7 @@ module.exports = function (config) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: TRAVIS ? ['Firefox'] : ['Chrome'],
+        browsers: [KARMA_BROWSER],
 
 
         // Continuous Integration mode
