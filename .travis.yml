@@ -6,3 +6,4 @@ before_script:
     - "sh -e /etc/init.d/xvfb start"
 env:
     - TRAVIS=1
+    - SELENIUM_BROWSER=firefox

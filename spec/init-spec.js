@@ -55,6 +55,9 @@ describe('init', function () {
             npmRegistry: config.npm.registry,
             beakerVersion: require('../package.json').version,
             cruftlessName: 'NON-APP',
+            seleniumHost: 'localhost',
+            seleniumPort: 4444,
+            seleniumBrowser: 'chrome',
             templateDir: path.join(CWD, 'files/project-templates'),
         };
 

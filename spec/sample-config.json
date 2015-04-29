@@ -1,11 +1,16 @@
 {
-    "github": {
-        "email": "buildbot@example.com",
-        "host": "github.com",
-        "token": "correcthorsebatterystaple",
-        "user": "cyaninc"
-    },
-    "npm": {
-        "registry": "http://npmjs.org"
-    }
+  "github": {
+    "email": "buildbot@example.com",
+    "host": "github.com",
+    "token": "correcthorsebatterystaple",
+    "user": "cyaninc"
+  },
+  "selenium": {
+    "host": "localhost",
+    "port": 4444,
+    "browser": "chrome"
+  },
+  "npm": {
+    "registry": "http://npmjs.org"
+  }
 }

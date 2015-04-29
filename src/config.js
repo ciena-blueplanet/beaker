@@ -35,8 +35,13 @@ ns.load = function (dir) {
         github: {
             host: 'github.com',
         },
+        selenium: {
+            host: 'localhost',
+            port: 4444,
+            browser: 'chrome',
+        },
         npm: {
-            registry: 'http://npmjs.org',
+            registry: 'https://registry.npmjs.com',
         },
     });
 };
