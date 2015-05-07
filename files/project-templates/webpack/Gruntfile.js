@@ -14,11 +14,7 @@ module.exports = function (grunt) {
     helper.init(grunt);
 
     // If you want to override part of the grunt config, you can do so by uncommenting/editing below
-    /*
-    var eslintConfig = grunt.config.get('eslint');
-    eslintConfig.options.config = '.custom-eslintrc';
-    grunt.config.set(eslintConfig);
-    */
+    // grunt.config.data.eslint.options.config = '.custom-eslintrc';
 
     // You can also add custom grunt tasks here if you want
     /*
