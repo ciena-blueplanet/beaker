@@ -1,5 +1,6 @@
 /**
- * @file Gruntfile
+ * @file Gruntfile.js
+ * @author {{ author }}
  * @copyright {{ year }} {{ company }}. All rights reserved.
 */
 

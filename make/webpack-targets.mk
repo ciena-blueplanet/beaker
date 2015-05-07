@@ -8,6 +8,9 @@ JASMINE_NODE_OPTS ?= --captureExceptions --verbose
 TEST_PORT := $(shell perl -MSocket -le 'socket S, PF_INET, SOCK_STREAM,getprotobyname("tcp"); $$port = int(rand(1080))+1080; ++$$port until bind S, sockaddr_in($$port,inet_aton("127.1")); print $$port')
 TEST_CONFIG := spec/e2e/test-config.json
 HOSTNAME ?= $(shell hostname)
+SELENIUM_HOST ?= localhost
+SELENIUM_PORT ?= 4444
+SELENIUM_BROWSER ?= chrome
 
 .PHONY: \
 	webpack-test \
@@ -31,11 +34,15 @@ start-httpserver:
 	$(ENV)http-server -s -c-1 -p $(TEST_PORT) &
 
 create-config:
-	$(HIDE)echo '{ "seleniumServer": "michelangelo", "url": "http://$(HOSTNAME):$(TEST_PORT)/demo" }' > $(TEST_CONFIG)
-
-create-config-local: create-config
-	$(HIDE) sed -i -e "s/michelangelo/localhost/g" $(TEST_CONFIG)
-	$(HIDE) rm -f $(TEST_CONFIG)-e
+	$(HIDE)echo "{" > $(TEST_CONFIG)
+	$(HIDE)echo "  \"seleniumServer\": \"$(SELENIUM_HOST)\"," >> $(TEST_CONFIG) # for backward-compatibility
+	$(HIDE)echo "  \"selenium\": {" >> $(TEST_CONFIG)
+	$(HIDE)echo "    \"host\": \"$(SELENIUM_HOST)\"," >> $(TEST_CONFIG)
+	$(HIDE)echo "    \"port\": \"$(SELENIUM_PORT)\"," >> $(TEST_CONFIG)
+	$(HIDE)echo "    \"browser\": \"$(SELENIUM_BROWSER)\"" >> $(TEST_CONFIG)
+	$(HIDE)echo "  }," >> $(TEST_CONFIG)
+	$(HIDE)echo "  \"url\": \"http://$(HOSTNAME):$(TEST_PORT)/demo\"" >> $(TEST_CONFIG)
+	$(HIDE)echo "}" >> $(TEST_CONFIG)
 
 do-e2e-test:
 	$(HIDE)echo "Running jasmine-node tests on port $(TEST_PORT)"
@@ -43,7 +50,6 @@ do-e2e-test:
 	$(ENV)kill $$(lsof -t -i:$(TEST_PORT)) || echo 'nothing to kill'
 
 e2e-test: kill-httpserver build-mock start-httpserver create-config do-e2e-test
-e2e-test-local: kill-httpserver build-mock start-httpserver create-config-local do-e2e-test
 
 #######################################################################
 #                         normal test targets                         #

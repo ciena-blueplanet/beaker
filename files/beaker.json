@@ -1,11 +1,16 @@
 {
     "author": "First Last <first.last@example.com>",
-    "company": "",
+    "company": "Acme, Co.",
     "github": {
         "email": "",
         "host": "github.com",
         "token": "",
         "user": ""
+    },
+    "selenium": {
+      "host": "localhost",
+      "port": 4444,
+      "browser": "chrome"
     },
     "npm": {
         "registry": "https://registry.npmjs.com"

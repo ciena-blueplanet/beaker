@@ -16,6 +16,8 @@ var configDir = path.join(__dirname, '../../config');
 var webpackLoaders = require(path.join(configDir, 'webpack/loaders'));
 var webpackResolve = require(path.join(configDir, 'webpack/resolve'));
 
+var USE_SOURCE_MAPS = process.env.MAPS === 'on';
+
 var ns = {};
 
 /**
@@ -198,7 +200,7 @@ ns.init = function (grunt) {
                 contentBase: './demo',
                 keepAlive: true,
                 webpack: {
-                    devtool: 'eval-source-map',
+                    devtool: USE_SOURCE_MAPS ? 'inline-cheap-module-eval-source-map' : 'eval',
                     debug: true,
                     plugins: [
                         new webpack.DefinePlugin({
