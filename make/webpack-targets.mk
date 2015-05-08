@@ -35,13 +35,18 @@ start-httpserver:
 
 create-config:
 	$(HIDE)echo "{" > $(TEST_CONFIG)
-	$(HIDE)echo "  \"seleniumServer\": \"$(SELENIUM_HOST)\"," >> $(TEST_CONFIG) # for backward-compatibility
-	$(HIDE)echo "  \"selenium\": {" >> $(TEST_CONFIG)
-	$(HIDE)echo "    \"host\": \"$(SELENIUM_HOST)\"," >> $(TEST_CONFIG)
-	$(HIDE)echo "    \"port\": \"$(SELENIUM_PORT)\"," >> $(TEST_CONFIG)
-	$(HIDE)echo "    \"browser\": \"$(SELENIUM_BROWSER)\"" >> $(TEST_CONFIG)
-	$(HIDE)echo "  }," >> $(TEST_CONFIG)
-	$(HIDE)echo "  \"url\": \"http://$(HOSTNAME):$(TEST_PORT)/demo\"" >> $(TEST_CONFIG)
+	$(HIDE)echo "    \"selenium\": {" >> $(TEST_CONFIG)
+	$(HIDE)echo "        \"host\": \"$(SELENIUM_HOST)\"," >> $(TEST_CONFIG)
+	$(HIDE)echo "        \"port\": \"$(SELENIUM_PORT)\"," >> $(TEST_CONFIG)
+	$(HIDE)echo "        \"browser\": \"$(SELENIUM_BROWSER)\"" >> $(TEST_CONFIG)
+	$(HIDE)echo "    }," >> $(TEST_CONFIG)
+	$(HIDE)echo "    \"http\": {" >> $(TEST_CONFIG)
+	$(HIDE)echo "        \"host\": \"$(HOSTNAME)\"," >> $(TEST_CONFIG)
+	$(HIDE)echo "        \"port\": \"$(TEST_PORT)\"," >> $(TEST_CONFIG)
+	$(HIDE)echo "        \"entryPoint\": \"/demo\"" >> $(TEST_CONFIG)
+	$(HIDE)echo "    }," >> $(TEST_CONFIG)
+	$(HIDE)echo "    \"seleniumServer\": \"$(SELENIUM_HOST)\"," >> $(TEST_CONFIG) # for backward-compatibility
+	$(HIDE)echo "    \"url\": \"http://$(HOSTNAME):$(TEST_PORT)/demo\"" >> $(TEST_CONFIG) # for backwrd-compatibility
 	$(HIDE)echo "}" >> $(TEST_CONFIG)
 
 do-e2e-test:
