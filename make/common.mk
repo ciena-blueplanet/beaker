@@ -24,7 +24,7 @@ build:
 	$(ENV)grunt build
 
 build-mock:
-	$(ENV)MOCK_APIS=1 grunt build-dev
+	$(ENV)MOCK_APIS=1 grunt webpack:build-dev
 
 lint:
 ifeq ($(IS_BEAKER), 1)
