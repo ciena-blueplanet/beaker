@@ -57,21 +57,26 @@ var sharedWaitBehavior = function (context) {
  * @param {Object} context - the spec context
  */
 var sharedWaitForPromiseBehavior = function (context) {
-    var done, promise, callback;
+    var done, promise, callback, secondPromise;
 
     describe('(shared) waitForPromise specs', function () {
         beforeEach(function () {
             done = context.done;
             promise = context.promise;
+            secondPromise = context.secondPromise;
             callback = context.callback;
         });
 
-        it('calls promise.done()', function () {
-            expect(promise.done).toHaveBeenCalledWith(jasmine.any(Function));
+        it('calls promise.then()', function () {
+            expect(promise.then).toHaveBeenCalledWith(jasmine.any(Function));
         });
 
         it('does not call done() yet', function () {
             expect(done).not.toHaveBeenCalled();
+        });
+
+        it('calls done() on the response of the first then() call', function () {
+            expect(secondPromise.done).toHaveBeenCalled();
         });
 
         describe('(shared) when promise is resolved', function () {
@@ -79,8 +84,8 @@ var sharedWaitForPromiseBehavior = function (context) {
             beforeEach(function () {
                 data = 'some-data';
 
-                // call the method passed to promise.done
-                promise.done.calls.mostRecent().args[0](data);
+                // call the method passed to promise.then
+                promise.then.calls.mostRecent().args[0](data);
             });
 
             it('calls done()', function () {
@@ -139,8 +144,12 @@ describe('test-utils', function () {
         beforeEach(function () {
             ctx.done = jasmine.createSpy('done');
             ctx.promise = {
-                done: jasmine.createSpy('promise.done'),
+                then: jasmine.createSpy('promise.then'),
             };
+            ctx.secondPromise = {
+                done: jasmine.createSpy('secondPromise.done'),
+            };
+            ctx.promise.then.and.returnValue(ctx.secondPromise);
         });
 
         describe('without callback', function () {
@@ -158,38 +167,6 @@ describe('test-utils', function () {
             });
 
             sharedWaitForPromiseBehavior(ctx);
-        });
-    });
-
-    describe('supertest', function () {
-        describe('.onEnd()', function () {
-            var done, callback, resp, respHandler;
-
-            beforeEach(function () {
-                done = jasmine.createSpy();
-                callback = jasmine.createSpy();
-                resp = {data: 'my data'};
-                respHandler = utils.supertest.onEnd(done, callback);
-            });
-
-            it('throws the passed in error', function () {
-                var err = {msg: 'my error'};
-                expect(function () {
-                    respHandler(err, resp);
-                }).toThrow(err);
-            });
-
-            it('calls callback before done', function () {
-                callback = function (response) {
-                    expect(done).not.toHaveBeenCalled();
-                    expect(response).toEqual(resp);
-                };
-                respHandler = utils.supertest.onEnd(done, callback);
-
-                respHandler(undefined, resp);
-
-                expect(done).toHaveBeenCalled();
-            });
         });
     });
 });

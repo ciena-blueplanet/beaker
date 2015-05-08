@@ -56,6 +56,9 @@ do-e2e-test:
 
 e2e-test: kill-httpserver build-mock start-httpserver create-config do-e2e-test
 
+update-screenshots:
+	$(HIDE)for i in $$(find spec/e2e/screenshots -name '*.regression.png'); do mv $$i $${i/regression/baseline}; done
+
 #######################################################################
 #                         normal test targets                         #
 #######################################################################

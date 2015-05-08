@@ -1,5 +1,5 @@
 /**
- * E2E Spec for {@link {{ projectName }}} module
+ * @author {{ author }}
  * @copyright {{ year }} {{ company }}. All rights reserved.
  */
 
@@ -9,61 +9,45 @@
 
 var webdriverio = require('webdriverio');
 var webdrivercss = require('webdrivercss');
+var utils = require('beaker/src/test-utils').e2e;
+
 var NORMAL_VIEWPORT_WIDTH = 1280;
 var NORMAL_VIEWPORT_HEIGHT = 800;
 var SMALL_VIEWPORT_WIDTH = 900;
 
 var testConfig = require('./test-config.json');
+var url = utils.getUrl(testConfig);
 
-describe('{{ projectName }} e2e tests using ' + testConfig.url, function () {
+describe('{{ projectName }} e2e tests using ' + url, function () {
 
-    var client = {};
+    var client;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 9999999;
 
     beforeEach(function () {
-        var wdIoOptions = {
-            desiredCapabilities: {browserName: testConfig.selenium.browser},
-            host: testConfig.selenium.host,
-            port: testConfig.selenium.port,
-            logLevel: 'silent',
-        };
-        client = webdriverio.remote(wdIoOptions);
-        client.init();
-        var wdCssOptions = {
-            screenshotRoot: 'spec/e2e/screenshots',
-            failedComparisonsRoot: 'spec/e2e/screenshots/diff',
-        };
-        webdrivercss.init(client, wdCssOptions);
+        client = utils.init(webdriverio, webdrivercss, testConfig);
     });
 
     afterEach(function (done) {
         client.end(done);
     });
 
-
     describe('basic demo page', function () {
 
         it('renders consistently full width', function (done) {
             client
-                .url(testConfig.url)
+                .url(url)
                 .localStorage('DELETE')
                 .setViewportSize({width: NORMAL_VIEWPORT_WIDTH, height: NORMAL_VIEWPORT_HEIGHT})
-                .webdrivercss('demo-normal', [{name: 'body', elem: 'body'}], function (err, res) {
-                    expect(err).toBeFalsy();
-                    expect(res['body'][0].isWithinMisMatchTolerance).toBeTruthy('screenshots match');
-                })
+                .verifyScreenshots('demo-normal', [{name: 'main', elem: 'body'}])
                 .call(done);
         });
 
         it('renders consistently narrow width', function (done) {
             client
-                .url(testConfig.url)
+                .url(url)
                 .localStorage('DELETE')
                 .setViewportSize({width: SMALL_VIEWPORT_WIDTH, height: NORMAL_VIEWPORT_HEIGHT})
-                .webdrivercss('demo-small', [{name: 'body', elem: 'body'}], function (err, res) {
-                    expect(err).toBeFalsy();
-                    expect(res['body'][0].isWithinMisMatchTolerance).toBeTruthy('screenshots match');
-                })
+                .verifyScreenshots('demo-small', [{name: 'main', elem: 'body'}])
                 .call(done);
         });
     });

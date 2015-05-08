@@ -48,80 +48,124 @@ ns.wait = function (done, milliseconds, callback, timeoutFn) {
  * @param {Function} [callback] - will be called before done() so you can expect() stuff
  */
 ns.waitForPromise = function (done, promise, callback) {
-    promise.done(function (data) {
+    promise.then(function (data) {
         if (callback) {
             callback(data);
         }
         done();
-    });
+    }).done();
 };
 
 // ------------------------------------------------------------------------------------------------
-// E2E Tests
+// E2E Test Utilities
 // ------------------------------------------------------------------------------------------------
 
-/**
- * @typedef {Object} Screenshot
- * @property {String} name - should be dash-separated as it will be used as part of a filename
- * @property {String} elem - the jQuery selector for element to screenshot (i.e. 'body' or '.navbar')
- */
+ns.e2e = {
 
-/**
- * Helper to create webdrivercss callback to DRY up e2e specs
- * @param {Screenshot[]} screenshots - the screenshots to take
- * @returns {Function} the webdrivercss callback that makes sure the screenshots match
- */
-ns.cssCallback = function (screenshots) {
-    return function (err, res) {
-        expect(err).toBeFalsy();
-        _.forEach(screenshots, function (screenshot) {
-            expect(res[screenshot.name][0].isWithinMisMatchTolerance).toBeTruthy();
-        });
-    };
-};
+    /**
+     * @typedef Screenshot
+     * @property {String} name - should be dash-separated as it will be used as part of a filename
+     * @property {String} [elem] - the jQuery selector for element to screenshot (i.e. 'body' or '.navbar')
+     * @property {Number} [width] - the fixed pixel width of the screenshot
+     * @property {Number} [height] - the fixed pixel height of the screenshot
+     * @property {Number} [x] - take screenshot at exact x,y position (requires width/height)
+     * @property {Number} [y] - take screenshot at exact x,y position (requires width/height)
+     * @property {String[]|Object[]} [exclude] - an array of selectors or objects with x,y values which span a polygon
+     */
 
-// ------------------------------------------------------------------------------------------------
-// Super Test (DEPRECATED)
-// We probably don't need these anymore, since we don't have nodejs backends anymore
-// ------------------------------------------------------------------------------------------------
+    /**
+     * @typedef TestConfig
+     * @property {Object} selenium - selenium server info
+     * @property {String} selenium.host - the hostname of the selenium server
+     * @property {Number} selenium.port - the port number for the selenium server
+     * @property {String} selenium.browser - the browser to use with selenium
+     * @property {Object} http - http-server info
+     * @property {String} http.host - the http-server hostname
+     * @property {Number} http.port - the http-server port
+     * @property {String} http.entryPoint - the URL path we want to start at
+     * @property {String} selniumServer - backward-compatible selenium server URL for older projects
+     * @property {String} url - backward-compatible http-server URL (including port)
+     */
 
-/** supertest utilities */
-ns.supertest = {};
-
-/**
- * @typedef {Object} SuperTest.Response
- * {@link http://visionmedia.github.io/superagent/#response-properties}
- */
-
-/**
- * Handler for a supertest response (only on success)
- * @callback SuperTest.ResponseHandler
- * @param {SuperTest.Response} resp - the response from the supertest request
- */
-
-/**
- * This method is called after the supertest request responds (also supports errors)
- * @callback SuperTest.ErrorHandler
- * @param {Error} err - an error that occurred during supertest request
- * @param {SuperTest.Response} resp - the response from the supertest request
- */
-
-
-/**
- * Handy shortcut for pausing a jasmine spec until a supertest .end() method is called.
- * @param {Function} done - the done method from a jasmine spec
- * @param {SuperTest.OnEnd} callback - the fn to call when supertest responds
- * @returns {SuperTest.ErrorHandler} a function to pass to .end() that handles errors as well
- */
-ns.supertest.onEnd = function (done, callback) {
-    return function (err, resp) {
-        if (err) {
-            throw err;
+    /**
+     * Initialize webdriverio and webdrivercss (should be called in your beforeEach())
+     * @param {Object} webdriverio - the webdriverio module [require('webdriverio')]
+     * @param {Object} webdrivercss - the webdrivercss module [require('webdrivercss')]
+     * @param {TestConfig} testConfig - the config for these specs
+     * @param {Object} [wdIoOpts] - the webdriverio options defaults will be used if not provided
+     * @param {Object} [wdCssOpts] - the webdrivercss options defaults will be used if not provided
+     * @returns {WebdriverIoClient} a webdriverio client instance
+     */
+    init: function (webdriverio, webdrivercss, testConfig, wdIoOpts, wdCssOpts) {
+        if (wdIoOpts === undefined) {
+            wdIoOpts = {};
         }
 
-        callback(resp);
-        done();
-    };
-}; // onEnd //
+        if (wdCssOpts === undefined) {
+            wdCssOpts = {};
+        }
+
+        _.defaults(wdIoOpts, {
+            desiredCapabilities: {browserName: testConfig.selenium.browser},
+            host: testConfig.selenium.host,
+            port: testConfig.selenium.port,
+            logLevel: 'silent',
+        });
+
+        _.defaults(wdCssOpts, {
+            screenshotRoot: 'spec/e2e/screenshots',
+            failedComparisonsRoot: 'spec/e2e/screenshots/diff',
+            misMatchTolerance: 0.1,
+        });
+
+        var client = webdriverio.remote(wdIoOpts);
+        client.init();
+        webdrivercss.init(client, wdCssOpts);
+        this.addCommands(client);
+
+        return client;
+    },
+
+    /**
+     * Add the 'verifyScreenshots' command to the webdriverio client
+     * @param {WebdriverIoClient} client - the webdriverio client
+     */
+    addCommands: function (client) {
+        client.addCommand('verifyScreenshots', function (name, screenshots) {
+
+            // this is a little odd, but webdriverio adds an additional callback argument at the end for chaining
+            // http://webdriver.io/guide/usage/customcommands.html
+            var callback = arguments[arguments.length - 1];
+
+            var screenshotsCopy = _.clone(screenshots);
+            client.webdrivercss(name, screenshotsCopy, function (err, res) {
+                expect(err).toBeFalsy();
+                _.forEach(screenshots, function (screenshot) {
+                    var result = res[screenshot.name][0];
+                    var msg = 'Visual difference found for "' + screenshot.name + '" \n';
+                    expect(result.isWithinMisMatchTolerance).toBeTruthy(msg + JSON.stringify(result, null, 4));
+                });
+            });
+
+            callback();
+        });
+    },
+
+    /**
+     * Construc the base URL from the testConfig
+     * @param {TestConfig} testConfig - the e2ee spec configuration
+     * @param {String} [extra] - extra URL path
+     * @returns {String} the full URL
+     */
+    getUrl: function (testConfig, extra) {
+        var http = testConfig.http;
+        var url = 'http://' + http.host + ':' + http.port + '/' + http.entryPoint;
+        if (extra) {
+            url = url + extra;
+        }
+
+        return url;
+    },
+};
 
 module.exports = ns;
