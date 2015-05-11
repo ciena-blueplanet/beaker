@@ -1,98 +1,107 @@
 {
-  "name": "beaker",
-  "version": "3.0.1",
-  "description": "Toolkit for building web interfaces",
-  "main": "src/index.js",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:cyaninc/beaker.git"
-  },
-  "keywords": [
-    "tools",
-    "webpack",
-    "grunt",
-    "karma"
-  ],
-  "author": {
-    "name": "Adam Meadows",
-    "email": "adam.meadows@gmail.com"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/cyaninc/beaker/issues"
-  },
-  "homepage": "https://github.com/cyaninc/beaker",
-  "devDependencies": {
-    "eslint": "^0.20.0",
-    "eslint-plugin-react": "^2.2.0",
-    "grunt": "^0.4.5",
-    "grunt-cli": "^0.1.13",
-    "grunt-eslint": "^12.0.0",
-    "grunt-filenames": "^0.4.0",
-    "http-server": "^0.8.0",
-    "istanbul": "^0.3.5",
-    "jasmine-node": "^2.0.0",
-    "karma": "^0.12.31",
-    "matchdep": "^0.3.0",
-    "nock": "^0.59.1",
-    "webpack": "^1.8.11"
-  },
-  "dependencies": {
-    "change-case": "^2.2.0",
-    "execSync": "^1.0.2",
-    "http-sync": "0.1.0",
-    "lodash": "^3.2.0",
-    "minimist": "^1.1.0",
-    "nconf": "^0.7.1",
-    "rimraf": "^2.2.8",
-    "superagent": "^0.21.0",
-    "versiony": "^1.3.0"
-  },
-  "peerDependencies": {
-    "autoprefixer-loader": "^1.1.0",
-    "babel-loader": "^5.0.0",
-    "css-loader": "^0.9.1",
-    "csso": "^1.3.11",
-    "eslint": "^0.20.0",
-    "eslint-plugin-react": "^2.2.0",
-    "file-loader": "^0.8.1",
-    "grunt": "^0.4.5",
-    "grunt-cli": "^0.1.13",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-eslint": "^12.0.0",
-    "grunt-filenames": "^0.4.0",
-    "grunt-karma": "^0.10.1",
-    "grunt-webpack": "^1.0.8",
-    "http-server": "^0.8.0",
-    "istanbul-instrumenter-loader": "^0.1.2",
-    "jade-loader": "^0.7.1",
-    "jasmine-node": "^2.0.0",
-    "json-loader": "^0.5.1",
-    "karma": "^0.12.31",
-    "karma-chrome-launcher": "^0.1.7",
-    "karma-cli": "^0.0.4",
-    "karma-firefox-launcher": "^0.1.4",
-    "karma-js-coverage": "^0.4.0",
-    "karma-jasmine": "^0.3.5",
-    "karma-jasmine-jquery": "^0.1.1",
-    "karma-sourcemap-loader": "^0.3.3",
-    "karma-spec-reporter": "^0.0.16",
-    "karma-webpack": "^1.5.0",
-    "less-loader": "^2.0.0",
-    "lodash": "^3.2.0",
-    "matchdep": "^0.3.0",
-    "style-loader": "^0.8.3",
-    "yaml-loader": "^0.1.0",
-    "webpack": "^1.8.11",
-    "webpack-dev-server": "^1.8.2"
-  },
-  "scripts": {
-    "prepublish": "bin/pre-publish.sh",
-    "postpublish": "bin/post-publish.sh",
-    "test": "make lint && make node-test"
-  },
-  "bin": {
-    "beaker": "./bin/beaker.js",
-    "create-gh-pages": "./bin/create-gh-pages.sh"
-  }
+    "name": "beaker",
+    "version": "3.1.0",
+    "description": "Toolkit for building web interfaces",
+    "keywords": [
+        "tools",
+        "webpack",
+        "grunt",
+        "karma"
+    ],
+    "homepage": "https://github.com/cyaninc/beaker",
+    "bugs": {
+        "url": "https://github.com/cyaninc/beaker/issues"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Adam Meadows",
+        "email": "adam.meadows@gmail.com"
+    },
+    "contributors": [],
+    "main": "src/index.js",
+    "bin": {
+        "beaker": "./bin/beaker.js",
+        "create-gh-pages": "./bin/create-gh-pages.sh"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:cyaninc/beaker.git"
+    },
+    "scripts": {
+        "prepublish": "bin/pre-publish.sh",
+        "postpublish": "bin/post-publish.sh",
+        "test": "make lint && make node-test"
+    },
+    "dependencies": {
+        "change-case": "^2.2.0",
+        "execSync": "^1.0.2",
+        "http-sync": "0.1.0",
+        "lodash": "^3.2.0",
+        "minimist": "^1.1.0",
+        "nconf": "^0.7.1",
+        "rimraf": "^2.2.8",
+        "superagent": "^0.21.0",
+        "versiony": "^1.3.0"
+    },
+    "devDependencies": {
+        "eslint": "^0.20.0",
+        "eslint-plugin-react": "^2.2.0",
+        "grunt": "^0.4.5",
+        "grunt-cli": "^0.1.13",
+        "grunt-eslint": "^12.0.0",
+        "grunt-filenames": "^0.4.0",
+        "http-server": "^0.8.0",
+        "istanbul": "^0.3.5",
+        "jasmine-node": "^2.0.0",
+        "json": "^9.0.3",
+        "karma": "^0.12.31",
+        "matchdep": "^0.3.0",
+        "nock": "^0.59.1",
+        "webpack": "^1.8.11"
+    },
+    "peerDependencies": {
+        "autoprefixer-loader": "^1.1.0",
+        "babel-loader": "^5.0.0",
+        "css-loader": "^0.9.1",
+        "csso": "^1.3.11",
+        "eslint": "^0.20.0",
+        "eslint-plugin-react": "^2.2.0",
+        "file-loader": "^0.8.1",
+        "grunt": "^0.4.5",
+        "grunt-cli": "^0.1.13",
+        "grunt-contrib-watch": "^0.6.1",
+        "grunt-eslint": "^12.0.0",
+        "grunt-filenames": "^0.4.0",
+        "grunt-karma": "^0.10.1",
+        "grunt-webpack": "^1.0.8",
+        "http-server": "^0.8.0",
+        "istanbul-instrumenter-loader": "^0.1.2",
+        "jade-loader": "^0.7.1",
+        "jasmine-node": "^2.0.0",
+        "json": "^9.0.3",
+        "json-loader": "^0.5.1",
+        "karma": "^0.12.31",
+        "karma-chrome-launcher": "^0.1.7",
+        "karma-cli": "^0.0.4",
+        "karma-firefox-launcher": "^0.1.4",
+        "karma-js-coverage": "^0.4.0",
+        "karma-jasmine": "^0.3.5",
+        "karma-jasmine-jquery": "^0.1.1",
+        "karma-sourcemap-loader": "^0.3.3",
+        "karma-spec-reporter": "^0.0.16",
+        "karma-webpack": "^1.5.0",
+        "less-loader": "^2.0.0",
+        "lodash": "^3.2.0",
+        "matchdep": "^0.3.0",
+        "style-loader": "^0.8.3",
+        "yaml-loader": "^0.1.0",
+        "webpack": "^1.8.11",
+        "webpack-dev-server": "^1.8.2"
+    },
+    "engines": {
+        "node": ">=0.10.29 <0.11"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org://registry.npmjs.org/"
+    }
 }

@@ -8,6 +8,7 @@ HIDE ?= @
 ENV ?= $(HIDE)source env.sh &&
 VERSION := $(shell grep -o '"version":.*",' package.json | awk '{ print $$2; }' | sed -e 's/[",]//g')
 IS_BEAKER ?= 0
+JSON_TABS ?= 4
 
 BEAKER_BIN ?= beaker
 
@@ -59,3 +60,8 @@ else
 	$(HIDE)echo "Bumping version"
 	$(ENV)$(BEAKER_BIN) github bump-version --repo $(REPO)
 endif
+
+# pretty-print JSON files
+%.json.pretty:
+	$(ENV)cat $(subst .pretty,,$@) | json -o json-$(JSON_TABS) > $@.tmp
+	$(HIDE)mv $@.tmp $(subst .pretty,,$@)
