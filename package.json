@@ -1,6 +1,6 @@
 {
     "name": "beaker",
-    "version": "3.1.0",
+    "version": "3.1.1",
     "description": "Toolkit for building web interfaces",
     "keywords": [
         "tools",
@@ -99,7 +99,7 @@
         "webpack-dev-server": "^1.8.2"
     },
     "engines": {
-        "node": ">=0.10.29 <0.11"
+        "node": ">=0.10.26 <0.11"
     },
     "publishConfig": {
         "registry": "https://registry.npmjs.org://registry.npmjs.org/"

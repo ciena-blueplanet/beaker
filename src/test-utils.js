@@ -45,15 +45,24 @@ ns.wait = function (done, milliseconds, callback, timeoutFn) {
  * Call done() once the given promise is resolved
  * @param {Function} done - the jasmine async done() method from the spec
  * @param {Q.promise} promise - wait till this is resolved before calling done()
- * @param {Function} [callback] - will be called before done() so you can expect() stuff
+ * @param {Function} [callback] - will be called before done() on resolution so you can expect() stuff
+ * @param {Function} [errback] - will be called before done() on rejection so you can expect() stuff
  */
-ns.waitForPromise = function (done, promise, callback) {
-    promise.then(function (data) {
-        if (callback) {
-            callback(data);
+ns.waitForPromise = function (done, promise, callback, errback) {
+    promise.then(
+        function (data) {
+            if (callback) {
+                callback(data);
+            }
+            done();
+        },
+        function (err) {
+            if (errback) {
+                errback(err);
+            }
+            done();
         }
-        done();
-    }).done();
+    ).done();
 };
 
 // ------------------------------------------------------------------------------------------------
