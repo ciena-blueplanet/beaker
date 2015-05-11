@@ -57,7 +57,7 @@ var sharedWaitBehavior = function (context) {
  * @param {Object} context - the spec context
  */
 var sharedWaitForPromiseBehavior = function (context) {
-    var done, promise, callback, secondPromise;
+    var done, promise, callback, errback, secondPromise;
 
     describe('(shared) waitForPromise specs', function () {
         beforeEach(function () {
@@ -65,10 +65,11 @@ var sharedWaitForPromiseBehavior = function (context) {
             promise = context.promise;
             secondPromise = context.secondPromise;
             callback = context.callback;
+            errback = context.errback;
         });
 
         it('calls promise.then()', function () {
-            expect(promise.then).toHaveBeenCalledWith(jasmine.any(Function));
+            expect(promise.then).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function));
         });
 
         it('does not call done() yet', function () {
@@ -95,6 +96,26 @@ var sharedWaitForPromiseBehavior = function (context) {
             it('calls callback() if given', function () {
                 if (callback) {
                     expect(callback).toHaveBeenCalledWith(data);
+                }
+            });
+        });
+
+        describe('(shared) when promise is rejected', function () {
+            var err;
+            beforeEach(function () {
+                err = 'some-error';
+
+                // call the method passed to promise.then
+                promise.then.calls.mostRecent().args[1](err);
+            });
+
+            it('calls done()', function () {
+                expect(done).toHaveBeenCalled();
+            });
+
+            it('calls errback() if given', function () {
+                if (errback) {
+                    expect(errback).toHaveBeenCalledWith(err);
                 }
             });
         });
@@ -164,6 +185,26 @@ describe('test-utils', function () {
             beforeEach(function () {
                 ctx.callback = jasmine.createSpy('callback');
                 utils.waitForPromise(ctx.done, ctx.promise, ctx.callback);
+            });
+
+            sharedWaitForPromiseBehavior(ctx);
+        });
+
+        describe('with errback', function () {
+            beforeEach(function () {
+                delete ctx.callback;
+                ctx.errback = jasmine.createSpy('errback');
+                utils.waitForPromise(ctx.done, ctx.promise, null, ctx.errback);
+            });
+
+            sharedWaitForPromiseBehavior(ctx);
+        });
+
+        describe('with callback and errback', function () {
+            beforeEach(function () {
+                ctx.callback = jasmine.createSpy('callback');
+                ctx.errback = jasmine.createSpy('errback');
+                utils.waitForPromise(ctx.done, ctx.promise, ctx.callback, ctx.errback);
             });
 
             sharedWaitForPromiseBehavior(ctx);
