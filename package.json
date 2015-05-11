@@ -102,6 +102,6 @@
         "node": ">=0.10.26 <0.11"
     },
     "publishConfig": {
-        "registry": "https://registry.npmjs.org://registry.npmjs.org/"
+        "registry": "https://registry.npmjs.org/"
     }
 }
