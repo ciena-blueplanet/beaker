@@ -1,0 +1,15 @@
+Usage: beaker webdriverioTester [options] [EXTRAS]
+
+Description:
+
+    Submit e2e tests to a webdriverio-server instance.
+
+    EXTRAS                  - any extra resources needed for e2e test (besides index.html and bundle/)
+
+
+Options:
+
+    --server SERVER             - The FQDN of the webdriverio-server (i.e. http://localhost:3000)
+    --initialSleep SECONDS      - Seconds to wait after first submitting a build, before polling status (default: 10).
+    --pollInterval SECONDS      - Seconds to wait between checking the server for status of the build (default: 3).
+

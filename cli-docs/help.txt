@@ -10,6 +10,7 @@ Commands:
     help [command]      Output usage information
     init                Initialize a new project with some default files
     newConfig           Create a new beaker.json configuration file
+    webdriverioTester   Run e2e tests using a webdriverio-server instance
 
 Options:
     -v --version        Output version information

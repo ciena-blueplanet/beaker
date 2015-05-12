@@ -27,7 +27,7 @@ describe('cli.argv', function () {
 
     beforeEach(function () {
         var packageJSON = t.require('../../package.json');
-        versionStr = 'tkit (' + packageJSON.name + ') v' + packageJSON.version;
+        versionStr = packageJSON.name + ' v' + packageJSON.version;
         spyOn(console, 'log');
         spyOn(console, 'error');
     });

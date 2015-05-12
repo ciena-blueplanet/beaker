@@ -5,7 +5,7 @@
 
 'use strict';
 
-var beaker = require('../index');
+var init = require('../init');
 
 /**
  * Process command line arguments and execute library code
@@ -13,5 +13,5 @@ var beaker = require('../index');
  * @returns {Number} 0 on success, > 0 on error
 */
 module.exports = function (argv) {
-    return beaker.init.command(argv);
+    return init.command(argv);
 };

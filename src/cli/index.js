@@ -21,4 +21,5 @@ module.exports = {
     help: require('./help'),
     init: require('./init'),
     newConfig: require('./new-config'),
+    webdriverioTester: require('./webdriverio-tester'),
 };
