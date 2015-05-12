@@ -50,12 +50,11 @@ function verifyCommands(ctx) {
  * @param {String[]} ctx.extras - expected extra files/folders
  */
 function itCallsTheRightMethods(ctx) {
-    var tester, argv, ret, filename, timestamp, server, initialSleep, pollInterval, extras, isApp;
+    var argv, ret, filename, timestamp, server, initialSleep, pollInterval, extras, isApp;
     describe('(shared) .command() specs', function () {
         beforeEach(function () {
-            tester = ctx.tester;
             argv = ctx.argv;
-            filename = 'tarball-name',
+            filename = 'tarball-name';
             timestamp = 'my-timestamp';
             server = ctx.server;
             initialSleep = ctx.initialSleep;
@@ -334,7 +333,7 @@ describe('webdriverio-tester', function () {
             beforeEach(function () {
                 context.tester = tester;
                 context.argv = {_: []};
-                context.server = 'http://localhost:3000',
+                context.server = 'http://localhost:3000';
                 context.initialSleep = 10;
                 context.pollInterval = 3;
                 context.extras = [];

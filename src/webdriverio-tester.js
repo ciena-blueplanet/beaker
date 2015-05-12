@@ -105,7 +105,6 @@ ns.waitForResults = function (params) {
 
     console.log('Checking for results...');
     var command = 'curl -s ' + params.server + '/status/' + params.timestamp;
-    var result = sh.exec(command);
     while (sh.exec(command).stdout.toLowerCase() === 'not found') {
         sleep.sleep(params.pollInterval);
         console.log('Checking for results...');
