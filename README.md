@@ -222,6 +222,7 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
 #### Data
  * [json-loader](https://github.com/webpack/json-loade://github.com/webpack/json-loader) so you can keep your `.js`
    files cleaner and keep data where it belongs.
+ * [raw-loader](https://github.com/webpack/raw-loader)
  * [yaml-loader](https://github.com/okonet/yaml-loader) in case you're lazy and don't wanna write full JSON.
 
 #### Code
