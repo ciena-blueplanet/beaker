@@ -8,3 +8,4 @@ env:
     global:
         - KARMA_BROWSER=Firefox
         - SELENIUM_BROWSER=firefox
+        - TRAVIS_CI=true
