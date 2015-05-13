@@ -11,7 +11,7 @@
 /* eslint-disable no-process-exit */
 
 var cli = require('../src/cli');
-var argv = require('minimist')(process.argv.slice(2));
+var argv = require('minimist')(process.argv.slice(2), {'boolean': 'app'});
 
 var ret = cli.argv(argv);
 

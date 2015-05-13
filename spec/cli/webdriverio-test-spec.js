@@ -6,20 +6,20 @@
 'use strict';
 
 var t = require('../../src/transplant')(__dirname);
-var init = t.require('../init');
+var tester = t.require('../webdriverio-tester');
 var cli = t.require('./index');
 
-describe('cli.init', function () {
+describe('cli.webdriverioTester', function () {
     var argv, ret;
 
     beforeEach(function () {
         argv = {_: ['init']};
-        spyOn(init, 'command').and.returnValue(13);
-        ret = cli.init(argv);
+        spyOn(tester, 'command').and.returnValue(13);
+        ret = cli.webdriverioTester(argv);
     });
 
-    it('calls init method', function () {
-        expect(init.command).toHaveBeenCalledWith(argv);
+    it('calls tester method', function () {
+        expect(tester.command).toHaveBeenCalledWith(argv);
     });
 
     it('returns result of init', function () {

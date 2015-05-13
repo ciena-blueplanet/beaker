@@ -6,7 +6,7 @@
 'use strict';
 
 var t = require('../../src/transplant')(__dirname);
-var beaker = t.require('../index');
+var newConfig = t.require('../new-config');
 var cli = t.require('./index');
 
 describe('cli.newConfig', function () {
@@ -14,12 +14,12 @@ describe('cli.newConfig', function () {
 
     beforeEach(function () {
         argv = {_: ['newConfig']};
-        spyOn(beaker.newConfig, 'command').and.returnValue(13);
+        spyOn(newConfig, 'command').and.returnValue(13);
         ret = cli.newConfig(argv);
     });
 
     it('calls newConfig method', function () {
-        expect(beaker.newConfig.command).toHaveBeenCalledWith(argv);
+        expect(newConfig.command).toHaveBeenCalledWith(argv);
     });
 
     it('returns result of init', function () {

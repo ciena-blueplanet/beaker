@@ -5,12 +5,24 @@
 
 'use strict';
 
+var gruntHelper = require('./grunt/helper');
+var testUtils = require('./test-utils');
+
 /** @exports beaker */
-module.exports = {
-    newConfig: require('./new-config'),
-    gruntHelper: require('./grunt/helper'),
-    github: require('./github'),
-    init: require('./init'),
+var ns = {
+    gruntHelper: gruntHelper, // for backward compatibility
+    testUtils: testUtils, // for backward compatibility
     transplant: require('./transplant'),
-    testUtils: require('./test-utils'),
+    jasmine: testUtils,
+    e2e: testUtils.e2e,
 };
+
+/**
+ * Better named wrapper around the grunt/helper module
+ * @param {Grunt} grunt - the grunt instance to initialize
+ */
+ns.pour = function (grunt) {
+    gruntHelper.init(grunt);
+};
+
+module.exports = ns;

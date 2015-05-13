@@ -18,7 +18,9 @@ SELENIUM_BROWSER ?= chrome
 	webdriver \
 	kill-httpserver \
 	start-httpserver \
-	e2e-test
+	e2e-test \
+	create-config \
+	remote-e2e-test
 
 #######################################################################
 #                          e2e test targets                           #
@@ -54,7 +56,17 @@ do-e2e-test:
 	$(ENV)jasmine-node $(JASMINE_NODE_OPTS) $(NODE_SPECS) || ($(ENV)kill $$(lsof -t -i:$(TEST_PORT)) && false)
 	$(ENV)kill $$(lsof -t -i:$(TEST_PORT)) || echo 'nothing to kill'
 
+# TODO: deprecate this and replace with a `make local-e2e-test` or something that
+# spawns http-server and seleinum in the background, then runs the test
 e2e-test: kill-httpserver build-mock start-httpserver create-config do-e2e-test
+
+remote-e2e-test: build-mock do-remote-e2e-test
+do-remote-e2e-test: create-config
+ifndef WEBDRIVERIO_SERVER
+	$(error WEBDRIVERIO_SERVER variable needs to be set)
+else
+	$(ENV)$(BEAKER_BIN) webdriverioTester --server $(WEBDRIVERIO_SERVER) $(WEBDRIVERIO_SERVER_EXTRAS)
+endif
 
 update-screenshots:
 	$(HIDE)for i in $$(find spec/e2e/screenshots -name '*.regression.png'); do mv $$i $${i/regression/baseline}; done

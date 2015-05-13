@@ -6,7 +6,7 @@
 'use strict';
 
 var t = require('../../src/transplant')(__dirname);
-var beaker = t.require('../index');
+var github = t.require('../github');
 var cli = t.require('./index');
 
 describe('cli.github', function () {
@@ -14,12 +14,12 @@ describe('cli.github', function () {
 
     beforeEach(function () {
         argv = {_: ['init']};
-        spyOn(beaker.github, 'command').and.returnValue(13);
+        spyOn(github, 'command').and.returnValue(13);
         ret = cli.github(argv);
     });
 
     it('calls github method', function () {
-        expect(beaker.github.command).toHaveBeenCalledWith(argv);
+        expect(github.command).toHaveBeenCalledWith(argv);
     });
 
     it('returns result of init', function () {

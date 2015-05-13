@@ -12,7 +12,7 @@ var _ = require('lodash');
 */
 function showVersion() {
     var pkgJSON = require('../../package.json');
-    console.log('tkit (' + pkgJSON.name + ') v' + pkgJSON.version);
+    console.log(pkgJSON.name + ' v' + pkgJSON.version);
 }
 
 /**
