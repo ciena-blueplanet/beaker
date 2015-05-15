@@ -11,6 +11,7 @@ var _ = require('lodash');
 var fs = require('fs');
 var childProcess = require('child_process');
 var path = require('path');
+var sys = require('sys');
 
 var config = require('./sample-config.json');
 var packageJSON = require('../package.json');
@@ -171,25 +172,46 @@ describe('utils', function () {
     });
 
     describe('.exec()', function () {
+        var fakeProcess;
         beforeEach(function () {
-            var fakeProcess = {
+            fakeProcess = {
                 stdout: {
-                    on: function () {},
+                    on: jasmine.createSpy('fakeProcess.stdout.on'),
                 },
-                on: function (evtName, callback) {
-                    if (evtName === 'exit') {
-                        callback(0);
-                    }
-                },
+                on: jasmine.createSpy('fakeProcess.on'),
             };
 
+            spyOn(sys, 'print');
             spyOn(childProcess, 'spawn').and.returnValue(fakeProcess);
             spyOn(console, 'log');
+            utils.exec('common', 'testprogram.sh', '.');
+        });
+
+        it('adds stdout handler', function () {
+            expect(fakeProcess.stdout.on).toHaveBeenCalledWith('data', jasmine.any(Function));
+        });
+
+        it('adds exit handler', function () {
+            expect(fakeProcess.on).toHaveBeenCalledWith('exit', jasmine.any(Function));
         });
 
         it('runs a file', function () {
-            utils.exec('common', 'testprogram.sh', '.');
+            expect(console.log.calls.argsFor(0)).toMatch(/running /);
+        });
+
+        it('prints out data', function () {
+            fakeProcess.stdout.on.calls.argsFor(0)[1]('my-data');
+            expect(sys.print).toHaveBeenCalledWith('my-data');
+        });
+
+        it('reports success', function () {
+            fakeProcess.on.calls.argsFor(0)[1](0);
             expect(console.log.calls.argsFor(1)).toMatch(/ succeeded\./);
+        });
+
+        it('reports failure', function () {
+            fakeProcess.on.calls.argsFor(0)[1](1);
+            expect(console.log.calls.argsFor(1)).toMatch(/ failed: 1/);
         });
     });
 
