@@ -109,22 +109,21 @@ ns.copyFile = function (filename, destination, data) {
     var srcPath = path.join(data.templateDir, filename);
     var extension = filename.split('.').pop().toLowerCase();
 
+    var contents;
     if (_.contains(['png', 'gif', 'jpg', 'jpeg'], extension)) {
-        var inStr = fs.createReadStream(srcPath);
-        var outStr = fs.createWriteStream(dstPath);
-        inStr.pipe(outStr);
-        return;
+        contents = fs.readFileSync(srcPath);
+        fs.writeFileSync(dstPath, contents);
+    } else {
+        contents = fs.readFileSync(srcPath, {encoding: 'utf-8'});
+
+        if (data) {
+            contents = _.template(contents, {
+                interpolate: /\{\{(.+?)\}\}/g,
+            })(data);
+        }
+
+        fs.writeFileSync(dstPath, contents);
     }
-
-    var contents = fs.readFileSync(srcPath, {encoding: 'utf-8'});
-
-    if (data) {
-        contents = _.template(contents, {
-            interpolate: /\{\{(.+?)\}\}/g,
-        })(data);
-    }
-
-    fs.writeFileSync(dstPath, contents);
 
     // restore original permissions
     var mode = fs.statSync(srcPath).mode;
