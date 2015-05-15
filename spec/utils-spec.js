@@ -54,13 +54,17 @@ describe('utils', function () {
     });
 
     describe('.copyFile()', function () {
+        beforeEach(function () {
+            spyOn(fs, 'readFileSync').and.returnValue('file-contents');
+            spyOn(fs, 'writeFileSync');
+            spyOn(fs, 'statSync').and.returnValue({mode: 744});
+            spyOn(fs, 'chmodSync');
+        });
+
         describe('when file already exists', function () {
             beforeEach(function () {
                 spyOn(console, 'log');
-                spyOn(fs, 'createReadStream');
                 spyOn(fs, 'existsSync').and.returnValue(true);
-                spyOn(fs, 'readFileSync');
-
                 utils.copyFile('common/myfile', CWD, templateData);
             });
 
@@ -68,9 +72,6 @@ describe('utils', function () {
                 expect(console.log).toHaveBeenCalled();
             });
 
-            it('does not call fs.createReadStream()', function () {
-                expect(fs.createReadStream).not.toHaveBeenCalled();
-            });
 
             it('does not call fs.readFileSync()', function () {
                 expect(fs.readFileSync).not.toHaveBeenCalled();
@@ -78,39 +79,35 @@ describe('utils', function () {
         });
 
         describe('when image', function () {
-            var inStr, outStr;
-            var IMAGE_FILES = ['common/foo.png', 'common/bar.JPEG', 'common/baz.GIF', 'common/blah.jpg'];
-
             beforeEach(function () {
-                inStr = {
-                    pipe: jasmine.createSpy(),
-                };
-                outStr = 'my-output-stream';
-
-                spyOn(fs, 'createReadStream').and.returnValue(inStr);
-                spyOn(fs, 'createWriteStream').and.returnValue(outStr);
+                spyOn(fs, 'existsSync').and.returnValue(false);
             });
 
+            var IMAGE_FILES = ['common/foo.png', 'common/bar.JPEG', 'common/baz.GIF', 'common/blah.jpg'];
             _.forEach(IMAGE_FILES, function (imageFilename) {
                 describe('copying ' + imageFilename, function () {
-                    var srcPath, dstPath;
+                    var srcPath, destPath;
 
                     beforeEach(function () {
                         srcPath = path.join(templateData.templateDir, imageFilename);
-                        dstPath = path.join(CWD, utils.removeHeadDir(imageFilename));
+                        destPath = path.join(CWD, utils.removeHeadDir(imageFilename));
                         utils.copyFile(imageFilename, CWD, templateData);
                     });
 
-                    it('creates a read stream', function () {
-                        expect(fs.createReadStream).toHaveBeenCalledWith(srcPath);
+                    it('reads the file', function () {
+                        expect(fs.readFileSync).toHaveBeenCalledWith(srcPath);
                     });
 
-                    it('creates a write stream', function () {
-                        expect(fs.createWriteStream).toHaveBeenCalledWith(dstPath);
+                    it('writes the file', function () {
+                        expect(fs.writeFileSync).toHaveBeenCalledWith(destPath, 'file-contents');
                     });
 
-                    it('pipes in to out', function () {
-                        expect(inStr.pipe).toHaveBeenCalledWith(outStr);
+                    it('calls fs.statSync()', function () {
+                        expect(fs.statSync).toHaveBeenCalled();
+                    });
+
+                    it('calls fs.chmodSync()', function () {
+                        expect(fs.chmodSync).toHaveBeenCalledWith(destPath, 744);
                     });
                 });
             });
@@ -120,11 +117,7 @@ describe('utils', function () {
             var destPath, srcPath;
 
             beforeEach(function () {
-                spyOn(fs, 'chmodSync');
                 spyOn(fs, 'existsSync').and.returnValue(false);
-                spyOn(fs, 'readFileSync');
-                spyOn(fs, 'statSync').and.returnValue({mode: 744});
-                spyOn(fs, 'writeFileSync');
 
                 srcPath = path.join(templateData.templateDir, 'common/myfile.txt');
                 destPath = path.join(CWD, 'myfile.txt');
