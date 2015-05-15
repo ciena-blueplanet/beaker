@@ -8,9 +8,10 @@ NODE_COVERAGE_DIR ?= .coverage
 JASMINE_NODE_OPTS ?= --captureExceptions --verbose
 NODE_COVERAGE_OPTS ?= -x **/spec/** --report cobertura --report lcov --dir $(NODE_COVERAGE_DIR)
 
-COVERALLS :=
 ifdef TRAVIS_CI
 COVERALLS := cat $(NODE_COVERAGE_DIR)/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+else
+COVERALLS := echo skipping coveralls
 endif
 
 .PHONY: \
