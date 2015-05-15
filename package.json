@@ -1,6 +1,6 @@
 {
     "name": "beaker",
-    "version": "3.3.0",
+    "version": "3.4.0",
     "description": "Toolkit for building web interfaces",
     "keywords": [
         "tools",
@@ -81,6 +81,7 @@
         "grunt-karma": "^0.10.1",
         "grunt-webpack": "^1.0.8",
         "http-server": "^0.8.0",
+        "imports-loader": "^0.6.3",
         "istanbul-instrumenter-loader": "^0.1.2",
         "jade-loader": "^0.7.1",
         "jasmine-node": "^2.0.0",
