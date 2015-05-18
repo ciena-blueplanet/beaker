@@ -13,11 +13,25 @@ var path = require('path');
 var transplant = {};
 
 /**
- * @param {String} srcPath - the full path of the module consumer
+ * @param {String} modulePath - the full path of the module consumer
+ * @param {Number} [extraLevels=0] - extra levels under spec/ where the specs really live
+ * @param {Function} [reqFunc] - override what to ue for require (for testing)
  * @returns {transplant} - the instance
  */
-transplant.init = function (srcPath) {
-    this.srcPath = srcPath;
+transplant.init = function (modulePath, extraLevels, reqFunc) {
+    this.modulePath = modulePath;
+
+    if (extraLevels === undefined) {
+        extraLevels = 0;
+    }
+
+    if (reqFunc === undefined) {
+        reqFunc = require;
+    }
+
+    this.extraLevels = extraLevels;
+    this.reqFunc = reqFunc;
+
     return this;
 };
 
@@ -46,10 +60,10 @@ transplant.init = function (srcPath) {
  * @returns {object} the module located at dstPath transplanted to parallel src/ tree
  */
 transplant.require = function (dstPath) {
-    var parts = this.srcPath.split('spec');
+    var parts = this.modulePath.split('spec');
 
     if (parts.length < 2) {
-        throw new Error('Invalid srcPath [' + this.srcPath + '] no "spec" dir found!');
+        throw new Error('Invalid modulePath "' + this.modulePath + '" no "spec" dir found!');
     }
 
     var pathFromSpec = parts[parts.length - 1];
@@ -63,16 +77,18 @@ transplant.require = function (dstPath) {
     }
 
     // now add back the pathFromSpec under src/ and of course, the dstPath
-    return require(path.join(this.srcPath, dots, 'src', pathFromSpec, dstPath));
+    return this.reqFunc(path.join(this.modulePath, dots, 'src', pathFromSpec, dstPath));
 };
 
 /**
  * Create a {@link transplant} instance with the given srcPath
  *
- * @param {String} srcPath - the full path of the module consumer
+ * @param {String} modulePath - the full path of the module consumer
+ * @param {Number} [extraLevels=0] - extra levels under spec/ where the specs really live
+ * @param {Function} [reqFunc] - override what to ue for require (for testing)
  *
  * @returns {transplant} the instance
  */
-module.exports = function (srcPath) {
-    return Object.create(transplant).init(srcPath);
+module.exports = function (modulePath, extraLevels, reqFunc) {
+    return Object.create(transplant).init(modulePath, extraLevels, reqFunc);
 };
