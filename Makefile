@@ -3,7 +3,7 @@
 #
 
 NODE_SPECS := spec/node
-NODE_COVERAGE_DIR := coverage
+NODE_COVERAGE_DIR := node-coverage
 REPO := cyaninc/beaker
 IS_BEAKER := 1
 
@@ -21,6 +21,7 @@ BEAKER_BIN := ./bin/beaker.js
 	init-test \
 	test \
 	coverage \
+	report-coverage \
 	release \
 	ghp-copy-custom \
 	ghp-update
@@ -29,6 +30,7 @@ install:
 	$(HIDE)npm install
 
 clean:
+	$(HIDE)rm -rf coverage node-coverage
 	$(ENV)npm cache clean beaker
 
 INIT_TEST_DIR := /tmp/.init-test
@@ -60,7 +62,7 @@ coverage: node-coverage
 
 report-coverage: jasmine-coveralls
 
-ci-test: export IS_BEAKER lint jasmine-test jasmine-coverage report-coverage node.init-test
+ci-test: lint jasmine-test jasmine-coverage karma-coverage report-coverage node.init-test
 
 release:
 	$(HIDE)echo "Publishing version $(VERSION)"

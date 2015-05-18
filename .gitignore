@@ -4,6 +4,7 @@ node_modules
 # Generated Directories
 /bundle
 /coverage
+/node-coverage
 
 # Generated Files
 demo/**/*.html
