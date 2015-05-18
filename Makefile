@@ -62,7 +62,7 @@ coverage: node-coverage
 
 report-coverage: jasmine-coveralls
 
-ci-test: lint jasmine-test jasmine-coverage karma-coverage report-coverage node.init-test
+ci-test: lint jasmine-test jasmine-coverage karma-test report-coverage node.init-test
 
 release:
 	$(HIDE)echo "Publishing version $(VERSION)"
