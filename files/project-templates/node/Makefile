@@ -19,9 +19,9 @@ install:
 clean:
 	$(HIDE)rm -rf $(NODE_COVERAGE_DIR)
 
-test: node-test
+test: jasmine-test
 
-coverage: node-coverage
+coverage: jasmine-coverage
 
 report-coverage:
 	$(HIDE)echo "Reporting Coverage not implemented yet"

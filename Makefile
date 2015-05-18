@@ -10,7 +10,6 @@ IS_BEAKER := 1
 -include make/gh-pages.mk
 -include make/node-targets.mk
 
-
 # Override the beaker binary, since we are beaker
 BEAKER_BIN := ./bin/beaker.js
 
@@ -20,7 +19,6 @@ BEAKER_BIN := ./bin/beaker.js
 	init-test \
 	test \
 	coverage \
-	report-coverage \
 	release \
 	ghp-copy-custom \
 	ghp-update
@@ -58,8 +56,9 @@ test: node-test init-test
 
 coverage: node-coverage
 
-report-coverage:
-	$(HIDE)echo "report-coverage not implemented yet"
+report-coverage: jasmine-coveralls
+
+ci-test: lint jasmine-test jasmine-coverage report-coverage node.init-test
 
 release:
 	$(HIDE)echo "Publishing version $(VERSION)"

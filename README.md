@@ -236,11 +236,14 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
 * [grunt-cli](https://github.com/gruntjs/grunt-cli)
 * [grunt-contrib-watch](https://github.com/gruntjs/grunt-contrib-watch)
 
-### Testing / Linting
+### Testing
+* [coveralls](https://github.com/cainus/node-coveralls) so you can report your code coverage to
+  [coveralls.io](https://coveralls.io)
 * [grunt-karma](https://github.com/karma-runner/grunt-karma)
 * [grunt-eslint](https://github.com/sindresorhus/grunt-eslint) so you can, you guessed it,
   use [`eslint`](http://eslint.org)
 * [grunt-filenames](https://github.com/bahmutov/grunt-filenames)
+* [jasmine-npm](https://github.com/jasmine/jasmine-npm)
 * [karma](https://github.com/karma-runner/karma)
 * [karma-chrome-launcher](https://github.com/karma-runner/karma-chrome-launcher)
 * [karma-cli](https://github.com/karma-runner/karma-cli)

@@ -26,6 +26,8 @@ describe('init', function () {
     beforeEach(function () {
         testConfig = config;
 
+        spyOn(console, 'info');
+        spyOn(console, 'error');
         spyOn(_config, 'load').and.callFake(function () {
             return testConfig;
         });
@@ -79,7 +81,6 @@ describe('init', function () {
 
         describe('if config fails to load', function () {
             beforeEach(function () {
-                spyOn(console, 'error');
                 testConfig = null;
                 returnValue = init.command({
                     projectType: 'app',
