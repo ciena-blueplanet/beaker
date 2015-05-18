@@ -13,6 +13,14 @@ var resolve = require('../webpack/resolve');
 var USE_SOURCE_MAPS = process.env.MAPS === 'on';
 var KARMA_BROWSER = process.env.KARMA_BROWSER || 'Chrome';
 
+var IS_BEAKER = process.env.IS_BEAKER === '1';
+var BEAKER_DIR = IS_BEAKER ? './' : 'node_modules/beaker/';
+var entryPoint = IS_BEAKER ? 'beaker-test-main.js' : 'test-main.js';
+var entryPointFull = path.join(BEAKER_DIR, 'config/karma', entryPoint);
+
+var preprocessors = {};
+preprocessors[entryPointFull] = ['webpack', 'sourcemap'];
+
 module.exports = function (config) {
     config.set({
         // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -24,14 +32,12 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'node_modules/beaker/config/karma/test-main.js',
+            entryPointFull,
         ],
 
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-        preprocessors: {
-            'node_modules/beaker/config/karma/test-main.js': ['webpack', 'sourcemap'],
-        },
+        preprocessors: preprocessors,
 
         // test results reporter to use
         // possible values: 'dots', 'progress'

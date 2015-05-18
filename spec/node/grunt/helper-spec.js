@@ -13,7 +13,7 @@ var matchdep = require('matchdep');
 var path = require('path');
 var rimraf = require('rimraf');
 
-var t = require('../../src/transplant')(__dirname);
+var t = require('../../../src/transplant')(__dirname);
 var helper = t.require('./helper');
 
 describe('grunt helper', function () {

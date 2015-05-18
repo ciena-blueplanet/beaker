@@ -5,7 +5,7 @@
 
 'use strict';
 
-var t = require('../../src/transplant')(__dirname);
+var t = require('../../../src/transplant')(__dirname);
 var noAliases = t.require('./no-lodash-aliases');
 
 describe('noAliases', function () {

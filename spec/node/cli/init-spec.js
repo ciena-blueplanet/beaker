@@ -5,7 +5,7 @@
 
 'use strict';
 
-var t = require('../../src/transplant')(__dirname);
+var t = require('../../../src/transplant')(__dirname);
 var init = t.require('../init');
 var cli = t.require('./index');
 

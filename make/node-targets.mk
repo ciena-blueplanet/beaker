@@ -5,9 +5,48 @@
 
 NODE_SPECS ?= spec
 NODE_COVERAGE_DIR ?= .coverage
-JASMINE_NODE_OPTS ?= --captureExceptions --verbose
 NODE_COVERAGE_OPTS ?= -x **/spec/** --report cobertura --report lcov --dir $(NODE_COVERAGE_DIR)
+JASMINE_CONFIG_FILE ?= $(NODE_SPECS)/jasmine.json
 
+.PHONY: \
+	clean-jasmine-config \
+	jasmine-config \
+	jasmine-coverage \
+	jasmine-coveralls \
+	jasmine-test
+
+clean-jasmine-config:
+	$(HIDE)rm $(JASMINE_CONFIG_FILE)
+
+jasmine-config: $(JASMINE_CONFIG_FILE)
+
+$(JASMINE_CONFIG_FILE):
+	$(HIDE)echo "{" > $@
+	$(HIDE)echo "    \"spec_dir\": \"$(NODE_SPECS)\"," >> $@
+	$(HIDE)echo "    \"spec_files\": [" >> $@
+	$(HIDE)echo "        \"**/*spec.js\"" >> $@
+	$(HIDE)echo "    ]," >> $@
+	$(HIDE)echo "    \"helpers\": [" >> $@
+	$(HIDE)echo "    ]" >> $@
+	$(HIDE)echo "}" >> $@
+
+jasmine-coveralls:
+	$(ENV)cat $(NODE_COVERAGE_DIR)/lcov.info | coveralls
+
+export JASMINE_CONFIG_PATH = $(JASMINE_CONFIG_FILE)
+export NODE_SPECS
+jasmine-coverage:
+	$(HIDE)echo "Running istanbul coverage on jasmine node specs"
+	$(ENV)istanbul cover $(NODE_COVERAGE_OPTS) jasmine
+
+jasmine-test:
+	$(HIDE)echo "Running jasmine node specs"
+	$(ENV)jasmine
+
+# =================================================================================================
+# DEPRECATED
+
+JASMINE_NODE_OPTS ?= --captureExceptions --verbose
 ifdef TRAVIS_CI
 COVERALLS := cat $(NODE_COVERAGE_DIR)/lcov.info | ./node_modules/coveralls/bin/coveralls.js
 else
@@ -19,10 +58,13 @@ endif
 	node-coverage
 
 node-test:
+	$(HIDE)echo "WARNING: 'node-test' target is DEPRECATED, use 'jasmine-test' instead"
 	$(HIDE)echo "Running jasmine-node tests"
 	$(ENV)jasmine-node $(JASMINE_NODE_OPTS) $(NODE_SPECS)
 
-
 node-coverage:
+	$(HIDE)echo "WARNING: 'node-coverage' target is DEPRECATED, use 'jasmine-coverage' instead"
 	$(HIDE)echo "Running istanbul cover jasmine-node tests"
 	$(ENV)istanbul cover $(NODE_COVERAGE_OPTS) jasmine-node $(JASMINE_NODE_OPTS) $(NODE_SPECS) && $(COVERALLS)
+
+# =================================================================================================

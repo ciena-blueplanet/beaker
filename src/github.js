@@ -54,7 +54,7 @@ ns.onResponse = function (res) {
     if (!res.ok) {
         throw new Error(msg);
     } else {
-        console.log(msg);
+        console.info(msg);
     }
 };
 
@@ -98,7 +98,7 @@ ns.getRequest = function (apiPath) {
     var urlPath = '/api/v3/' + apiPath;
     var protocol = 'https';
 
-    console.log(protocol + '://' + host + urlPath);
+    console.info(protocol + '://' + host + urlPath);
 
     var req = httpSync.request({
         host: host,
@@ -168,7 +168,7 @@ ns.getPullRequests = function (repo, searchAll) {
  * @returns {Object} pull request information (null if PR not found for SHA)
  */
 ns.getPullRequestForSHA = function (repo, sha, searchAll) {
-    console.log('Looking for PR on repository ' + repo + ' with HEAD at commit ' + sha);
+    console.info('Looking for PR on repository ' + repo + ' with HEAD at commit ' + sha);
 
     var result = null;
     var pullRequests = ns.getPullRequests(repo, searchAll);
@@ -177,7 +177,7 @@ ns.getPullRequestForSHA = function (repo, sha, searchAll) {
     _.forEach(pullRequests, function (pr) {
         // If pull request is at specific commit
         if (pr.head.sha === sha || pr.merge_commit_sha === sha) {
-            console.log('Found PR at commit: ' + pr.id);
+            console.info('Found PR at commit: ' + pr.id);
             result = pr;
             return false;
         }
@@ -245,7 +245,7 @@ ns.versionBumped = function (argv) {
 
     // If pull request not found
     if (!pr) {
-        console.log('Could not find PR on repository ' + argv.repo + ' with commit ' + argv.sha);
+        console.error('Could not find PR on repository ' + argv.repo + ' with commit ' + argv.sha);
         return 1;
     }
 
@@ -303,7 +303,7 @@ ns.pushChanges = function () {
     }
 
     var cmd = 'git push origin ' + branch;
-    console.log(cmd);
+    console.info(cmd);
 
     // Push local changes to remote
     result = sh.exec(cmd);
@@ -372,7 +372,7 @@ ns.bumpVersion = function (argv) {
 
             // If pull request not found
             if (!pr) {
-                console.log('Could not find PR #' + matches[1] + ' on repository ' + argv.repo);
+                console.warn('Could not find PR #' + matches[1] + ' on repository ' + argv.repo);
                 // Note: Do not change error b/c a repo could have older PR's that are from before
                 // the version-bump comment
                 return true;
@@ -411,7 +411,7 @@ ns.command = function (argv) {
         return 1;
     }
 
-    console.log(argv);
+    console.info(argv);
 
     var command = argv._[1];
     var ret = 0;

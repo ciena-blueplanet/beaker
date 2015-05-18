@@ -1,10 +1,13 @@
 #
-# Makefile to define some webpack project make targets
+# Makefile to define some e2e make targets
 # Copyright (c) 2015 Cyan, Inc. All rights reserved.
 #
 
+ifndef JASMINE_CONFIG_FILE
+	$(error JASMINE_CONFIG_FILE variable needs to be set. Maybe include 'node-targets.mk' first?)
+endif
+
 NODE_SPECS ?= spec/e2e
-JASMINE_NODE_OPTS ?= --captureExceptions --verbose
 TEST_PORT := $(shell perl -MSocket -le 'socket S, PF_INET, SOCK_STREAM,getprotobyname("tcp"); $$port = int(rand(1080))+1080; ++$$port until bind S, sockaddr_in($$port,inet_aton("127.1")); print $$port')
 TEST_CONFIG := spec/e2e/test-config.json
 HOSTNAME ?= $(shell hostname)
@@ -13,8 +16,6 @@ SELENIUM_PORT ?= 4444
 SELENIUM_BROWSER ?= chrome
 
 .PHONY: \
-	webpack-test \
-	webpack-coverage \
 	webdriver \
 	kill-httpserver \
 	start-httpserver \
@@ -52,8 +53,8 @@ create-config:
 	$(HIDE)echo "}" >> $(TEST_CONFIG)
 
 do-e2e-test:
-	$(HIDE)echo "Running jasmine-node tests on port $(TEST_PORT)"
-	$(ENV)jasmine-node $(JASMINE_NODE_OPTS) $(NODE_SPECS) || ($(ENV)kill $$(lsof -t -i:$(TEST_PORT)) && false)
+	$(HIDE)echo "Running e2e tests on port $(TEST_PORT)"
+	$(ENV)JASMINE_CONFIG_PATH=$(JASMINE_CONFIG_FILE) jasmine || ($(ENV)kill $$(lsof -t -i:$(TEST_PORT)) && false)
 	$(ENV)kill $$(lsof -t -i:$(TEST_PORT)) || echo 'nothing to kill'
 
 # TODO: deprecate this and replace with a `make local-e2e-test` or something that
@@ -70,32 +71,3 @@ endif
 
 update-screenshots:
 	$(HIDE)for i in $$(find spec/e2e/screenshots -name '*.regression.png'); do mv $$i $${i/regression/baseline}; done
-
-#######################################################################
-#                         normal test targets                         #
-#######################################################################
-
-KARMA_CONFIG := node_modules/beaker/config/karma/config.js
-karma:
-	$(HIDE)echo "WARNING: the 'karma' target is DEPRECATED.
-	$(HIDE)echo "Running Karma Server"
-	$(ENV)karma start $(KARMA_CONFIG)
-
-%.test:
-	$(HIDE)echo "WARNING: the '*.test' target is DEPRECATED.
-	$(ENV)karma run $(KARMA_CONFIG) -- --grep=$(subst .test,,$@)
-
-webpack-watch-test:
-	$(HIDE)echo "WARNING: the 'webpack-watch-test' target is DEPRECATED. Use 'karma-watch' instead."
-	$(HIDE)echo "Running Karma webpack tests (with watching)"
-	$(ENV)grunt karma:unit watch:karma
-
-webpack-test:
-	$(HIDE)echo "WARNING: the 'webpack-test' target is DEPRECATED. Use 'karma-test' instead."
-	$(HIDE)echo "Running Karma webpack tests once"
-	$(ENV)grunt test
-
-webpack-coverage:
-	$(HIDE)echo "WARNING: the 'webpack-coverage' target is DEPRECATED. Use 'karma-coverage' instead."
-	$(HIDE)echo "Running Karma webpack tests (with coverage)"
-	$(ENV)grunt test-coverage

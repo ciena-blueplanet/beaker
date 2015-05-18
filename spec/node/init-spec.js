@@ -12,10 +12,10 @@ var fs = require('fs');
 var path = require('path');
 var changeCase = require('change-case');
 
-var _config = require('../src/config');
+var _config = require('../../src/config');
 var config = require('./sample-config.json');
 
-var t = require('../src/transplant')(__dirname);
+var t = require('../../src/transplant')(__dirname);
 var init = t.require('./init');
 var utils = t.require('./utils');
 var CWD = process.cwd();
@@ -26,6 +26,8 @@ describe('init', function () {
     beforeEach(function () {
         testConfig = config;
 
+        spyOn(console, 'info');
+        spyOn(console, 'error');
         spyOn(_config, 'load').and.callFake(function () {
             return testConfig;
         });
@@ -53,7 +55,7 @@ describe('init', function () {
             githubHost: config.github.host,
             githubUser: config.github.user,
             npmRegistry: config.npm.registry,
-            beakerVersion: require('../package.json').version,
+            beakerVersion: t.require('../package.json').version,
             cruftlessName: 'NON-APP',
             seleniumHost: 'localhost',
             seleniumPort: 4444,
@@ -79,7 +81,6 @@ describe('init', function () {
 
         describe('if config fails to load', function () {
             beforeEach(function () {
-                spyOn(console, 'error');
                 testConfig = null;
                 returnValue = init.command({
                     projectType: 'app',

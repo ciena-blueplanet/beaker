@@ -13,7 +13,8 @@ REPO := {{ githubUser }}/{{ projectName }}
 
 -include node_modules/beaker/make/common.mk
 -include node_modules/beaker/make/gh-pages.mk
--include node_modules/beaker/make/webpack-targets.mk
+-include node_modules/beaker/make/karma-targets.mk
+-include node_modules/beaker/make/e2e-targets.mk
 
 .PHONY: install clean test coverage report-coverage release ghp-update
 

@@ -2,14 +2,15 @@
 # Makefile for the beaker package
 #
 
-NODE_COVERAGE_DIR := coverage
+NODE_SPECS := spec/node
+NODE_COVERAGE_DIR := node-coverage
 REPO := cyaninc/beaker
 IS_BEAKER := 1
 
 -include make/common.mk
 -include make/gh-pages.mk
 -include make/node-targets.mk
-
+-include make/karma-targets.mk
 
 # Override the beaker binary, since we are beaker
 BEAKER_BIN := ./bin/beaker.js
@@ -29,6 +30,7 @@ install:
 	$(HIDE)npm install
 
 clean:
+	$(HIDE)rm -rf coverage node-coverage
 	$(ENV)npm cache clean beaker
 
 INIT_TEST_DIR := /tmp/.init-test
@@ -54,12 +56,13 @@ init-test: webpack.init-test node.init-test app.init-test
 	$(HIDE)./bin/post-publish.sh
 	$(HIDE)npm cache clean beaker
 
-test: node-test init-test
+test: lint jasmine-test karma-test
 
 coverage: node-coverage
 
-report-coverage:
-	$(HIDE)echo "report-coverage not implemented yet"
+report-coverage: jasmine-coveralls
+
+ci-test: lint jasmine-test jasmine-coverage karma-test report-coverage
 
 release:
 	$(HIDE)echo "Publishing version $(VERSION)"

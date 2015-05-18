@@ -1,11 +1,13 @@
 {
     "globals": {
         "describe": false,
+        "fdescribe": false,
         "xdescribe": false,
         "beforeEach": false,
         "afterEach": false,
         "spyOn": false,
         "it": false,
+        "fit": false,
         "xit": false,
         "expect": false,
         "jasmine": false,

@@ -71,7 +71,6 @@ If you are unfamiliar with Grunt you may want to head over to
 [Grunt's getting started page](http://gruntjs.com/getting-started) and learn more about it.
 
 
-
 ### Verify
 We should now have our basic project setup. Try running the following command to see if everything works:
 
@@ -98,7 +97,7 @@ would like to generate source-maps, simply set the `MAPS` environment variable t
 by simply adding `MAPS=on` before the command.
 
     MAPS=on grunt
-    MAPS=on make webpack-watch-test
+    MAPS=on make karma-watch
 
 This can be useful if you're not sure where a test is failing, or where an exception is being raised.
 
@@ -122,30 +121,13 @@ UglifyJS to minify your code, and the dedupe plugin to remove duplicate modules.
 ### `grunt lint`
 Checks your code for lint.
 
-### `make webpack-test`
+### `make karma-test`
 A CI-friendly test that executes tests once and exits
 
-### `make webpack-watch-test`
+### `make karma-watch`
 This is a simple make target that does a `grunt karma:unit watch:karma`. This will cause the `karma` server to
 start and a watcher to be placed on all the files in `src/`. So, when any file is changed, all your karma tests
 will be run. It's still a little slow because of the source-maps being generated.
-
-### `make karma`
-This just starts the karma server, without any watchers, in case you wanna run scoped specs (see below).
-
-### `make <pattern>.test`
-This translates to doing a `karma run` with the `--grep=<pattern>` option given to `karma-jasmine`. This will
-effectively `xit()` any specs that don't match the pattern, so that you can run just a subset of specs, without
-having to manually change `it()` to `xit()` in your source code.
-
-Currently, this only works with simple text (no-whitespace) patterns. Such as:
-
-    make foo-bar.test
-
-If you wanna play with more advanced patterns,
-you can use the karma command directly:
-
-    karma run node_modules/beaker/config/karma/config.js -- --grep=<pattern>
 
 ## Contributing
 
@@ -238,11 +220,14 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
 * [grunt-cli](https://github.com/gruntjs/grunt-cli)
 * [grunt-contrib-watch](https://github.com/gruntjs/grunt-contrib-watch)
 
-### Testing / Linting
+### Testing
+* [coveralls](https://github.com/cainus/node-coveralls) so you can report your code coverage to
+  [coveralls.io](https://coveralls.io)
 * [grunt-karma](https://github.com/karma-runner/grunt-karma)
 * [grunt-eslint](https://github.com/sindresorhus/grunt-eslint) so you can, you guessed it,
   use [`eslint`](http://eslint.org)
 * [grunt-filenames](https://github.com/bahmutov/grunt-filenames)
+* [jasmine-npm](https://github.com/jasmine/jasmine-npm)
 * [karma](https://github.com/karma-runner/karma)
 * [karma-chrome-launcher](https://github.com/karma-runner/karma-chrome-launcher)
 * [karma-cli](https://github.com/karma-runner/karma-cli)

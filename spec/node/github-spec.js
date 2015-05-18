@@ -13,42 +13,90 @@ var nock = require('nock');
 var sh = require('execSync');
 var versiony = require('versiony');
 
-var _config = require('../src/config');
-var config = require('./sample-config.json');
-
-var t = require('../src/transplant')(__dirname);
+var t = require('../../src/transplant')(__dirname);
 var github = t.require('./github');
+var _config = t.require('./config');
+
+var config = require('./sample-config.json');
 
 var GITHUB_HOST = 'https://' + config.github.host;
 
 describe('github', function () {
     beforeEach(function () {
+        spyOn(console, 'info');
+        spyOn(console, 'error');
         spyOn(_config, 'load').and.returnValue(config);
     });
 
     describe('.bumpFiles()', function () {
+        var versionySpy, ret;
         beforeEach(function () {
-            spyOn(versiony, 'minor').and.callFake(function () {
-                return this;
+            var methods = ['to', 'end', 'indent', 'patch', 'minor', 'newMajor'];
+            versionySpy = jasmine.createSpyObj('versiony', methods);
+
+            _.forEach(methods, function (method) {
+                versionySpy[method].and.returnValue(versionySpy);
             });
-            spyOn(versiony, 'newMajor');
-            spyOn(versiony, 'patch');
+
+            spyOn(versiony, 'from').and.returnValue(versionySpy);
         });
 
-        it('handle major bumps', function () {
-            expect(github.bumpFiles('major')).toBeTruthy();
-            expect(versiony.newMajor).toHaveBeenCalled();
+        describe('major bumps', function () {
+            beforeEach(function () {
+                ret = github.bumpFiles('major');
+            });
+
+            it('sets indentation', function () {
+                expect(versionySpy.indent).toHaveBeenCalledWith('  ');
+            });
+
+            it('bumps the major', function () {
+                expect(versionySpy.newMajor).toHaveBeenCalled();
+            });
+
+            it('returns truthy', function () {
+                expect(ret).toBeTruthy();
+            });
         });
 
-        it('handle minor bumps', function () {
-            expect(github.bumpFiles('minor')).toBeTruthy();
-            expect(versiony.minor).toHaveBeenCalled();
-            expect(versiony.patch).toHaveBeenCalledWith(0);
+        describe('minor bumps', function () {
+            beforeEach(function () {
+                ret = github.bumpFiles('minor');
+            });
+
+            it('sets indentation', function () {
+                expect(versionySpy.indent).toHaveBeenCalledWith('  ');
+            });
+
+            it('bumps the minor', function () {
+                expect(versionySpy.minor).toHaveBeenCalled();
+            });
+
+            it('resets the patch', function () {
+                expect(versionySpy.patch).toHaveBeenCalledWith(0);
+            });
+
+            it('returns truthy', function () {
+                expect(ret).toBeTruthy();
+            });
         });
 
-        it('handle patch bumps', function () {
-            expect(github.bumpFiles('patch')).toBeTruthy();
-            expect(versiony.patch).toHaveBeenCalled();
+        describe('patch bumps', function () {
+            beforeEach(function () {
+                ret = github.bumpFiles('patch');
+            });
+
+            it('sets indentation', function () {
+                expect(versionySpy.indent).toHaveBeenCalledWith('  ');
+            });
+
+            it('bumps the patch', function () {
+                expect(versionySpy.patch).toHaveBeenCalled();
+            });
+
+            it('returns truthy', function () {
+                expect(ret).toBeTruthy();
+            });
         });
 
         it('returns false for unknown bump type', function () {
@@ -145,8 +193,6 @@ describe('github', function () {
             argv = {
                 _: ['github'],
             };
-
-            spyOn(console, 'error');
         });
 
         it('errors when wrong number of positional arguments', function () {
@@ -465,10 +511,6 @@ describe('github', function () {
     describe('.onResponse()', function () {
         var res;
 
-        beforeEach(function () {
-            spyOn(console, 'log');
-        });
-
         describe('on success', function () {
             beforeEach(function () {
                 res = {
@@ -484,7 +526,7 @@ describe('github', function () {
 
             it('logs the response', function () {
                 var msg = 'Status Code: 201\nResponse Body:\n' + JSON.stringify(res.body, null, 2);
-                expect(console.log).toHaveBeenCalledWith(msg);
+                expect(console.info).toHaveBeenCalledWith(msg);
             });
         });
 

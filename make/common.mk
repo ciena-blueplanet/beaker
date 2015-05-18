@@ -11,6 +11,7 @@ IS_BEAKER ?= 0
 JSON_TABS ?= 4
 
 BEAKER_BIN ?= beaker
+export IS_BEAKER
 
 .PHONY: \
 	build \
