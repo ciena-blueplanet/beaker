@@ -11,7 +11,7 @@ var _ = require('lodash');
 var sh = require('execSync');
 var sleep = require('sleep');
 
-var t = require('../src/transplant')(__dirname);
+var t = require('../../src/transplant')(__dirname);
 var tester = t.require('./webdriverio-tester');
 
 /**

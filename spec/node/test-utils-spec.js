@@ -7,7 +7,7 @@
 
 'use strict';
 
-var t = require('../src/transplant')(__dirname);
+var t = require('../../src/transplant')(__dirname);
 var utils = t.require('./test-utils');
 
 /**

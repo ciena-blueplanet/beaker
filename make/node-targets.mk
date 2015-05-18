@@ -33,13 +33,15 @@ $(JASMINE_CONFIG_FILE):
 jasmine-coveralls:
 	$(ENV)cat $(NODE_COVERAGE_DIR)/lcov.info | coveralls
 
+export JASMINE_CONFIG_PATH = $(JASMINE_CONFIG_FILE)
+export NODE_SPECS
 jasmine-coverage:
 	$(HIDE)echo "Running istanbul coverage on jasmine node specs"
-	$(ENV)JASMINE_CONFIG_PATH=$(JASMINE_CONFIG_FILE) istanbul cover $(NODE_COVERAGE_OPTS) jasmine
+	$(ENV)istanbul cover $(NODE_COVERAGE_OPTS) jasmine
 
 jasmine-test:
 	$(HIDE)echo "Running jasmine node specs"
-	$(ENV)JASMINE_CONFIG_PATH=$(JASMINE_CONFIG_FILE) jasmine
+	$(ENV)jasmine
 
 # =================================================================================================
 # DEPRECATED

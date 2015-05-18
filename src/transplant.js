@@ -14,22 +14,18 @@ var transplant = {};
 
 /**
  * @param {String} modulePath - the full path of the module consumer
- * @param {Number} [extraLevels=0] - extra levels under spec/ where the specs really live
+ * @param {String} [extraDirs] - extra levels under spec/ where the specs really live
  * @param {Function} [reqFunc] - override what to ue for require (for testing)
  * @returns {transplant} - the instance
  */
-transplant.init = function (modulePath, extraLevels, reqFunc) {
+transplant.init = function (modulePath, extraDirs, reqFunc) {
     this.modulePath = modulePath;
-
-    if (extraLevels === undefined) {
-        extraLevels = 0;
-    }
 
     if (reqFunc === undefined) {
         reqFunc = require;
     }
 
-    this.extraLevels = extraLevels;
+    this.extraDirs = extraDirs;
     this.reqFunc = reqFunc;
 
     return this;
@@ -76,19 +72,24 @@ transplant.require = function (dstPath) {
         dots = path.join(dots, '..');
     }
 
-    // now add back the pathFromSpec under src/ and of course, the dstPath
-    return this.reqFunc(path.join(this.modulePath, dots, 'src', pathFromSpec, dstPath));
+    var pathFromSrc = pathFromSpec.replace(this.extraDirs, '');
+    return this.reqFunc(path.join(this.modulePath, dots, 'src', pathFromSrc, dstPath));
 };
 
 /**
  * Create a {@link transplant} instance with the given srcPath
  *
  * @param {String} modulePath - the full path of the module consumer
- * @param {Number} [extraLevels=0] - extra levels under spec/ where the specs really live
  * @param {Function} [reqFunc] - override what to ue for require (for testing)
  *
  * @returns {transplant} the instance
  */
-module.exports = function (modulePath, extraLevels, reqFunc) {
-    return Object.create(transplant).init(modulePath, extraLevels, reqFunc);
+module.exports = function (modulePath, reqFunc) {
+    var extraDirs = '';
+
+    if (process.env.NODE_SPECS && process.env.NODE_SPECS !== 'spec') {
+        extraDirs = process.env.NODE_SPECS.replace('spec/', '');
+    }
+
+    return Object.create(transplant).init(modulePath, extraDirs, reqFunc);
 };

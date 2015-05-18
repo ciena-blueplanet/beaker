@@ -3,12 +3,6 @@
 # Copyright (c) 2015 Cyan, Inc. All rights reserved.
 #
 
-ifeq ($(IS_BEAKER), 1)
-KARMA_CONFIG := config/karma/config.js
-else
-KARMA_CONFIG := node_modules/beaker/config/karma/config.js
-endif
-
 .PHONY: \
 	karma-coverage \
 	karma-test \

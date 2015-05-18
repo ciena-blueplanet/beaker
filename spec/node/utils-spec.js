@@ -14,8 +14,9 @@ var path = require('path');
 var sys = require('sys');
 
 var config = require('./sample-config.json');
-var packageJSON = require('../package.json');
-var t = require('../src/transplant')(__dirname);
+
+var t = require('../../src/transplant')(__dirname);
+var packageJSON = t.require('../package.json');
 var utils = t.require('./utils');
 
 var CWD = process.cwd();
@@ -40,7 +41,7 @@ describe('utils', function () {
             githubUser: config.github.user,
             npmRegistry: config.npm.registry,
             projectType: 'app',
-            beakerVersion: require('../package.json').version,
+            beakerVersion: packageJSON.version,
             cruftlessName: 'NON-APP',
             templateDir: path.join(CWD, 'files/project-templates'),
         };

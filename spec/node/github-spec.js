@@ -13,11 +13,11 @@ var nock = require('nock');
 var sh = require('execSync');
 var versiony = require('versiony');
 
-var _config = require('../src/config');
-var config = require('./sample-config.json');
-
-var t = require('../src/transplant')(__dirname);
+var t = require('../../src/transplant')(__dirname);
 var github = t.require('./github');
+var _config = t.require('./config');
+
+var config = require('./sample-config.json');
 
 var GITHUB_HOST = 'https://' + config.github.host;
 

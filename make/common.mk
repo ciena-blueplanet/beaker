@@ -33,7 +33,7 @@ ifeq ($(IS_BEAKER), 1)
 else
 	-$(ENV)cmp .eslintrc node_modules/beaker/.eslintrc || echo "warning '.eslintrc' is out of date, run 'make update-eslintrc' for latest version."
 endif
-	$(ENV)grunt lint
+	$(ENV)IS_BEAKER=$(IS_BEAKER) grunt lint
 
 package-test:
 	$(HIDE) echo "WARNING: the package-test target is DEPRECATED, please remove it from your Makefile."

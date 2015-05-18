@@ -5,7 +5,7 @@
 
 'use strict';
 
-var t = require('../../src/transplant')(__dirname);
+var t = require('../../../src/transplant')(__dirname);
 var noDupeFunc = t.require('./no-dupe-func');
 
 describe('noDupeFunc', function () {

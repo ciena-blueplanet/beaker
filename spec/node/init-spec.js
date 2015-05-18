@@ -12,10 +12,10 @@ var fs = require('fs');
 var path = require('path');
 var changeCase = require('change-case');
 
-var _config = require('../src/config');
+var _config = require('../../src/config');
 var config = require('./sample-config.json');
 
-var t = require('../src/transplant')(__dirname);
+var t = require('../../src/transplant')(__dirname);
 var init = t.require('./init');
 var utils = t.require('./utils');
 var CWD = process.cwd();
@@ -55,7 +55,7 @@ describe('init', function () {
             githubHost: config.github.host,
             githubUser: config.github.user,
             npmRegistry: config.npm.registry,
-            beakerVersion: require('../package.json').version,
+            beakerVersion: t.require('../package.json').version,
             cruftlessName: 'NON-APP',
             seleniumHost: 'localhost',
             seleniumPort: 4444,

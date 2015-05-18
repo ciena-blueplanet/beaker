@@ -3,12 +3,14 @@
  * @copyright 2015 Cyan, Inc. All rights reserved
 */
 
+/* eslint-disable max-nested-callbacks */
+
 'use strict';
 
-var transplantModule = require('../src/transplant');
+var transplantModule = require('../../src/transplant');
 
 describe('transplant', function () {
-    var reqFunc, t, modulePath, extras;
+    var reqFunc, t, modulePath;
     beforeEach(function () {
         reqFunc = jasmine.createSpy('reqFunc');
     });
@@ -16,8 +18,7 @@ describe('transplant', function () {
     describe('when specs live in "spec/"', function () {
         beforeEach(function () {
             modulePath = '/path/to/spec/foo/bar';
-            extras = undefined;
-            t = transplantModule(modulePath, extras, reqFunc);
+            t = transplantModule(modulePath, reqFunc);
         });
 
         it('moves from spec/ tree to src/ tree', function () {
@@ -28,7 +29,7 @@ describe('transplant', function () {
         describe('and an invalid modulePath is given', function () {
             beforeEach(function () {
                 modulePath = '/path/to/src/foo/bar';
-                t = transplantModule(modulePath, extras, reqFunc);
+                t = transplantModule(modulePath, reqFunc);
             });
 
             it('throws an error if used outside spec/ tree', function () {
@@ -39,5 +40,4 @@ describe('transplant', function () {
             });
         });
     });
-
 });

@@ -18,6 +18,12 @@ var webpackResolve = require(path.join(configDir, 'webpack/resolve'));
 
 var USE_SOURCE_MAPS = process.env.MAPS === 'on';
 
+var BEAKER_DIR = 'node_modules/beaker';
+
+if (process.env.IS_BEAKER) {
+    BEAKER_DIR = '.';
+}
+
 var ns = {};
 
 /**
@@ -58,7 +64,8 @@ ns.init = function (grunt) {
     _.without(gruntTasks, 'grunt-cli').forEach(grunt.loadNpmTasks);
 
     // load local tasks
-    matchdep.filterAll('grunt-*', path.join(process.cwd(), 'package.json')).forEach(grunt.loadNpmTasks);
+    var localGruntTasks = matchdep.filterAll('grunt-*', path.join(process.cwd(), 'package.json'));
+    _.without(localGruntTasks, 'grunt-cli').forEach(grunt.loadNpmTasks);
 
     var webpackConfig = require(path.join(process.cwd(), 'webpack.config.js'));
 
@@ -76,7 +83,7 @@ ns.init = function (grunt) {
 
             options: {
                 config: '.eslintrc',
-                rulesdir: ['node_modules/beaker/src/eslint-rules'],
+                rulesdir: [path.join(BEAKER_DIR, 'src/eslint-rules')],
             },
         },
 
@@ -96,7 +103,7 @@ ns.init = function (grunt) {
 
         karma: {
             options: {
-                configFile: 'node_modules/beaker/config/karma/config.js',
+                configFile: path.join(BEAKER_DIR, 'config/karma/config.js'),
             },
 
             unit: {
@@ -131,7 +138,7 @@ ns.init = function (grunt) {
                         preLoaders: [
                             {
                                 test: /\.js$/,
-                                loader: path.join(process.cwd(), 'node_modules/beaker/config/karma/self-loader.js'),
+                                loader: path.join(process.cwd(), BEAKER_DIR, 'config/karma/self-loader.js'),
                             },
                         ],
 
