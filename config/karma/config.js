@@ -13,8 +13,9 @@ var resolve = require('../webpack/resolve');
 var USE_SOURCE_MAPS = process.env.MAPS === 'on';
 var KARMA_BROWSER = process.env.KARMA_BROWSER || 'Chrome';
 
-var BEAKER_DIR = process.env.IS_BEAKER ? './' : 'node_modules/beaker/';
-var entryPoint = process.env.IS_BEAKER ? 'beaker-test-main.js' : 'test-main.js';
+var IS_BEAKER = process.env.IS_BEAKER === '1';
+var BEAKER_DIR = IS_BEAKER ? './' : 'node_modules/beaker/';
+var entryPoint = IS_BEAKER ? 'beaker-test-main.js' : 'test-main.js';
 var entryPointFull = path.join(BEAKER_DIR, 'config/karma', entryPoint);
 
 var preprocessors = {};

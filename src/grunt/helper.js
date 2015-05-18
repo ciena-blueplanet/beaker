@@ -18,11 +18,7 @@ var webpackResolve = require(path.join(configDir, 'webpack/resolve'));
 
 var USE_SOURCE_MAPS = process.env.MAPS === 'on';
 
-var BEAKER_DIR = 'node_modules/beaker';
-
-if (process.env.IS_BEAKER) {
-    BEAKER_DIR = '.';
-}
+var BEAKER_DIR = (process.env.IS_BEAKER === '1') ? './' : 'node_modules/beaker';
 
 var ns = {};
 

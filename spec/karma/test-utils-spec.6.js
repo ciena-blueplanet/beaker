@@ -17,5 +17,9 @@ describe('test-utils', () => {
         it('is defined', () => {
             expect(beaker.wait).toBeDefined();
         });
+
+        it('is defined (inverted)', () => {
+            expect(beaker.wait).not.toBeUndefined();
+        });
     });
 });

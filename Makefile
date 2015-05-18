@@ -54,7 +54,6 @@ init-test: webpack.init-test node.init-test app.init-test
 	$(HIDE)./bin/post-publish.sh
 	$(HIDE)npm cache clean beaker
 
-export IS_BEAKER
 test: lint jasmine-test karma-test
 
 coverage: node-coverage
