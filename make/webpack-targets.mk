@@ -77,20 +77,25 @@ update-screenshots:
 
 KARMA_CONFIG := node_modules/beaker/config/karma/config.js
 karma:
+	$(HIDE)echo "WARNING: the 'karma' target is DEPRECATED.
 	$(HIDE)echo "Running Karma Server"
 	$(ENV)karma start $(KARMA_CONFIG)
 
 %.test:
+	$(HIDE)echo "WARNING: the '*.test' target is DEPRECATED.
 	$(ENV)karma run $(KARMA_CONFIG) -- --grep=$(subst .test,,$@)
 
 webpack-watch-test:
+	$(HIDE)echo "WARNING: the 'webpack-watch-test' target is DEPRECATED. Use 'karma-watch' instead."
 	$(HIDE)echo "Running Karma webpack tests (with watching)"
 	$(ENV)grunt karma:unit watch:karma
 
 webpack-test:
+	$(HIDE)echo "WARNING: the 'webpack-test' target is DEPRECATED. Use 'karma-test' instead."
 	$(HIDE)echo "Running Karma webpack tests once"
 	$(ENV)grunt test
 
 webpack-coverage:
+	$(HIDE)echo "WARNING: the 'webpack-coverage' target is DEPRECATED. Use 'karma-coverage' instead."
 	$(HIDE)echo "Running Karma webpack tests (with coverage)"
 	$(ENV)grunt test-coverage
