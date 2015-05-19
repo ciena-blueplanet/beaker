@@ -3,10 +3,6 @@
 # Copyright (c) 2015 Cyan, Inc. All rights reserved.
 #
 
-ifndef JASMINE_CONFIG_FILE
-	$(error JASMINE_CONFIG_FILE variable needs to be set. Maybe include 'node-targets.mk' first?)
-endif
-
 NODE_SPECS ?= spec/e2e
 TEST_PORT := $(shell perl -MSocket -le 'socket S, PF_INET, SOCK_STREAM,getprotobyname("tcp"); $$port = int(rand(1080))+1080; ++$$port until bind S, sockaddr_in($$port,inet_aton("127.1")); print $$port')
 TEST_CONFIG := spec/e2e/test-config.json
@@ -53,6 +49,10 @@ create-config:
 	$(HIDE)echo "}" >> $(TEST_CONFIG)
 
 do-e2e-test:
+ifndef JASMINE_CONFIG_FILE
+	$(error JASMINE_CONFIG_FILE variable needs to be set. Maybe include 'node-targets.mk' first?)
+endif
+
 	$(HIDE)echo "Running e2e tests on port $(TEST_PORT)"
 	$(ENV)JASMINE_CONFIG_PATH=$(JASMINE_CONFIG_FILE) jasmine || ($(ENV)kill $$(lsof -t -i:$(TEST_PORT)) && false)
 	$(ENV)kill $$(lsof -t -i:$(TEST_PORT)) || echo 'nothing to kill'
