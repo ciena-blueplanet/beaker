@@ -29,7 +29,7 @@ describe('github', function () {
     });
 
     describe('.bumpFiles()', function () {
-        var versionySpy, ret;
+        var versionySpy, ret, jsonTabs, jsonIndent;
         beforeEach(function () {
             var methods = ['to', 'end', 'indent', 'patch', 'minor', 'newMajor'];
             versionySpy = jasmine.createSpyObj('versiony', methods);
@@ -39,6 +39,14 @@ describe('github', function () {
             });
 
             spyOn(versiony, 'from').and.returnValue(versionySpy);
+
+            jsonTabs = process.env.JSON_TABS;
+            process.env.JSON_TABS = '6';
+            jsonIndent = '      ';
+        });
+
+        afterEach(function () {
+            process.env.JSON_TABS = jsonTabs;
         });
 
         describe('major bumps', function () {
@@ -47,7 +55,7 @@ describe('github', function () {
             });
 
             it('sets indentation', function () {
-                expect(versionySpy.indent).toHaveBeenCalledWith('  ');
+                expect(versionySpy.indent).toHaveBeenCalledWith(jsonIndent);
             });
 
             it('bumps the major', function () {
@@ -65,7 +73,7 @@ describe('github', function () {
             });
 
             it('sets indentation', function () {
-                expect(versionySpy.indent).toHaveBeenCalledWith('  ');
+                expect(versionySpy.indent).toHaveBeenCalledWith(jsonIndent);
             });
 
             it('bumps the minor', function () {
@@ -87,7 +95,7 @@ describe('github', function () {
             });
 
             it('sets indentation', function () {
-                expect(versionySpy.indent).toHaveBeenCalledWith('  ');
+                expect(versionySpy.indent).toHaveBeenCalledWith(jsonIndent);
             });
 
             it('bumps the patch', function () {
