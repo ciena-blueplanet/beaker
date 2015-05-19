@@ -9,6 +9,7 @@ ENV ?= $(HIDE)source env.sh &&
 VERSION := $(shell grep -o '"version":.*",' package.json | awk '{ print $$2; }' | sed -e 's/[",]//g')
 IS_BEAKER ?= 0
 JSON_TABS ?= 4
+export JSON_TABS
 
 BEAKER_BIN ?= beaker
 export IS_BEAKER

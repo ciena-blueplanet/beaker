@@ -258,8 +258,13 @@ ns.versionBumped = function (argv) {
  * @returns {Boolean} whether or not file bump succeeded
  */
 ns.bumpFiles = function (bump) {
+
+    // fill in the correct number of spaces based on JSON_TABS env
+    var numSpaces = parseInt(process.env.JSON_TABS || '4', 10);
+    var jsonIndent = new Array(numSpaces + 1).join(' ');
+
     // Get current version from package.json
-    var v = versiony.from('package.json').indent('  ');
+    var v = versiony.from('package.json').indent(jsonIndent);
 
     switch (bump) {
         case 'major':
