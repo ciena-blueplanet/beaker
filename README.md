@@ -213,7 +213,7 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
  * [babel-loader](https://github.com/babel/babel-loade://github.com/babel/babel-loader) so you can write the code of
    tomorrow, today with [`babel`](https://github.com/babel/babel)
  * [imports-loader](https://github.com/webpack/imports-loader) so you can include code that was intended to be
-   included directly in a `<script>` tag. 
+   included directly in a `<script>` tag.
 
 ### Task Management
 * [grunt](https://github.com/gruntjs/grunt)
@@ -240,5 +240,5 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
 We also include code from the following sources.
 
 * [nodeca](https://github.com/nodeca/nodeca/)
-(some [eslint rules](https://github.com/nodeca/eslint-plugin-nodeca/tree/master/lib))`
+(some [eslint rules](https://github.com/nodeca/eslint-plugin-nodeca/tree/master/lib))
 
