@@ -27,6 +27,9 @@ var loaders = [
     }, {
         test: /\.(svg|woff|woff2|eot|dtd|png|gif|jpg|jpeg|ttf)(\?.*)?$/,
         loader: 'file',
+    }, {
+        test: /bootstrap\/js\//,
+        loader: 'imports?jQuery=jquery',
     },
 ];
 
