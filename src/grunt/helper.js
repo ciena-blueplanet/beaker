@@ -64,6 +64,7 @@ ns.init = function (grunt) {
     _.without(localGruntTasks, 'grunt-cli').forEach(grunt.loadNpmTasks);
 
     var webpackConfig = require(path.join(process.cwd(), 'webpack.config.js'));
+    var WEBPACK_PORT = grunt.option('port') || process.env.WEBPACK_PORT || 8080;
 
     // initial grunt config
     grunt.initConfig({
@@ -176,6 +177,7 @@ ns.init = function (grunt) {
             options: {
                 webpack: webpackConfig,
                 publicPath: '/' + webpackConfig.output.publicPath,
+                port: WEBPACK_PORT,
             },
 
             start: {
