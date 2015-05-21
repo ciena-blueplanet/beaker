@@ -29,6 +29,9 @@ describe('grunt helper', function () {
 
             beakerTasks = ['beaker-task-1', 'grunt-cli', 'beaker-task-2'];
             localTasks = ['local-task-1', 'local-task-2'];
+            grunt.option = function () {
+                return null;
+            };
             spyOn(matchdep, 'filterAll').and.callFake(function (pattern, pkg) {
                 if (pkg) {
                     return localTasks;
