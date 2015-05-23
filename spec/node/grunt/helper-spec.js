@@ -22,7 +22,7 @@ describe('grunt helper', function () {
         var grunt, beakerTasks, localTasks;
         beforeEach(function () {
             spyOn(process, 'cwd').and.returnValue(path.join(__dirname, '_cwd'));
-            grunt = jasmine.createSpyObj('grunt', ['loadNpmTasks', 'initConfig', 'registerTask']);
+            grunt = jasmine.createSpyObj('grunt', ['loadNpmTasks', 'initConfig', 'registerTask', 'option']);
             grunt.log = {
                 writeln: jasmine.createSpy('grunt.log.writeln'),
             };
