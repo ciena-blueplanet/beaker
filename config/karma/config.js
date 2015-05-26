@@ -89,7 +89,9 @@ module.exports = function (config) {
             },
             plugins: [
                 new webpack.DefinePlugin({
-                    MOCK_APIS: false,
+                    'process.env': {
+                        'JASMINE': process.env.JASMINE,
+                    },
                 }),
             ],
             resolve: resolve,
