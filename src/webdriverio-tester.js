@@ -11,85 +11,187 @@
  * @property {String} stdout - the standard output from command
  */
 
+require('./typedefs');
+
+
 var _ = require('lodash');
+var async = require('async');
 var path = require('path');
+var exec = require('child_process').exec;
 var sh = require('execSync');
 var sleep = require('sleep');
 
-var ns = {};
+var throwCliError = require('./cli/utils').throwCliError;
 
+/**
+ * Obvious
+ * @param {AsyncCallback} callback - callback to call when done
+ */
+function makeDemoDirectory(callback) {
+    exec('mkdir demo', function (err) {
+        callback(err);
+    });
+}
+
+/**
+ * if we're an app, remove the demo directory
+ * @param {Boolean} isApp - true if app project
+ * @param {AsyncCallback} callback - the async.waterfall callback to call when done or on error
+ */
+function maybeRemoveDemoDirectory(isApp, callback) {
+    if (isApp) {
+        remove('demo', callback);
+    } else {
+        callback(null);
+    }
+}
+
+/**
+ * Obvious
+ * @param {String[]} extras - extra files/directories to include in tarball
+ * @param {AsyncCallback} callback - callback to call when done
+ */
+function copyFilesToDemoDirectory(extras, callback) {
+    var cmd = ['cp', '-a', 'index.html', 'bundle'];
+    cmd = cmd.concat(extras);
+    cmd.push('demo');
+
+    exec(cmd.join(' '), function (err) {
+        var newExtras = _.map(extras, function (extra) {
+            return 'demo/' + extra;
+        });
+
+        callback(err, newExtras);
+    });
+}
 
 /**
  * @param {String[]} extras - extra files/directories to include in tarball
- * @returns {String[]} - updated extras (all with demo/ in front of them)
+ * @param {AsyncCallback} callback - the async.waterfall callback to call when done or on error
  */
-ns.prepareDemoDirectory = function (extras) {
+function prepareDemoDirectory(extras, callback) {
 
-    sh.exec('mkdir demo');
+    async.waterfall([
+        function (cb) {
+            makeDemoDirectory(cb);
+        },
 
-    var command = ['cp', '-a', 'index.html', 'bundle'];
-    command = command.concat(extras);
-    command.push('demo');
-
-    sh.exec(command.join(' '));
-
-    var newExtras = _.map(extras, function (extra) {
-        return 'demo/' + extra;
+        function (cb) {
+            copyFilesToDemoDirectory(extras, cb);
+        },
+    ],
+    function (err, result) {
+        callback(err, result);
     });
+}
 
-    return newExtras;
-};
+/**
+ * if we're an app, prepare the demo directory
+ * @param {Boolean} isApp - true if app project
+ * @param {String[]} extras - optional extra files/directories to include in tarball
+ * @param {AsyncCallback} callback - the async.waterfall callback to call when done or on error
+ */
+function maybePrepareDemoDirectory(isApp, extras, callback) {
+    if (isApp) {
+        prepareDemoDirectory(extras, callback);
+    } else {
+        callback(null, extras);
+    }
+}
+
+/**
+ * obvious
+ * @param {String[]} extras - extra files/directories to include in tarball
+ * @param {AsyncCallaback} callback - callback to call once we're done
+ */
+function tarUpDemoDirectory(extras, callback) {
+
+    var cmd = ['tar', '--exclude="*.map"', '-czf', 'test.tar.gz', 'spec', 'demo/index.html', 'demo/bundle'];
+    cmd = cmd.concat(extras);
+
+    exec(cmd.join(' '), function (err) {
+        callback(err);
+    });
+}
 
 /**
  * Create a tarball of the resources to submit
  * @param {Boolean} isApp - true if we need to fake the demo directory
  * @param {String[]} extras - optional extra files/directories to include in tarball
- * @returns {String} - the full path  of the created tarball
+ * @param {AsyncCallaback} callback - callback to call once we're done
  */
-ns.createTarball = function (isApp, extras) {
+function createTarball(isApp, extras, callback) {
 
     console.log('Creating bundle...');
 
-    if (isApp) {
-        extras = this.prepareDemoDirectory(extras);
-    }
+    async.waterfall([
 
-    var filename = 'test.tar.gz'; // TODO: add some timestamp or anything?
+        function (cb) {
+            maybePrepareDemoDirectory(isApp, extras, cb);
+        },
 
-    var command = ['tar', '--exclude="*.map"', '-czf', filename, 'spec', 'demo/index.html', 'demo/bundle'];
-    command = command.concat(extras);
+        function (newExtras, cb) {
+            tarUpDemoDirectory(newExtras, cb);
+        },
 
-    sh.exec(command.join(' '));
+        function (cb) {
+            maybeRemoveDemoDirectory(isApp, cb);
+        },
 
-    if (isApp) {
-        sh.exec('rm -rf demo');
-    }
-
-    return filename;
-};
+    ], function (err) {
+        callback(err);
+    });
+}
 
 /**
  * Submit the tarball for test
- * @param {String} filename - the path to the tarball to submit
  * @param {String} server - the protocol/host/port of the server
- * @returns {Result} the result of the submission
+ * @param {AsyncCallaback} callback - callback to call once we're done
  */
-ns.submitTarball = function (filename, server) {
+function submitTarball(server, callback) {
 
     console.log('Submitting bundle to ' + server + ' for test...');
 
-    var command = [
+    var cmd = [
         'curl',
         '-s',
         '-F',
-        '"tarball=@' + filename + '"',
+        '"tarball=@test.tar.gz"',
         '-F',
         '"entry-point=demo/"',
         server + '/',
     ];
 
-    return sh.exec(command.join(' '));
-};
+    exec(cmd.join(' '), function (err, stdout) {
+        var timestamp = '';
+        if (!err) {
+            timestamp = stdout.toString();
+            console.log('TIMESTAMP: ' + timestamp);
+        }
+
+        callback(err, timestamp);
+    });
+}
+
+/**
+ * Wait till the server is done with our tests
+ * @param {String} cmd - the command to execute to check for results
+ * @param {Number} pollInterval - the poll interval in seconds
+ * @param {AsyncCallaback} callback - callback to call once we're done
+ */
+function checkForResults(cmd, pollInterval, callback) {
+    console.log('Checking for results...');
+    exec(cmd, function (err, stdout) {
+        if (err) {
+            callback(err);
+        } else if (stdout.toString().toLowerCase() === 'not found') {
+            sleep.sleep(pollInterval);
+            checkForResults(cmd, pollInterval, callback);
+        } else {
+            callback(null);
+        }
+    });
+}
 
 /**
  * Wait till the server is done with our tests
@@ -98,66 +200,144 @@ ns.submitTarball = function (filename, server) {
  * @param {String} params.server - the protocol/host/port of the server
  * @param {Number} params.initialSleep - the initial sleep time in seconds
  * @param {Number} params.pollInterval - the poll interval in seconds
+ * @param {AsyncCallaback} params.callback - callback to call once we're done
  */
-ns.waitForResults = function (params) {
+function waitForResults(params) {
     console.log('Waiting ' + params.initialSleep + 's before checking');
     sleep.sleep(params.initialSleep);
 
-    console.log('Checking for results...');
-    var command = 'curl -s ' + params.server + '/status/' + params.timestamp;
-    while (sh.exec(command).stdout.toLowerCase() === 'not found') {
-        sleep.sleep(params.pollInterval);
-        console.log('Checking for results...');
-    }
-};
+    var cmd = 'curl -s ' + params.server + '/status/' + params.timestamp;
+    checkForResults(cmd, params.pollInterval, params.callback);
+}
 
 /**
- * Remove the given file
+ * obvious
  * @param {String} filename - the filename to remove
- * @returns {Result} the result of the remove
+ * @param {AsyncCallback} callback - callback to call when done
  */
-ns.remove = function (filename) {
-    return sh.exec('rm -f ' + filename);
-};
+function remove(filename, callback) {
+    exec('rm -rf ' + filename, function (err) {
+        callback(err);
+    });
+}
+
+/**
+ * Fetch the results from the server
+ * @param {String} url - the url to fetch results from
+ * @param {AsyncCallback} callback - callback to call when done
+ */
+function getResults(url, callback) {
+
+    exec('curl -s ' + url, function (err, stdout) {
+        if (err) {
+            callback(err);
+        } else {
+            console.log('Parsing results...');
+            var results = JSON.parse(stdout.toString());
+            callback(null, results);
+        }
+    });
+}
+
+/**
+ * obvious
+ * @param {String} url - the URL to get the tarball from
+ * @param {WebdriverioServerTestResults} results - details of the test results
+ * @param {AsyncCallback} callback - callback to call when done
+ */
+function getTarball(url, results, callback) {
+
+    exec('curl -s -O' + url, function (err) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, results);
+        }
+
+    });
+}
+
+/**
+ * Obvious
+ * @param {WebdriverioServerTestResults} results - details of the test results
+ * @param {AsyncCallback} callback - callback to call when done
+ */
+function extractTarball(results, callback) {
+
+    var filename = path.basename(results.output);
+    sh.exec('tar -xf ' + filename);
+    exec('tar -xf' + filename, function (err) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, filename, results);
+        }
+    });
+}
+
 
 /**
  * Parse and output the results
  * @param {String} timestamp - the timestamp of the results we're processing
  * @param {String} server - the protocol/host/port of the server
- * @returns {Number} 0 on success, non-zero on error
+ * @param {AsyncCallback} callback - callback to call when done
  */
-ns.processResults = function (timestamp, server) {
-    var result = sh.exec('curl -s ' + server + '/screenshots/output-' + timestamp + '.json');
+function processResults(timestamp, server, callback) {
 
-    console.log('Parsing results...');
-    var results = JSON.parse(result.stdout);
+    async.waterfall([
+        function (cb) {
+            var url = server + '/screenshots/output-' + timestamp + '.json';
+            getResults(url, cb);
+        },
 
-    var filename = results.output;
-    sh.exec('curl -s -O ' + server + '/' + filename);
+        function (results, cb) {
+            var url = server + '/' + results.output;
+            getTarball(url, results, cb);
+        },
 
-    sh.exec('tar -xf ' + path.basename(filename));
-    this.remove(path.basename(filename));
+        function (results, cb) {
+            extractTarball(results, cb);
+        },
 
-    console.log(results.info);
+        function (filename, results, cb) {
+            // remove the tarball
+            remove(filename, function (err) {
+                if (err) {
+                    cb(err);
+                } else {
+                    cb(null, results);
+                }
+            });
+        },
 
-    console.log('----------------------------------------------------------------------');
-    console.log('Screenshots directory updated with results from server.');
+    ], function (err, results) {
+        if (err) {
+            callback(err);
+        } else {
+            console.log(results.info);
 
-    if (results.exitCode === 0) {
-        console.log('Tests Pass.');
-    } else {
-        console.log('ERRORS Encountered.');
-    }
+            console.log('----------------------------------------------------------------------');
+            console.log('Screenshots directory updated with results from server.');
 
-    return results.exitCode;
-};
+            if (results.exitCode === 0) {
+                console.log('Tests Pass.');
+                callback(null);
+            } else {
+                callback({
+                    message: 'ERRORS Encountered.',
+                    exitCode: results.exitCode,
+                });
+            }
+        }
+    });
+}
 
 /**
  * Actual functionality of the 'webdriverio-test' command
- * @param {Ojbect} argv - the minimist arguments object
- * @returns {Number} 0 on success, 1 on error
+ * @param {MinimistArgv} argv - the minimist arguments object
+ * @throws CliError
 */
-ns.command = function (argv) {
+function command(argv) {
 
     _.defaults(argv, {
         initialSleep: 10,
@@ -167,26 +347,50 @@ ns.command = function (argv) {
 
     var extras = argv._.slice(1);
 
-    var filename = this.createTarball(argv.app, extras);
-    var result = this.submitTarball(filename, argv.server);
+    async.waterfall([
+        function (callback) {
+            createTarball(argv.app, extras, callback);
+        },
 
-    if (result.code !== 0) {
-        console.log('The e2e test server appears to be offline');
-        return result.code;
-    }
+        function (callback) {
+            submitTarball(argv.server, callback);
+        },
 
-    var timestamp = result.stdout;
-    console.log('TIMESTAMP: ' + timestamp);
+        function (timestamp, callback) {
+            remove('test.tar.gz', function (err) {
+                if (err) {
+                    callback(err);
+                } else {
+                    callback(null, timestamp);
+                }
+            });
+        },
 
-    this.remove(filename);
-    this.waitForResults({
-        timestamp: timestamp,
-        server: argv.server,
-        pollInterval: argv.pollInterval,
-        initialSleep: argv.initialSleep,
+        function (timestamp, callback) {
+            waitForResults({
+                timestamp: timestamp,
+                server: argv.server,
+                pollInterval: argv.pollInterval,
+                initialSleep: argv.initialSleep,
+                callback: callback,
+            });
+        },
+
+        function (timestamp, callback) {
+            processResults(timestamp, argv.server, callback);
+        },
+
+    ], function (err) {
+        throwCliError(err.message, err.exitCode || 1);
     });
+}
 
-    return this.processResults(timestamp, argv.server);
+module.exports = {
+    command: command,
+    createTarball: createTarball,
+    submitTarball: submitTarball,
+    waitForResults: waitForResults,
+    remove: remove,
+    prepareDemoDirectory: prepareDemoDirectory,
+    processResults: processResults,
 };
-
-module.exports = ns;

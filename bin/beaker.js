@@ -8,11 +8,19 @@
 'use strict';
 
 // Since this is a CLI and only a CLI, we actually want process.exit
-/* eslint-disable no-process-exit */
 
+var exit = require('exit');
 var cli = require('../src/cli');
 var argv = require('minimist')(process.argv.slice(2), {'boolean': 'app'});
 
-var ret = cli.argv(argv);
+process.on('unhandledException', function (err) {
+    var exitCode = 1;
+    if (err.exitCode !== undefined) {
+        exitCode = err.exitCode;
+    }
 
-process.exit(ret);
+    console.error(err.message);
+    exit(exitCode);
+});
+
+cli.argv(argv);

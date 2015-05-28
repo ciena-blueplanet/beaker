@@ -5,10 +5,14 @@
 
 'use strict';
 
+require('./typedefs');
+
 var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
 var changeCase = require('change-case');
+
+var throwCliError = require('./cli/utils').throwCliError;
 var config = require('./config');
 var utils = require('./utils');
 
@@ -38,16 +42,17 @@ ns.cleanupCruft = function (projectName) {
 
 /**
  * Actual functionality of the 'init' command
- * @param {Ojbect} argv - the minimist arguments object
- * @returns {Number} 0 on success, 1 on error
+ * @param {MinimistArgv} argv - the minimist arguments object
+ * @throws {CliError}
 */
 ns.command = function (argv) {
     var _config = config.load(CWD);
 
     if (!_config) {
-        console.error('beaker.json missing');
-        console.info('To create a default beaker.json file run the following command: beaker newConfig');
-        return 1;
+        var msg = 'beaker.json missing\n';
+        msg += 'To create a default beaker.json file, run the following command: beaker newConfig';
+
+        throwCliError(msg);
     }
 
     // get today's year for copyright headers, etc.
@@ -80,12 +85,12 @@ ns.command = function (argv) {
     // clean up symlinks, if they exist
     _.forEach(['src', 'spec', 'node-spec'], function (pathElement) {
         var fullPath = path.join(CWD, pathElement, 'project-name');
-        if (fs.existsSync(fullPath)) {
-            fs.unlink(fullPath);
-        }
+        fs.exists(fullPath, function (exists) {
+            if (exists) {
+                fs.unlink(fullPath);
+            }
+        });
     });
-
-    return 0;
 };
 
 module.exports = ns;

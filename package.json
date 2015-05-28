@@ -37,8 +37,10 @@
         "test": "make ci-test"
     },
     "dependencies": {
+        "async": "^1.0.0",
         "change-case": "^2.2.0",
         "execSync": "^1.0.2",
+        "exit": "^0.1.2",
         "http-sync": "0.1.0",
         "lodash": "^3.2.0",
         "minimist": "^1.1.0",
