@@ -6,6 +6,9 @@
 'use strict';
 
 var path = require('path');
+var autoprefixer = require('autoprefixer-core');
+var csswring = require('csswring');
+
 var loaders = require('beaker/config/webpack/loaders');
 var resolve = require('beaker/config/webpack/resolve');
 
@@ -34,6 +37,8 @@ module.exports = {
         ],
         loaders: loaders,
     },
+
+    postcss: [autoprefixer, csswring],
 
     resolve: resolve,
 };
