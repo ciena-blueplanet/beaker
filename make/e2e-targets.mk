@@ -68,7 +68,7 @@ endif
 e2e-test: kill-httpserver build-mock start-httpserver create-config do-e2e-test
 
 remote-e2e-test: build-mock do-remote-e2e-test
-do-remote-e2e-test: clean-regressions create-config
+do-remote-e2e-test: clean-screenshots create-config
 ifndef WEBDRIVERIO_SERVER
 	$(error WEBDRIVERIO_SERVER variable needs to be set)
 else
