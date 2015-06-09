@@ -52,7 +52,7 @@ create-config:
 SCREENSHOTS_DIR := spec/e2e/screenshots
 clean-screenshots:
 	$(HIDE)echo "Removing everything but *.baseline.png files from $(SCREENSHOTS_DIR)"
-	$(HIDE)find $(SCREENSHOTS_DIR) -type f ! -name *.baseline.png -exec rm -f {} \;
+	$(HIDE)find $(SCREENSHOTS_DIR) -type f ! -name *.baseline.png -exec rm -f {} \; || echo "No screenshots present"
 
 do-e2e-test:
 ifndef JASMINE_CONFIG_FILE
