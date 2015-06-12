@@ -17,7 +17,8 @@
         "regexYFlag": true,
         "superInFunctions": true,
         "templateStrings": true,
-        "unicodeCodePointEscapes": true
+        "unicodeCodePointEscapes": true,
+        "destructuring": true
     },
     "env": {
         "amd": true,
