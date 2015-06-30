@@ -125,11 +125,12 @@ ns.getRequest = function (apiPath) {
 /**
  * Get list of commits for repository
  * @param {String} repo - repsitory name (including owner)
+ * @param {String} branch - branch name
  * @throws an Error when response indicates failure
  * @returns {Array<Object>} commits for repository
  */
-ns.getCommits = function (repo) {
-    return ns.getRequest('repos/' + repo + '/commits');
+ns.getCommits = function (repo, branch) {
+    return ns.getRequest('repos/' + repo + '/commits?sha=' + branch);
 };
 
 /**
@@ -291,27 +292,33 @@ ns.bumpFiles = function (bump) {
 };
 
 /**
- * Push local Git changes to remote
- * @returns {Boolean} whether or not push succeeded
+ * Get the current branch (based on last commit) only valid for merge scenario, not PRs
+ * @returns {String} the name of the branch or null on error
  */
-ns.pushChanges = function () {
-    var branch,
-        result;
+ns.getBranch = function () {
+    var result;
 
     result = sh.exec('git rev-parse --abbrev-ref HEAD');
 
     if (result.code !== 0) {
         console.error('Failed to get branch name with error: ' + result.stdout);
-        return false;
+        return null;
     } else {
-        branch = result.stdout;
+        return result.stdout;
     }
+};
 
+/**
+ * Push local Git changes to remote
+ * @param {String} branch - the branch to push to
+ * @returns {Boolean} whether or not push succeeded
+ */
+ns.pushChanges = function (branch) {
     var cmd = 'git push origin ' + branch;
     console.info(cmd);
 
     // Push local changes to remote
-    result = sh.exec(cmd);
+    var result = sh.exec(cmd);
 
     if (result.code !== 0) {
         console.error('Failed to push to remote with error: ' + result.stdout);
@@ -323,9 +330,10 @@ ns.pushChanges = function () {
 
 /**
  * Commit changes to bower.json and package.json
+ * @param {String} branch - the branch to push to
  * @returns {Boolean} whether or not commit succeeded
  */
-ns.commitBumpedFiles = function () {
+ns.commitBumpedFiles = function (branch) {
     _.forEach(['bower.json', 'package.json'], function (file) {
         var filePath = path.join(CWD, file);
 
@@ -343,7 +351,7 @@ ns.commitBumpedFiles = function () {
     }
 
     // Return whether or not local changes were successfully pushed to remote
-    return ns.pushChanges();
+    return ns.pushChanges(branch);
 };
 
 /**
@@ -357,7 +365,13 @@ ns.bumpVersion = function (argv) {
         return 1;
     }
 
-    var commits = ns.getCommits(argv.repo);
+    var branch = this.getBranch();
+    if (branch === null) {
+        console.error('Unable to lookup branch');
+        return 1;
+    }
+
+    var commits = ns.getCommits(argv.repo, branch);
     var error = false;
 
     var bumps = [];
@@ -398,7 +412,7 @@ ns.bumpVersion = function (argv) {
     });
 
     // If failed to commit changes
-    if (error || !ns.commitBumpedFiles()) {
+    if (error || !ns.commitBumpedFiles(branch)) {
         return 1;
     }
 
