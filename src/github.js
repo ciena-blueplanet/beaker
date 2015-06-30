@@ -5,14 +5,17 @@
 
 'use strict';
 
+var Q = require('q');
+var exec = Q.denodify(require('child_process').exec);
 var sh = require('execSync');
 var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
 var request = require('superagent');
-var httpSync = require('http-sync');
+var http = require('q-io/http');
 var versiony = require('versiony');
 
+var throwCliError = require('./cli/utils').throwCliError;
 var config = require('./config');
 
 // 'Constants' to store some info so we don't calculate it more than once
@@ -88,60 +91,41 @@ ns.createRelease = function (argv) {
 /**
  * Make GitHub API GET request
  * @param {String} apiPath - path to desired GitHub API
- * @throws an Error when response indicates failure
- * @returns {Object} JSON object
+ * @returns {Q.Promise} a promise that will be resolved with the result of the request
  */
 ns.getRequest = function (apiPath) {
-    var msg;
-
-    var host = getConfig().github.host;
-    var urlPath = '/api/v3/' + apiPath;
-    var protocol = 'https';
-
-    console.info(protocol + '://' + host + urlPath);
-
-    var req = httpSync.request({
-        host: host,
-        path: urlPath,
-        protocol: protocol,
+    var url = 'https://' + getConfig().github.host + '/api/v3/' + apiPath;
+    return http.request(url).then(function (res) {
+        // NOTE: this is all within this then() because the inner one needs
+        // access to the res object and I wasn't sure how to do that if I returned
+        // res.body.read() here and used chaining -- ARM
+        return res.body.read().then(function (content) {
+            return {
+                status: res.status,
+                data: JSON.parse(content),
+            };
+        });
     });
-
-    req.setTimeout(10000, function () {
-        msg = 'Request timed out: ' + protocol + '://' + host + urlPath;
-        throw new Error(msg);
-    });
-
-    var res = req.end();
-
-    if (res.statusCode !== 200) {
-        msg = 'Status Code: ' + res.statusCode + '\n' +
-            'Response Body:\n' + res.body.toString();
-        throw new Error(msg);
-    }
-
-    return JSON.parse(res.body.toString());
 };
 
 /**
  * Get list of commits for repository
  * @param {String} repo - repsitory name (including owner)
  * @param {String} branch - branch name
- * @throws an Error when response indicates failure
- * @returns {Array<Object>} commits for repository
+ * @returns {Q.Promise} a promise that will be resolved with the results of the commits API
  */
 ns.getCommits = function (repo, branch) {
-    return ns.getRequest('repos/' + repo + '/commits?sha=' + branch);
+    return this.getRequest('repos/' + repo + '/commits?sha=' + branch);
 };
 
 /**
  * Get single pull request for repository
  * @param {String} repo - repsitory name (including owner)
  * @param {String} number - pull request number
- * @throws an Error when response indicates failure
- * @returns {Object} single pull request for repository
+ * @returns {Q.Promise} a promise that will be resolved with the results of the commits API
  */
 ns.getPullRequest = function (repo, number) {
-    return ns.getRequest('repos/' + repo + '/pulls/' + number);
+    return this.getRequest('repos/' + repo + '/pulls/' + number);
 };
 
 /**
@@ -215,20 +199,21 @@ ns.specifiesVersionBumpLevel = function (pr) {
 /**
  * Determine if all required arguments are present for bump commands
  * @param {Object} argv - the minimist arguments object
- * @param {Array<String>} required - list of required arguments
- * @returns {Boolean} whether or not required arguments are missing
+ * @param {String[]} requiredArgs - list of required arguments
+ * @throws CliError
  */
-ns.missingArgs = function (argv, required) {
-    var argsMissing = false;
+ns.verifyRequiredArgs = function (argv, requiredArgs) {
+    var errors = [];
 
-    _.forEach(required, function (arg) {
+    requiredArgs.forEach(function (arg) {
         if (!_.has(argv, arg)) {
-            console.error(arg + ' argument is required');
-            argsMissing = true;
+            errors.push(arg + ' argument is required');
         }
     });
 
-    return argsMissing;
+    if (errors.length > 0) {
+        throwCliError(errors.join('\n'), 1);
+    }
 };
 
 /**
@@ -237,10 +222,7 @@ ns.missingArgs = function (argv, required) {
  * @returns {Number} return value (1 for failure, 0 for success)
  */
 ns.versionBumped = function (argv) {
-    // If missing required command line arguments
-    if (ns.missingArgs(argv, ['repo', 'sha'])) {
-        return 1;
-    }
+    this.verifyRequiredArgs(argv, ['repo', 'sha']);
 
     var pr = ns.getPullRequestForSHA(argv.repo, argv.sha, false);
 
@@ -256,7 +238,7 @@ ns.versionBumped = function (argv) {
 /**
  * Bump version in bower.json and package.json files
  * @param {String} bump - version bump level
- * @returns {Boolean} whether or not file bump succeeded
+ * @throws CliError
  */
 ns.bumpFiles = function (bump) {
 
@@ -281,31 +263,26 @@ ns.bumpFiles = function (bump) {
             break;
 
         default:
-            console.error('Missing version bump comment');
-            return false;
+            throwCliError('Missing version bump comment', 1);
+            break;
     }
 
     // Update package.json with bumped version
     v.to('package.json').end();
-
-    return true;
 };
 
 /**
  * Get the current branch (based on last commit) only valid for merge scenario, not PRs
- * @returns {String} the name of the branch or null on error
+ * @returns {Q.Promise} a promise resolved with the the name of the branch
  */
 ns.getBranch = function () {
-    var result;
-
-    result = sh.exec('git rev-parse --abbrev-ref HEAD');
-
-    if (result.code !== 0) {
-        console.error('Failed to get branch name with error: ' + result.stdout);
-        return null;
-    } else {
-        return result.stdout;
-    }
+    return exec('git rev-parse --abbrev-ref HEAD').then(function (result) {
+        if (result.code !== 0) {
+            throwCliError('Faild to get branch name with error: ' + result.stdout, 1);
+        } else {
+            return result.stdout;
+        }
+    });
 };
 
 /**
@@ -355,28 +332,14 @@ ns.commitBumpedFiles = function (branch) {
 };
 
 /**
- * Bump version based on comment in pull request
- * @param {Object} argv - the minimist arguments object
- * @returns {Number} return value (1 for failure, 0 for success)
+ * Collect all the version bumps in the list of commits
+ * @param {String} repo - the repository name (including owner)
+ * @param {Object[]} commits - the array of commits to go through
+ * @returns {Q.Promsie} a promise resolved with the array of version bumps to be made
  */
-ns.bumpVersion = function (argv) {
-    // If missing required command line arguments
-    if (ns.missingArgs(argv, ['repo'])) {
-        return 1;
-    }
-
-    var branch = this.getBranch();
-    if (branch === null) {
-        console.error('Unable to lookup branch');
-        return 1;
-    }
-
-    var commits = ns.getCommits(argv.repo, branch);
-    var error = false;
-
-    var bumps = [];
-
-    _.forEach(commits, function (commitObj) {
+ns.getVersionBumps = function (repo, commits) {
+    var prPromises = [];
+    commits.forEach(function (commitObj, index) {
         // If commit was made by buildbot we can ignore all previous commits
         if (commitObj.commit.author.email === getConfig().github.email) {
             return false;
@@ -387,74 +350,99 @@ ns.bumpVersion = function (argv) {
 
         // If commit is for a pull request merge
         if (matches) {
-            var pr = ns.getPullRequest(argv.repo, matches[1]);
+            var prPromise = this.getPullRequest(repo, matches[1]).then(function (resp) {
+                return {
+                    index: index,
+                    resp: resp,
+                };
+            });
+            prPromises.push(prPromise);
+            prPromise.done();
+        }
+    });
 
-            // If pull request not found
-            if (!pr) {
-                console.warn('Could not find PR #' + matches[1] + ' on repository ' + argv.repo);
-                // Note: Do not change error b/c a repo could have older PR's that are from before
-                // the version-bump comment
-                return true;
+    return Q.all(prPromises).then(function (resolutions) {
+        var responses = _(resolutions).sortBy('index').pluck('resp').value();
+
+        // reverse it since we need to bump versions from oldest to newest
+        return responses.map(this.getVersionBumpLevel).reverse();
+    });
+};
+
+/**
+ * Bump the version for the given repo/branch
+ * @param {String} repo - the repository (including owner)
+ * @param {String} branch - the branch to bump
+ * @returns {Q.Promise} a promise resolved when bump is finished
+ */
+ns.bumpVersionForBranch = function (repo, branch) {
+
+    return this.getCommits(repo, branch)
+        .then(function (resp) {
+            return this.getVersionBumps(repo, resp.data);
+        })
+        .then(function (bumps) {
+            bumps.forEach(function (bump) {
+                this.bumpFiles(bump);
+            });
+        })
+        .then(function () {
+            return this.commitBumpedFiles(branch);
+        });
+};
+
+/**
+ * Bump version based on comment in pull request
+ * @param {Object} argv - the minimist arguments object
+ * @throws CliError
+ */
+ns.bumpVersion = function (argv) {
+    this.verifyRequiredArgs(argv, ['repo']);
+
+    this.getBranch()
+        .then(function (branch) {
+            if (branch === null) {
+                throwCliError('Unable to lookup branch', 1);
             }
-
-            var bump = ns.getVersionBumpLevel(pr);
-
-            // Add to beginning of array since we need to bump versions from oldest to newest
-            bumps.unshift(bump);
-        }
-    });
-
-    _.forEach(bumps, function (bump) {
-        // If failed to bump files
-        if (!ns.bumpFiles(bump)) {
-            error = true;
-        }
-    });
-
-    // If failed to commit changes
-    if (error || !ns.commitBumpedFiles(branch)) {
-        return 1;
-    }
-
-    return 0;
+            return branch;
+        })
+        .then(function (branch) {
+            return this.bumpVersionForBranch(argv.repo, branch);
+        })
+        .done();
 };
 
 /**
  * Actual functionality of the 'github' command
  * @param {Ojbect} argv - the minimist arguments object
- * @returns {Number} 0 on success, 1 on error
+ * @throws CliError
 */
 ns.command = function (argv) {
     if (argv._.length !== 2) {
-        console.error('Invalid command: ' + JSON.stringify(argv._));
-        return 1;
+        throwCliError('Invalid command: ' + JSON.stringify(argv._), 1);
     }
 
     console.info(argv);
 
     var command = argv._[1];
-    var ret = 0;
 
     switch (command) {
         case 'bump-version':
-            ret = ns.bumpVersion(argv);
+            this.bumpVersion(argv);
             break;
 
         case 'version-bumped':
-            ret = ns.versionBumped(argv);
+            this.versionBumped(argv);
             break;
 
         case 'release':
-            ns.createRelease(argv);
+            this.createRelease(argv);
             break;
 
         default:
-            console.error('Unknown command: ' + command);
-            ret = 1;
+            throwCliError('Unknown command: ' + command, 1);
             break;
     }
-
-    return ret;
 };
 
 module.exports = ns;
