@@ -663,7 +663,10 @@ describe('github', function () {
             };
 
             spyOn(github, 'getPullRequest').and.callFake(function (repo, number) {
-                return Q(prs[number]);
+                return Q({
+                    status: 200,
+                    data: prs[number],
+                });
             });
 
             github.getVersionBumps('cyaninc/beaker', commits).then(function (resp) {

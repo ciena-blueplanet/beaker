@@ -181,7 +181,7 @@ ns.versionBumped = function (argv) {
                 utils.throwCliError('Missing version bump comment', 1);
             }
         })
-        .done();
+        .catch(console.error.bind(console));
 };
 
 /**
@@ -300,7 +300,7 @@ ns.getVersionBumps = function (repo, commits) {
     });
 
     return Q.all(prPromises).then(function (resolutions) {
-        var responses = _(resolutions).sortBy('index').pluck('resp').value();
+        var responses = _(resolutions).sortBy('index').pluck('resp').pluck('data').value();
 
         // reverse it since we need to bump versions from oldest to newest
         return responses.map(self.getVersionBumpLevel).reverse();
@@ -357,7 +357,7 @@ ns.bumpVersion = function (argv) {
         .then(function (branch) {
             return self.bumpVersionForBranch(argv.repo, branch);
         })
-        .done();
+        .catch(console.error.bind(console));
 };
 
 /**
