@@ -10,19 +10,15 @@ var init = t.require('../init');
 var cli = t.require('./index');
 
 describe('cli.init', function () {
-    var argv, ret;
+    var argv;
 
     beforeEach(function () {
         argv = {_: ['init']};
-        spyOn(init, 'command').and.returnValue(13);
-        ret = cli.init(argv);
+        spyOn(init, 'command');
+        cli.init(argv);
     });
 
     it('calls init method', function () {
         expect(init.command).toHaveBeenCalledWith(argv);
-    });
-
-    it('returns result of init', function () {
-        expect(ret).toBe(13);
     });
 });

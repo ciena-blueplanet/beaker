@@ -12,7 +12,7 @@ var fs = require('fs');
 var path = require('path');
 var changeCase = require('change-case');
 
-var throwCliError = require('./cli/utils').throwCliError;
+var cliUtils = require('./cli/utils');
 var config = require('./config');
 var utils = require('./utils');
 
@@ -52,7 +52,8 @@ ns.command = function (argv) {
         var msg = 'beaker.json missing\n';
         msg += 'To create a default beaker.json file, run the following command: beaker newConfig';
 
-        throwCliError(msg);
+        cliUtils.throwCliError(msg);
+        return; // not really needed, but it is for testing when you spyOn throwCliError
     }
 
     // get today's year for copyright headers, etc.
@@ -85,11 +86,9 @@ ns.command = function (argv) {
     // clean up symlinks, if they exist
     _.forEach(['src', 'spec', 'node-spec'], function (pathElement) {
         var fullPath = path.join(CWD, pathElement, 'project-name');
-        fs.exists(fullPath, function (exists) {
-            if (exists) {
-                fs.unlink(fullPath);
-            }
-        });
+        if (fs.existsSync(fullPath)) {
+            fs.unlink(fullPath);
+        }
     });
 };
 

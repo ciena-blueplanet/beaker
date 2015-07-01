@@ -39,12 +39,12 @@ export NODE_SPECS
 jasmine-coverage: export JASMINE=1
 jasmine-coverage:
 	$(HIDE)echo "Running istanbul coverage on jasmine node specs"
-	$(HIDE)echo "Running jasmine node specs JASMINE=[$$JASMINE]"
+	$(HIDE)echo "Running jasmine node specs"
 	$(ENV)istanbul cover $(NODE_COVERAGE_OPTS) jasmine
 
 jasmine-test: export JASMINE=1
 jasmine-test:
-	$(HIDE)echo "Running jasmine node specs JASMINE=[$$JASMINE]"
+	$(HIDE)echo "Running jasmine node specs"
 	$(ENV)jasmine
 
 # =================================================================================================

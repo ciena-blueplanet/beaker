@@ -6,23 +6,19 @@
 'use strict';
 
 var t = require('../../../src/transplant')(__dirname);
-var github = t.require('../github');
+var githubProto = t.require('../github').proto;
 var cli = t.require('./index');
 
 describe('cli.github', function () {
-    var argv, ret;
+    var argv;
 
     beforeEach(function () {
         argv = {_: ['init']};
-        spyOn(github, 'command').and.returnValue(13);
-        ret = cli.github(argv);
+        spyOn(githubProto, 'command');
+        cli.github(argv);
     });
 
     it('calls github method', function () {
-        expect(github.command).toHaveBeenCalledWith(argv);
-    });
-
-    it('returns result of init', function () {
-        expect(ret).toBe(13);
+        expect(githubProto.command).toHaveBeenCalledWith(argv);
     });
 });

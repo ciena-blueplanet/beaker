@@ -8,6 +8,7 @@
 require('../typedefs');
 
 var _ = require('lodash');
+var utils = require('./utils');
 
 /** obvious */
 function showVersion() {
@@ -35,10 +36,8 @@ module.exports = function (argv) {
     var command = argv._[0];
 
     if (!_.has(this, command)) {
-        throw {
-            message: 'Invalid command "' + command + '"',
-            exitCode: 1,
-        };
+        utils.throwCliError('Invalid command "' + command + '"', 1);
+        return; // not really necessary except for when testing and spying on utils.throwCliError
     }
 
     this[command](argv);

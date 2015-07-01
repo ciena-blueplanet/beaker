@@ -384,7 +384,7 @@ describe('github', function () {
     });
 
     describe('.bumpFiles()', function () {
-        var versionySpy, ret, jsonTabs, jsonIndent;
+        var versionySpy, jsonTabs, jsonIndent;
         beforeEach(function () {
             var methods = ['to', 'end', 'indent', 'patch', 'minor', 'newMajor'];
             versionySpy = jasmine.createSpyObj('versiony', methods);
@@ -393,6 +393,7 @@ describe('github', function () {
                 versionySpy[method].and.returnValue(versionySpy);
             });
 
+            spyOn(utils, 'throwCliError');
             spyOn(versiony, 'from').and.returnValue(versionySpy);
 
             jsonTabs = process.env.JSON_TABS;
@@ -406,7 +407,7 @@ describe('github', function () {
 
         describe('major bumps', function () {
             beforeEach(function () {
-                ret = github.bumpFiles('major');
+                github.bumpFiles('major');
             });
 
             it('sets indentation', function () {
@@ -417,14 +418,14 @@ describe('github', function () {
                 expect(versionySpy.newMajor).toHaveBeenCalled();
             });
 
-            it('returns truthy', function () {
-                expect(ret).toBeTruthy();
+            it('does not throw', function () {
+                expect(utils.throwCliError).not.toHaveBeenCalled();
             });
         });
 
         describe('minor bumps', function () {
             beforeEach(function () {
-                ret = github.bumpFiles('minor');
+                github.bumpFiles('minor');
             });
 
             it('sets indentation', function () {
@@ -439,14 +440,14 @@ describe('github', function () {
                 expect(versionySpy.patch).toHaveBeenCalledWith(0);
             });
 
-            it('returns truthy', function () {
-                expect(ret).toBeTruthy();
+            it('does not throw', function () {
+                expect(utils.throwCliError).not.toHaveBeenCalled();
             });
         });
 
         describe('patch bumps', function () {
             beforeEach(function () {
-                ret = github.bumpFiles('patch');
+                github.bumpFiles('patch');
             });
 
             it('sets indentation', function () {
@@ -457,13 +458,19 @@ describe('github', function () {
                 expect(versionySpy.patch).toHaveBeenCalled();
             });
 
-            it('returns truthy', function () {
-                expect(ret).toBeTruthy();
+            it('does not throw', function () {
+                expect(utils.throwCliError).not.toHaveBeenCalled();
             });
         });
 
-        it('returns false for unknown bump type', function () {
-            expect(github.bumpFiles('non-existent-bump-type')).toBeFalsy();
+        describe('unknown bumps', function () {
+            beforeEach(function () {
+                github.bumpFiles('non-existent-bump-type');
+            });
+
+            it('throws an error', function () {
+                expect(utils.throwCliError).toHaveBeenCalledWith('Missing version bump comment', 1);
+            });
         });
     });
 
