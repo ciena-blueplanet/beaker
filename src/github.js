@@ -285,10 +285,12 @@ ns.commitBumpedFiles = function () {
  * @returns {Q.Promsie} a promise resolved with the array of version bumps to be made
  */
 ns.getVersionBumps = function (repo, commits) {
+    var self = this;
+
     var prPromises = [];
     commits.forEach(function (commitObj, index) {
         // If commit was made by the CI system we can ignore all previous commits
-        if (commitObj.commit.author.email === this.config.github.email) {
+        if (commitObj.commit.author.email === self.config.github.email) {
             return false;
         }
 
@@ -297,7 +299,7 @@ ns.getVersionBumps = function (repo, commits) {
 
         // If commit is for a pull request merge
         if (matches) {
-            var prPromise = this.getPullRequest(repo, matches[1]).then(function (resp) {
+            var prPromise = self.getPullRequest(repo, matches[1]).then(function (resp) {
                 return {
                     index: index,
                     resp: resp,
@@ -312,7 +314,7 @@ ns.getVersionBumps = function (repo, commits) {
         var responses = _(resolutions).sortBy('index').pluck('resp').value();
 
         // reverse it since we need to bump versions from oldest to newest
-        return responses.map(this.getVersionBumpLevel).reverse();
+        return responses.map(self.getVersionBumpLevel).reverse();
     });
 };
 
@@ -352,6 +354,8 @@ ns.bumpVersionForBranch = function (repo, branch) {
  * @throws CliError
  */
 ns.bumpVersion = function (argv) {
+    var self = this;
+
     this.verifyRequiredArgs(argv, ['repo']);
 
     this.getBranch()
@@ -362,7 +366,7 @@ ns.bumpVersion = function (argv) {
             return branch;
         })
         .then(function (branch) {
-            return this.bumpVersionForBranch(argv.repo, branch);
+            return self.bumpVersionForBranch(argv.repo, branch);
         })
         .done();
 };
