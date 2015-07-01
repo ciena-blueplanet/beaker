@@ -226,11 +226,7 @@ ns.bumpFiles = function (bump) {
  */
 ns.getBranch = function () {
     return this.exec('git rev-parse --abbrev-ref HEAD').then(function (result) {
-        if (result.code !== 0) {
-            utils.throwCliError('Failed to get branch name with error: ' + result.stdout, 1);
-        } else {
-            return result.stdout;
-        }
+        return result[0].replace('\n', '');
     });
 };
 

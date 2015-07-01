@@ -490,33 +490,16 @@ describe('github', function () {
 
         describe('when command works', function () {
             beforeEach(function (done) {
-                cmdResolver.resolve({
-                    code: 0,
-                    stdout: 'my-branch',
-                });
+                cmdResolver.resolve([
+                    'my-branch\n',
+                    '',
+                ]);
 
                 setTimeout(done, 1);
             });
 
             it('resolves with the branch`', function () {
                 expect(branch).toBe('my-branch');
-            });
-        });
-
-        describe('when command fails', function () {
-            beforeEach(function (done) {
-                spyOn(utils, 'throwCliError');
-                cmdResolver.resolve({
-                    code: 1,
-                    stdout: 'my-error',
-                });
-
-                setTimeout(done, 1);
-            });
-
-            it('throws a cli error`', function () {
-                var msg = 'Failed to get branch name with error: my-error';
-                expect(utils.throwCliError).toHaveBeenCalledWith(msg, 1);
             });
         });
     });
