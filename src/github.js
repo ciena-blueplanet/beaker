@@ -273,7 +273,7 @@ ns.getVersionBumps = function (repo, commits) {
     var self = this;
 
     var prPromises = [];
-    commits.forEach(function (commitObj, index) {
+    _.forEach(commits, function (commitObj, index) {
         // If commit was made by the CI system we can ignore all previous commits
         if (commitObj.commit.author.email === self.config.github.email) {
             return false;

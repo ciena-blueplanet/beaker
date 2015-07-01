@@ -673,6 +673,26 @@ describe('github', function () {
                 'patch',
             ]);
         });
+
+        describe('when a bump commit exists in the middle', function () {
+            beforeEach(function (done) {
+                bumps = null;
+                commits[3].commit.author.email = github.config.github.email;
+                github.getVersionBumps('cyaninc/beaker', commits).then(function (resp) {
+                    bumps = resp;
+                });
+
+                setTimeout(done, 1);
+            });
+
+            it('resolves with the bumps', function () {
+                // NOTE: inverted order because we want to bump from oldest to newest
+                expect(bumps).toEqual([
+                    'minor',
+                    'patch',
+                ]);
+            });
+        });
     });
 
     describe('.bumpVersionForBranch()', function () {
