@@ -8,6 +8,8 @@
 var t = require('../../../src/transplant')(__dirname);
 var githubProto = t.require('../github').proto;
 var cli = t.require('./index');
+var config = t.require('../config');
+var _config = require('../sample-config.json');
 
 describe('cli.github', function () {
     var argv;
@@ -15,6 +17,7 @@ describe('cli.github', function () {
     beforeEach(function () {
         argv = {_: ['init']};
         spyOn(githubProto, 'command');
+        spyOn(config, 'load').and.returnValue(_config);
         cli.github(argv);
     });
 

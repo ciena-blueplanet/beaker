@@ -48,17 +48,6 @@ ns.init = function () {
  */
 ns.createRelease = function (argv) {
     utils.throwCliError(argv._[1] + ' currently unavailable, hopefully coming back soon', 1);
-    /*
-    var url = this.config.urlBase + '/repos/' + argv.repo + '/releases';
-    var body = {
-        'tag_name': argv.version,
-        'target_commitish': argv.branch,
-        name: argv.version,
-        body: argv.description,
-        draft: false,
-        prerelease: false,
-    };
-    */
 };
 
 /**

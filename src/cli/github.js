@@ -5,7 +5,7 @@
 
 'use strict';
 
-var github = require('../github')();
+var github = require('../github');
 
 /**
  * Process command line arguments and execute library code
@@ -13,5 +13,5 @@ var github = require('../github')();
  * @returns {Number} 0 on success, > 0 on error
 */
 module.exports = function (argv) {
-    return github.command(argv);
+    return github().command(argv);
 };
