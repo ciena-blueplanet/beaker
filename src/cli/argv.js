@@ -5,11 +5,12 @@
 
 'use strict';
 
-var _ = require('lodash');
+require('../typedefs');
 
-/**
- * Print version info from package.json file
-*/
+var _ = require('lodash');
+var utils = require('./utils');
+
+/** obvious */
 function showVersion() {
     var pkgJSON = require('../../package.json');
     console.log(pkgJSON.name + ' v' + pkgJSON.version);
@@ -18,7 +19,7 @@ function showVersion() {
 /**
  * Execute the appropriate command based on command-line arguments
  * @param {MinimistArgv} argv - the minimist argv command-line arguments
- * @returns {Number} 0 on success, > 0 on error.
+ * @throws {CliError}
  */
 module.exports = function (argv) {
     // when no command given, default to 'help' (or version)
@@ -26,7 +27,7 @@ module.exports = function (argv) {
 
         if (argv.v || argv.version) {
             showVersion();
-            return 0;
+            return;
         }
 
         argv._.push('help');
@@ -35,9 +36,9 @@ module.exports = function (argv) {
     var command = argv._[0];
 
     if (!_.has(this, command)) {
-        console.error('Invalid command "' + command + '"');
-        return 1;
+        utils.throwCliError('Invalid command "' + command + '"', 1);
+        return; // not really necessary except for when testing and spying on utils.throwCliError
     }
 
-    return this[command](argv);
+    this[command](argv);
 };

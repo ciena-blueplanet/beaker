@@ -9,6 +9,7 @@ var _ = require('lodash');
 
 var t = require('../../../src/transplant')(__dirname);
 var cli = t.require('./index');
+var utils = t.require('./utils');
 
 /**
  * Construct an argv object
@@ -30,6 +31,7 @@ describe('cli.argv', function () {
         versionStr = packageJSON.name + ' v' + packageJSON.version;
         spyOn(console, 'log');
         spyOn(console, 'error');
+        spyOn(utils, 'throwCliError');
     });
 
     it('help command calls cli.help()', function () {
@@ -57,28 +59,24 @@ describe('cli.argv', function () {
     });
 
     it('shows version with -v', function () {
-        var ret = cli.argv(constructArgv([], {v: true}));
+        cli.argv(constructArgv([], {v: true}));
         expect(console.log).toHaveBeenCalledWith(versionStr);
-        expect(ret).toBe(0);
     });
 
     it('shows version with --version', function () {
-        var ret = cli.argv(constructArgv([], {version: true}));
+        cli.argv(constructArgv([], {version: true}));
         expect(console.log).toHaveBeenCalledWith(versionStr);
-        expect(ret).toBe(0);
     });
 
     it('defaults to help when no args', function () {
-        spyOn(cli, 'help').and.returnValue(3);
-        var ret = cli.argv(constructArgv());
+        spyOn(cli, 'help');
+        cli.argv(constructArgv());
         expect(cli.help).toHaveBeenCalled();
-        expect(ret).toBe(3);
     });
 
     it('indicates invalid command', function () {
-        var ret = cli.argv(constructArgv(['foobar']));
+        cli.argv(constructArgv(['foobar']));
         var errorMsg = 'Invalid command "foobar"';
-        expect(console.error).toHaveBeenCalledWith(errorMsg);
-        expect(ret).toBe(1);
+        expect(utils.throwCliError).toHaveBeenCalledWith(errorMsg, 1);
     });
 });

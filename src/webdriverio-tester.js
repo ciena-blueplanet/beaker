@@ -16,6 +16,8 @@ var path = require('path');
 var sh = require('execSync');
 var sleep = require('sleep');
 
+var utils = require('./cli/utils');
+
 var ns = {};
 
 
@@ -155,7 +157,7 @@ ns.processResults = function (timestamp, server) {
 /**
  * Actual functionality of the 'webdriverio-test' command
  * @param {Ojbect} argv - the minimist arguments object
- * @returns {Number} 0 on success, 1 on error
+ * @throws CliError
 */
 ns.command = function (argv) {
 
@@ -171,8 +173,7 @@ ns.command = function (argv) {
     var result = this.submitTarball(filename, argv.server);
 
     if (result.code !== 0) {
-        console.log('The e2e test server appears to be offline');
-        return result.code;
+        utils.throwCliError('Error submitting tarball: ' + result.stdout, result.code);
     }
 
     var timestamp = result.stdout;
@@ -186,7 +187,9 @@ ns.command = function (argv) {
         initialSleep: argv.initialSleep,
     });
 
-    return this.processResults(timestamp, argv.server);
+    if (this.processResults(timestamp, argv.server) > 0) {
+        utils.throwCliError('Error processing results', 1);
+    }
 };
 
 module.exports = ns;

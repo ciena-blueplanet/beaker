@@ -5,13 +5,15 @@
 
 'use strict';
 
+require('../typedefs');
+
 var tester = require('../webdriverio-tester');
 
 /**
  * Process command line arguments and execute library code
- * @param {Argv} argv - the minimist argv command-line arguments
- * @returns {Number} 0 on success, > 0 on error
+ * @param {MinimistArgv} argv - the minimist argv command-line arguments
+ * @throws {CliError}
 */
 module.exports = function (argv) {
-    return tester.command(argv);
+    tester.command(argv);
 };

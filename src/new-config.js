@@ -5,18 +5,34 @@
 
 'use strict';
 
+require('./typedefs');
+
 var fs = require('fs');
 var path = require('path');
 
-// 'Constants' to store some info so we con't calculate it more than once
-var CWD = process.cwd();
+var throwCliError = require('./cli/utils').throwCliError;
 
 var ns = {};
 
+/**
+ * Create a default beaker.json file
+ * @throws {CliError}
+ */
 ns.command = function () {
     var sourcePath = path.join(__dirname, '../files/beaker.json');
-    var targetPath = path.join(CWD, 'beaker.json');
-    fs.writeFileSync(targetPath, fs.readFileSync(sourcePath));
+    var targetPath = path.join(process.cwd(), 'beaker.json');
+
+    fs.readFile(sourcePath, function (err, data) {
+        if (err) {
+            throwCliError(err.message);
+        }
+
+        fs.writeFile(targetPath, data, function (err2) {
+            if (err2) {
+                throwCliError(err2.message);
+            }
+        });
+    });
 };
 
 module.exports = ns;

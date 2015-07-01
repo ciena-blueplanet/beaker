@@ -10,19 +10,15 @@ var newConfig = t.require('../new-config');
 var cli = t.require('./index');
 
 describe('cli.newConfig', function () {
-    var argv, ret;
+    var argv;
 
     beforeEach(function () {
         argv = {_: ['newConfig']};
-        spyOn(newConfig, 'command').and.returnValue(13);
-        ret = cli.newConfig(argv);
+        spyOn(newConfig, 'command');
+        cli.newConfig(argv);
     });
 
     it('calls newConfig method', function () {
         expect(newConfig.command).toHaveBeenCalledWith(argv);
-    });
-
-    it('returns result of init', function () {
-        expect(ret).toBe(13);
     });
 });
