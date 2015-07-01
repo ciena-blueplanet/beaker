@@ -181,7 +181,7 @@ ns.versionBumped = function (argv) {
                 utils.throwCliError('Missing version bump comment', 1);
             }
         })
-        .done();
+        .catch(console.error.bind(console));
 };
 
 /**
@@ -226,11 +226,7 @@ ns.bumpFiles = function (bump) {
  */
 ns.getBranch = function () {
     return this.exec('git rev-parse --abbrev-ref HEAD').then(function (result) {
-        if (result.code !== 0) {
-            utils.throwCliError('Failed to get branch name with error: ' + result.stdout, 1);
-        } else {
-            return result.stdout;
-        }
+        return result[0].replace('\n', '');
     });
 };
 
@@ -300,7 +296,7 @@ ns.getVersionBumps = function (repo, commits) {
     });
 
     return Q.all(prPromises).then(function (resolutions) {
-        var responses = _(resolutions).sortBy('index').pluck('resp').value();
+        var responses = _(resolutions).sortBy('index').pluck('resp').pluck('data').value();
 
         // reverse it since we need to bump versions from oldest to newest
         return responses.map(self.getVersionBumpLevel).reverse();
@@ -357,7 +353,7 @@ ns.bumpVersion = function (argv) {
         .then(function (branch) {
             return self.bumpVersionForBranch(argv.repo, branch);
         })
-        .done();
+        .catch(console.error.bind(console));
 };
 
 /**
