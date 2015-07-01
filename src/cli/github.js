@@ -5,7 +5,7 @@
 
 'use strict';
 
-var github = require('../github');
+var github = require('../github')();
 
 /**
  * Process command line arguments and execute library code

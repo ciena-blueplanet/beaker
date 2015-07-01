@@ -7,10 +7,34 @@
 
 /* global expect */
 
+/**
+ * @typedef Resolver
+ * @param {Function} resolve - resolve the promise
+ * @param {Function} reject - reject the promise
+ * @param {Function} notify - notify of progress on the promise
+ */
+
 var _ = require('lodash');
+var Q = require('q');
 
 /** @exports testUtils */
 var ns = {};
+
+
+/**
+ * Create a Promise that can be resolved by the given resolver object`resolver` method for Q.Promise
+ * @param {Resolver} resolver - the reference of the resolver to update (methods don't have to exist)
+ * @returns {Q.Promise} the resolver method for Q.Promise
+ */
+ns.makePromise = function (resolver) {
+    /* eslint-disable new-cap */
+    return Q.Promise(function (resolve, reject, notify) {
+        resolver.resolve = resolve;
+        resolver.reject = reject;
+        resolver.notify = notify;
+    });
+    /* eslint-enable new-cap */
+};
 
 // ------------------------------------------------------------------------------------------------
 // Waiting

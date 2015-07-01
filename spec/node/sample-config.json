@@ -1,7 +1,7 @@
 {
   "github": {
     "email": "buildbot@example.com",
-    "host": "github.com",
+    "host": "our.github-enterprise.com",
     "token": "correcthorsebatterystaple",
     "user": "cyaninc"
   },

@@ -1,31 +1,438 @@
 /**
  * @author Matthew Dahl [@sandersky](https://github.com/sandersky)
+ * @author Adam Meadows [@job13er](https://github.com/job13er)
  * @copyright 2014-2015 Cyan, Inc. All rights reserved.
 */
 
 /* eslint max-nested-callbacks: 0 */
 
+/* eslint-disable new-cap */ // <-- for Q.Promise
+
 'use strict';
 
 var _ = require('lodash');
-var httpSync = require('http-sync');
-var nock = require('nock');
-var sh = require('execSync');
+var Q = require('q');
+
+var http = require('q-io/http');
+var fs = require('q-io/fs');
 var versiony = require('versiony');
 
 var t = require('../../src/transplant')(__dirname);
-var github = t.require('./github');
 var _config = t.require('./config');
+var githubFactory = t.require('./github');
+var utils = t.require('./cli/utils');
+var makePromise = t.require('./test-utils').makePromise;
 
 var config = require('./sample-config.json');
 
-var GITHUB_HOST = 'https://' + config.github.host;
 
 describe('github', function () {
+    var github;
     beforeEach(function () {
         spyOn(console, 'info');
         spyOn(console, 'error');
+        spyOn(process, 'cwd').and.returnValue('/current/working/directory');
         spyOn(_config, 'load').and.returnValue(config);
+        github = githubFactory();
+
+    });
+
+    it('loads the config', function () {
+        expect(_config.load).toHaveBeenCalledWith('/current/working/directory');
+    });
+
+    it('sets the urlBase', function () {
+        expect(github.config.urlBase).toBe('https://our.github-enterprise.com/api/v3');
+    });
+
+    describe('.createRelease()', function () {
+        beforeEach(function () {
+            spyOn(utils, 'throwCliError');
+            github.createRelease({_: ['github', 'create-release']});
+        });
+
+        it('throws an error', function () {
+            var msg = 'create-release currently unavailable, hopefully coming back soon';
+            expect(utils.throwCliError).toHaveBeenCalledWith(msg, 1);
+        });
+    });
+
+    // TODO: re-enable/fix this once we support createRelease again
+    /*
+    describe('.createRelease()', function () {
+        var argv, scope, opts, releaseData;
+
+        beforeEach(function (done) {
+            argv = {
+                repo: 'cyaninc/my-repo-name',
+                version: '0.1.2',
+            };
+
+            releaseData = {
+                'tag_name': '0.1.2',
+                'target_commitish': 'master',
+                name: '0.1.2',
+                body: '',
+                draft: false,
+                prerelease: false,
+            };
+
+            opts = {
+                reqheaders: {
+                    authorization: 'Basic ' + github.token + ':x-oauth-basic',
+                },
+            };
+
+            scope = nock(GITHUB_HOST, opts)
+                .post('/api/v3/repos/cyaninc/my-repo-name/releases', releaseData)
+                .reply(201, releaseData);
+
+            spyOn(github, 'onResponse').and.callFake(function () {
+                done();
+            });
+
+            github.createRelease(argv);
+        });
+
+        afterEach(function () {
+            nock.cleanAll();
+        });
+
+        it('makes the POST to create the release', function () {
+            scope.done();
+        });
+
+        it('calls onResponse', function () {
+            expect(github.onResponse).toHaveBeenCalled();
+        });
+    });
+    */
+
+    describe('.getRequest()', function () {
+        var requestResolver, resp;
+        beforeEach(function () {
+            requestResolver = {};
+
+            spyOn(http, 'request').and.returnValue(makePromise(requestResolver));
+            github.getRequest('/repos').then(function (response) {
+                resp = response;
+            }).done();
+        });
+
+        it('calls the http.request() method', function () {
+            expect(http.request).toHaveBeenCalledWith('https://our.github-enterprise.com/api/v3/repos');
+        });
+
+        describe('when request comes back', function () {
+            var body;
+            beforeEach(function (done) {
+                body = ['foo', 'bar', 'baz'];
+                var response = {
+                    status: 200,
+                    body: jasmine.createSpyObj('resp.body', ['read']),
+                };
+                response.body.read.and.returnValue(Q(JSON.stringify(body)));
+
+                requestResolver.resolve(response);
+
+                setTimeout(done, 1);
+            });
+
+            it('resolves the original promise with proper response', function () {
+                expect(resp).toEqual({
+                    status: 200,
+                    data: body,
+                });
+            });
+        });
+    });
+
+    describe('.getCommits()', function () {
+        var ret;
+        beforeEach(function () {
+            spyOn(github, 'getRequest').and.returnValue('a-promise');
+            ret = github.getCommits('cyaninc/beaker', 'r_3.x');
+        });
+
+        it('calls getRequest with proper URL', function () {
+            expect(github.getRequest).toHaveBeenCalledWith('/repos/cyaninc/beaker/commits?sha=r_3.x');
+        });
+
+        it('returns the result of getRequest()', function () {
+            expect(ret).toBe('a-promise');
+        });
+    });
+
+    describe('.getPullRequest()', function () {
+        var ret;
+        beforeEach(function () {
+            spyOn(github, 'getRequest').and.returnValue('a-promise');
+            ret = github.getPullRequest('cyaninc/beaker', '12345');
+        });
+
+        it('calls getRequest with proper URL', function () {
+            expect(github.getRequest).toHaveBeenCalledWith('/repos/cyaninc/beaker/pulls/12345');
+        });
+
+        it('returns the result of getRequest()', function () {
+            expect(ret).toBe('a-promise');
+        });
+    });
+
+    describe('.getPullRequests()', function () {
+        var ret;
+        beforeEach(function () {
+            spyOn(github, 'getRequest').and.returnValue('a-promise');
+            ret = github.getPullRequests('cyaninc/beaker');
+        });
+
+        it('calls getRequest with proper URL', function () {
+            expect(github.getRequest).toHaveBeenCalledWith('/repos/cyaninc/beaker/pulls');
+        });
+
+        it('returns the result of getRequest()', function () {
+            expect(ret).toBe('a-promise');
+        });
+    });
+
+    describe('.getPullRequestForSha()', function () {
+        var pr, prsResolver, prs;
+        beforeEach(function () {
+            prsResolver = {};
+            spyOn(github, 'getPullRequests').and.returnValue(makePromise(prsResolver));
+            github.getPullRequestForSha('cyaninc/beaker', 'abcde').then(function (resp) {
+                pr = resp;
+            });
+        });
+
+        it('says what it is doing', function () {
+            var msg = 'Looking for PR on repository cyaninc/beaker with HEAD at commit abcde';
+            expect(console.info).toHaveBeenCalledWith(msg);
+        });
+
+        it('fetches the pull requests', function () {
+            expect(github.getPullRequests).toHaveBeenCalledWith('cyaninc/beaker');
+        });
+
+        describe('when the sha is present on head', function () {
+            beforeEach(function (done) {
+                prs = [
+                    {id: 1, head: {sha: 'sha-1'}, 'merge_commit_sha': 'sha-2'},
+                    {id: 2, head: {sha: 'abcde'}, 'merge_commit_sha': 'sha-3'},
+                    {id: 3, head: {sha: 'sha-3'}, 'merge_commit_sha': 'sha-4'},
+                ];
+
+                prsResolver.resolve({
+                    status: 200,
+                    data: prs,
+                });
+
+                setTimeout(done, 1);
+            });
+
+            it('says "I found it"', function () {
+                expect(console.info).toHaveBeenCalledWith('Found PR at commit: 2');
+            });
+
+            it('resolves with the pr', function () {
+                expect(pr).toBe(prs[1]);
+            });
+        });
+
+        describe('when the sha is present on merge commit', function () {
+            beforeEach(function (done) {
+                prs = [
+                    {id: 1, head: {sha: 'sha-1'}, 'merge_commit_sha': 'abcde'},
+                    {id: 2, head: {sha: 'sha-2'}, 'merge_commit_sha': 'sha-3'},
+                    {id: 3, head: {sha: 'sha-3'}, 'merge_commit_sha': 'sha-4'},
+                ];
+
+                prsResolver.resolve({
+                    status: 200,
+                    data: prs,
+                });
+
+                setTimeout(done, 1);
+            });
+
+            it('says "I found it"', function () {
+                expect(console.info).toHaveBeenCalledWith('Found PR at commit: 1');
+            });
+
+            it('resolves with the pr', function () {
+                expect(pr).toBe(prs[0]);
+            });
+        });
+
+        describe('when the sha is not present', function () {
+            beforeEach(function (done) {
+                prs = [
+                    {id: 1, head: {sha: 'sha-1'}, 'merge_commit_sha': 'sha-2'},
+                    {id: 2, head: {sha: 'sha-3'}, 'merge_commit_sha': 'sha-4'},
+                    {id: 3, head: {sha: 'sha-5'}, 'merge_commit_sha': 'sha-6'},
+                ];
+
+                prsResolver.resolve({
+                    status: 200,
+                    data: prs,
+                });
+
+                setTimeout(done, 1);
+            });
+
+            it('resolves with null', function () {
+                expect(pr).toBe(null);
+            });
+        });
+
+    });
+
+    describe('.getVersionBumpLevel()', function () {
+        it('finds major bump comment', function () {
+            var pr = {body: '#MAJOR#'};
+            expect(github.getVersionBumpLevel(pr)).toEqual('major');
+        });
+
+        it('finds minor bump comment', function () {
+            var pr = {body: '#MINOR#'};
+            expect(github.getVersionBumpLevel(pr)).toEqual('minor');
+        });
+
+        it('finds patch bump comment', function () {
+            var pr = {body: '#PATCH#'};
+            expect(github.getVersionBumpLevel(pr)).toEqual('patch');
+        });
+
+        it('returns null if no bump comment found', function () {
+            var pr = {body: '#FAKE#'};
+            expect(github.getVersionBumpLevel(pr)).toEqual(null);
+        });
+
+        it('finds bump comment sourrounded by other text', function () {
+            var pr = {body: 'Blah blah blah\n#MAJOR#blah blah blah'};
+            expect(github.getVersionBumpLevel(pr)).toEqual('major');
+        });
+    });
+
+    describe('.hasVersionBumpComment()', function () {
+        var level, ret;
+        beforeEach(function () {
+            level = 'minor';
+            spyOn(github, 'getVersionBumpLevel').and.callFake(function () {
+                return level;
+            });
+
+            ret = github.hasVersionBumpComment('foo');
+        });
+
+        it('looks up the version bump level', function () {
+            expect(github.getVersionBumpLevel).toHaveBeenCalledWith('foo');
+        });
+
+        it('returns true', function () {
+            expect(ret).toBe(true);
+        });
+
+        describe('when no bump level found', function () {
+            beforeEach(function () {
+                level = null;
+                ret = github.hasVersionBumpComment('foo');
+            });
+
+            it('returns false', function () {
+                expect(ret).toBe(false);
+            });
+        });
+    });
+
+    describe('.verifyRequiredArgs()', function () {
+        var argv;
+
+        beforeEach(function () {
+            spyOn(utils, 'throwCliError');
+            argv = {
+                repo: 'cyaninc/my-repo-name',
+                sha: 'aabea989b5ebfa181f55f6593c5b814cc8da45e2',
+            };
+        });
+
+        describe('when everything is fine', function () {
+            beforeEach(function () {
+                github.verifyRequiredArgs(argv, ['repo', 'sha']);
+            });
+
+            it('does not throw a CLI error', function () {
+                expect(utils.throwCliError).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('when missing required arguments', function () {
+            beforeEach(function () {
+                delete argv.repo;
+                delete argv.sha;
+                github.verifyRequiredArgs(argv, ['repo', 'sha']);
+            });
+
+            it('throws a CLI error', function () {
+                var msg = 'repo argument is required\nsha argument is required';
+                expect(utils.throwCliError).toHaveBeenCalledWith(msg, 1);
+            });
+        });
+    });
+
+    describe('.versionBumped()', function () {
+        var argv, pr;
+
+        beforeEach(function (done) {
+            spyOn(utils, 'throwCliError');
+
+            pr = {
+                hasVersionBumpComment: true,
+            };
+
+            spyOn(github, 'verifyRequiredArgs');
+            spyOn(github, 'hasVersionBumpComment').and.callFake(function (prToCheck) {
+                return prToCheck.hasVersionBumpComment;
+            });
+
+            spyOn(github, 'getPullRequestForSha').and.returnValue(Q(pr));
+
+            argv = {
+                _: ['github', 'bump-version'],
+                repo: 'cyaninc/my-repo-name',
+                sha: 'aabea989b5ebfa181f55f6593c5b814cc8da45e2',
+            };
+
+            github.versionBumped(argv);
+            setTimeout(done, 1);
+        });
+
+        it('verifies required arguments', function () {
+            expect(github.verifyRequiredArgs).toHaveBeenCalledWith(argv, ['repo', 'sha']);
+        });
+
+        it('fetches the pr', function () {
+            expect(github.getPullRequestForSha).toHaveBeenCalledWith(argv.repo, argv.sha);
+        });
+
+        it('does not throw', function () {
+            expect(utils.throwCliError).not.toHaveBeenCalled();
+        });
+
+        describe('when no version bump found', function () {
+            beforeEach(function (done) {
+                pr.hasVersionBumpComment = false;
+                github.versionBumped(argv);
+                setTimeout(done, 1);
+            });
+
+            it('throws an error', function () {
+                expect(utils.throwCliError).toHaveBeenCalledWith('Missing version bump comment', 1);
+            });
+
+            // TODO: find a way to make sure that the .done() was called and the error is re-raised after thrown
+            // you can't use expect().toThrow() becuase Q is catching the error and re-throwing it later.
+        });
     });
 
     describe('.bumpFiles()', function () {
@@ -111,6 +518,154 @@ describe('github', function () {
             expect(github.bumpFiles('non-existent-bump-type')).toBeFalsy();
         });
     });
+
+    describe('.getBranch()', function () {
+        var cmdResolver, branch;
+        beforeEach(function () {
+            cmdResolver = {};
+            spyOn(github, 'exec').and.returnValue(makePromise(cmdResolver));
+            github.getBranch().then(function (result) {
+                branch = result;
+            });
+        });
+
+        it('executes the git command', function () {
+            expect(github.exec).toHaveBeenCalledWith('git rev-parse --abbrev-ref HEAD');
+        });
+
+        describe('when command works', function () {
+            beforeEach(function (done) {
+                cmdResolver.resolve({
+                    code: 0,
+                    stdout: 'my-branch',
+                });
+
+                setTimeout(done, 1);
+            });
+
+            it('resolves with the branch`', function () {
+                expect(branch).toBe('my-branch');
+            });
+        });
+
+        describe('when command fails', function () {
+            beforeEach(function (done) {
+                spyOn(utils, 'throwCliError');
+                cmdResolver.resolve({
+                    code: 1,
+                    stdout: 'my-error',
+                });
+
+                setTimeout(done, 1);
+            });
+
+            it('throws a cli error`', function () {
+                var msg = 'Failed to get branch name with error: my-error';
+                expect(utils.throwCliError).toHaveBeenCalledWith(msg, 1);
+            });
+        });
+    });
+
+    describe('.pushChanges()', function () {
+        var ret;
+        beforeEach(function () {
+            spyOn(github, 'exec').and.returnValue('result');
+            ret = github.pushChanges('my-branch');
+        });
+
+        it('executes the command to push the branch', function () {
+            expect(github.exec).toHaveBeenCalledWith('git push origin my-branch');
+        });
+
+        it('returns the result of exec', function () {
+            expect(ret).toBe('result');
+        });
+    });
+
+    describe('.commitBumpedFiles()', function () {
+        var existingFiles, resolvers;
+        beforeEach(function () {
+            resolvers = {
+                pkg: {},
+                bower: {},
+                commit: {},
+            };
+
+            existingFiles = {
+                'package.json': true,
+                'bower.json': true,
+            };
+
+            spyOn(fs, 'exists').and.callFake(function (filename) {
+                return Q(_.has(existingFiles, filename));
+            });
+
+            spyOn(github, 'exec').and.callFake(function (cmd) {
+                if (cmd === 'git add package.json') {
+                    return makePromise(resolvers.pkg);
+                } else if (cmd === 'git add bower.json') {
+                    return makePromise(resolvers.bower);
+                } else {
+                    return makePromise(resolvers.commit);
+                }
+            });
+        });
+
+        describe('when both files exist', function () {
+            var result;
+            beforeEach(function (done) {
+                github.commitBumpedFiles().then(function (resp) {
+                    result = resp;
+                });;
+                setTimeout(done, 1);
+            });
+
+            it('checks if package.json exists', function () {
+                expect(fs.exists).toHaveBeenCalledWith('package.json');
+            });
+
+            it('checks if bower.json exists', function () {
+                expect(fs.exists).toHaveBeenCalledWith('bower.json');
+            });
+
+            it('adds package.json', function () {
+                expect(github.exec).toHaveBeenCalledWith('git add package.json');
+            });
+
+            it('adds bower.json', function () {
+                expect(github.exec).toHaveBeenCalledWith('git add bower.json');
+            });
+
+            it('does not yet commit the files', function () {
+                expect(github.exec).not.toHaveBeenCalledWith('git commit -m "bump version"');
+            });
+
+            describe('when both files have been added', function () {
+                beforeEach(function (done) {
+                    resolvers.pkg.resolve();
+                    resolvers.bower.resolve();
+                    setTimeout(done, 1);
+                });
+
+                it('commits the files', function () {
+                    expect(github.exec).toHaveBeenCalledWith('git commit -m "bump version"');
+                });
+
+                describe('when commit finishes', function () {
+                    beforeEach(function (done) {
+                        resolvers.commit.resolve('commit-result');
+                        setTimeout(done, 1);
+                    });
+
+                    it('resolves with the result of the commit', function () {
+                        expect(result).toBe('commit-result');
+                    });
+                });
+            });
+        });
+    });
+
+    // ARM IS HERE
 
     describe('.bumpVersion()', function () {
         var argv,
@@ -289,233 +844,6 @@ describe('github', function () {
         });
     });
 
-    describe('.createRelease()', function () {
-        var argv, scope, opts, releaseData;
-
-        beforeEach(function (done) {
-            argv = {
-                repo: 'cyaninc/my-repo-name',
-                version: '0.1.2',
-            };
-
-            releaseData = {
-                'tag_name': '0.1.2',
-                'target_commitish': 'master',
-                name: '0.1.2',
-                body: '',
-                draft: false,
-                prerelease: false,
-            };
-
-            opts = {
-                reqheaders: {
-                    authorization: 'Basic ' + github.token + ':x-oauth-basic',
-                },
-            };
-
-            scope = nock(GITHUB_HOST, opts)
-                .post('/api/v3/repos/cyaninc/my-repo-name/releases', releaseData)
-                .reply(201, releaseData);
-
-            spyOn(github, 'onResponse').and.callFake(function () {
-                done();
-            });
-
-            github.createRelease(argv);
-        });
-
-        afterEach(function () {
-            nock.cleanAll();
-        });
-
-        it('makes the POST to create the release', function () {
-            scope.done();
-        });
-
-        it('calls onResponse', function () {
-            expect(github.onResponse).toHaveBeenCalled();
-        });
-    });
-
-    describe('.getCommits()', function () {
-        it('returns commits if API request was successful', function () {
-            var req = {
-                end: function () {
-                    return {
-                        body: '[]',
-                        statusCode: 200,
-                    };
-                },
-                setTimeout: function () {},
-            };
-
-            spyOn(httpSync, 'request').and.returnValue(req);
-            expect(github.getCommits('cyaninc/my-repo-name')).toEqual([]);
-        });
-    });
-
-    describe('.getPullRequest()', function () {
-        it('returns pull request if API request was successful', function () {
-            var req = {
-                end: function () {
-                    return {
-                        body: '{}',
-                        statusCode: 200,
-                    };
-                },
-                setTimeout: function () {},
-            };
-
-            spyOn(httpSync, 'request').and.returnValue(req);
-            expect(github.getPullRequest('cyaninc/my-repo-name', '22')).toEqual({});
-        });
-    });
-
-    describe('.getPullRequests()', function () {
-        it('returns pull requests if API request was successful', function () {
-            var req = {
-                end: function () {
-                    return {
-                        body: '[]',
-                        statusCode: 200,
-                    };
-                },
-                setTimeout: function () {},
-            };
-
-            spyOn(httpSync, 'request').and.returnValue(req);
-            expect(github.getPullRequests('cyaninc/my-repo-name')).toEqual([]);
-        });
-
-        it('appends query string "?state=all" if search all argument set', function (done) {
-            spyOn(github, 'getRequest').and.callFake(function (apiPath) {
-                var expected = '?state=all';
-                expect(apiPath.indexOf(expected, apiPath.length - expected.length)).not.toEqual(-1);
-                done();
-            });
-            github.getPullRequests('cyaninc/my-repo-name', true);
-        });
-
-        it('appends query string "?state=all" if search all argument set', function (done) {
-            spyOn(github, 'getRequest').and.callFake(function (apiPath) {
-                var expected = '?state=all';
-                expect(apiPath.indexOf(expected, apiPath.length - expected.length)).not.toEqual(-1);
-                done();
-            });
-            github.getPullRequests('UI/my-repo-name', true);
-        });
-    });
-
-    describe('.getPullRequestForSHA()', function () {
-        var pullRequests = [
-            {
-                head: {
-                    sha: 'aabea989b5ebfa181f55f6593c5b814cc8da45e2',
-                },
-            }, {
-                head: {
-                    sha: '6541f8f8bdea1c5e4a180d6fccfde4809e38da76',
-                },
-            },
-        ];
-
-        it('returns pull request with commit hash', function () {
-            spyOn(github, 'getPullRequests').and.returnValue(pullRequests);
-
-            expect(
-                github.getPullRequestForSHA('cyaninc/my-repo-name', 'aabea989b5ebfa181f55f6593c5b814cc8da45e2')
-            ).toBe(pullRequests[0]);
-
-            expect(
-                github.getPullRequestForSHA('cyaninc/my-repo-name', '6541f8f8bdea1c5e4a180d6fccfde4809e38da76')
-            ).toBe(pullRequests[1]);
-        });
-
-        it('returns null if pull request not found for commit', function () {
-            spyOn(github, 'getPullRequests').and.returnValue(pullRequests);
-
-            expect(
-                github.getPullRequestForSHA('cyaninc/my-repo-name', 'a3b76828283df43097407281c348ba802bfcb5bd')
-            ).toBe(null);
-        });
-
-        it('returns null if no pull requests found', function () {
-            spyOn(github, 'getPullRequests').and.returnValue([]);
-
-            expect(
-                github.getPullRequestForSHA('cyaninc/my-repo-name', 'a3b76828283df43097407281c348ba802bfcb5bd')
-            ).toBe(null);
-        });
-    });
-
-    describe('.getRequest()', function () {
-        it('throws error if HTTP response status code is not 200', function () {
-            var req = {
-                end: function () {
-                    return {
-                        body: '',
-                        statusCode: 404,
-                    };
-                },
-                setTimeout: function () {},
-            };
-
-            spyOn(httpSync, 'request').and.returnValue(req);
-
-            expect(function () {
-                github.getRequest('some/api/path');
-            }).toThrow();
-        });
-    });
-
-    describe('.getVersionBumpLevel()', function () {
-        it('finds major bump comment', function () {
-            var pr = {body: '#MAJOR#'};
-            expect(github.getVersionBumpLevel(pr)).toEqual('major');
-        });
-
-        it('finds minor bump comment', function () {
-            var pr = {body: '#MINOR#'};
-            expect(github.getVersionBumpLevel(pr)).toEqual('minor');
-        });
-
-        it('finds patch bump comment', function () {
-            var pr = {body: '#PATCH#'};
-            expect(github.getVersionBumpLevel(pr)).toEqual('patch');
-        });
-
-        it('returns null if no bump comment found', function () {
-            var pr = {body: '#FAKE#'};
-            expect(github.getVersionBumpLevel(pr)).toEqual(null);
-        });
-
-        it('finds bump comment sourrounded by other text', function () {
-            var pr = {body: 'Blah blah blah\n#MAJOR#blah blah blah'};
-            expect(github.getVersionBumpLevel(pr)).toEqual('major');
-        });
-    });
-
-    describe('.missingArgs()', function () {
-        var argv;
-
-        beforeEach(function () {
-            argv = {
-                repo: 'cyaninc/my-repo-name',
-                sha: 'aabea989b5ebfa181f55f6593c5b814cc8da45e2',
-            };
-        });
-
-        it('returns true if missing required repo argument', function () {
-            delete argv.repo;
-            expect(github.missingArgs(argv, ['repo', 'sha'])).toBeTruthy();
-        });
-
-        it('returns true if missing required sha argument', function () {
-            delete argv.sha;
-            expect(github.missingArgs(argv, ['repo', 'sha'])).toBeTruthy();
-        });
-    });
-
     describe('.onResponse()', function () {
         var res;
 
@@ -558,94 +886,4 @@ describe('github', function () {
         });
     });
 
-    describe('.pushChanges()', function () {
-        it('returns false if failed to get branch', function () {
-            spyOn(sh, 'exec').and.returnValue({
-                code: 1,
-                stdout: 'blah blah blah',
-            });
-
-            expect(github.pushChanges()).toBeFalsy();
-        });
-
-        it('returns false if failed to push to remote', function () {
-            spyOn(sh, 'exec').and.callFake(function (cmd) {
-                if (cmd === 'git rev-parse --abbrev-ref HEAD') {
-                    return {
-                        code: 0,
-                        stdout: 'master',
-                    };
-                }
-
-                expect(cmd).toBe('git push origin master');
-
-                return {
-                    code: 1,
-                    stdout: 'blah blah blah',
-                };
-            });
-
-            expect(github.pushChanges()).toBeFalsy();
-        });
-
-        it('returns true if push succeeded', function () {
-            spyOn(sh, 'exec').and.returnValue({
-                code: 0,
-                stdout: '',
-            });
-
-            expect(github.pushChanges()).toBeTruthy();
-        });
-    });
-
-    describe('.specifiesVersionBumpLevel()', function () {
-        _.forEach(['MAJOR', 'MINOR', 'PATCH'], function (level) {
-            it('returns true if ' + level + ' bump comment', function () {
-                var pr = {body: '#' + level + '#'};
-                expect(github.specifiesVersionBumpLevel(pr)).toBeTruthy();
-            });
-        });
-
-        it('returns false if bump comment missing', function () {
-            var pr = {body: '#FAKE#'};
-            expect(github.specifiesVersionBumpLevel(pr)).toBeFalsy();
-        });
-    });
-
-    describe('.versionBumped()', function () {
-        var argv;
-
-        beforeEach(function () {
-            argv = {
-                _: ['github', 'bump-version'],
-                repo: 'cyaninc/my-repo-name',
-                sha: 'aabea989b5ebfa181f55f6593c5b814cc8da45e2',
-            };
-        });
-
-        it('returns 1 if missing repo argument', function () {
-            delete argv.repo;
-            expect(github.versionBumped(argv)).toBe(1);
-        });
-
-        it('returns 1 if missing sha argument', function () {
-            delete argv.sha;
-            expect(github.versionBumped(argv)).toBe(1);
-        });
-
-        it('returns 0 if version bump comment found', function () {
-            spyOn(github, 'getPullRequestForSHA').and.returnValue({body: '#MAJOR#'});
-            expect(github.versionBumped(argv)).toBe(0);
-        });
-
-        it('returns 1 if version bump comment not found', function () {
-            spyOn(github, 'getPullRequestForSHA').and.returnValue({body: '#FAKE#'});
-            expect(github.versionBumped(argv)).toBe(1);
-        });
-
-        it('returns 1 if pull request not found', function () {
-            spyOn(github, 'getPullRequestForSHA').and.returnValue(null);
-            expect(github.versionBumped(argv)).toBe(1);
-        });
-    });
 });
