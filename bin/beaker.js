@@ -13,7 +13,7 @@ var exit = require('exit');
 var cli = require('../src/cli');
 var argv = require('minimist')(process.argv.slice(2), {'boolean': 'app'});
 
-process.on('unhandledException', function (err) {
+process.on('uncaughtException', function (err) {
     var exitCode = 1;
     if (err.exitCode !== undefined) {
         exitCode = err.exitCode;
