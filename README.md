@@ -247,10 +247,10 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
 #### Code
  * [jade-loader](https://github.com/webpack/jade-loader) so you can use client-side
    [`jade` templates](http://jade-lang.com)
- * [babel-loader](https://github.com/babel/babel-loade://github.com/babel/babel-loader) so you can write the code of
+ * [babel-loader](https://github.com/babel/babel-loader) so you can write the code of
    tomorrow, today with [`babel`](https://github.com/babel/babel)
  * [imports-loader](https://github.com/webpack/imports-loader) so you can include code that was intended to be
-   included directly in a `<script>` tag. 
+   included directly in a `<script>` tag.
 
 ### Task Management
 * [grunt](https://github.com/gruntjs/grunt)
@@ -272,6 +272,11 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
 * [karma-js-coverage](https://github.com/danielflower/karma-js-coverage)
 * [karma-jasmine](https://github.com/karma-runner/karma-jasmine)
 * [karma-spec-reporter](https://github.com/mlex/karma-spec-reporter)
+* [rewire](https://github.com/jhnns/rewire)
+* [rewire-webpack](https://github.com/jhnns/rewire-webpack)
+
+### Views
+ * [react](https://github.com/facebook/react)
 
 ## Additional References
 We also include code from the following sources.

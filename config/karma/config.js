@@ -7,6 +7,7 @@
 
 var path = require('path');
 var webpack = require('webpack');
+var RewirePlugin = require('rewire-webpack');
 var loaders = require('../webpack/loaders');
 var resolve = require('../webpack/resolve');
 
@@ -129,6 +130,7 @@ module.exports = function (config) {
                         'JASMINE': process.env.JASMINE,
                     },
                 }),
+                new RewirePlugin(),
             ],
             resolve: resolve,
             devtool: USE_SOURCE_MAPS ? 'inline-cheap-module-source-map' : 'eval',
