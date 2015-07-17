@@ -22,9 +22,9 @@ var ns = {};
 
 
 /**
- * Create a Promise that can be resolved by the given resolver object`resolver` method for Q.Promise
+ * Create a Promise that can be resolved by the given resolver object
  * @param {Resolver} resolver - the reference of the resolver to update (methods don't have to exist)
- * @returns {Q.Promise} the resolver method for Q.Promise
+ * @returns {Q.Promise} the promise that is created
  */
 ns.makePromise = function (resolver) {
     /* eslint-disable new-cap */

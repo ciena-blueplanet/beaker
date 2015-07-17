@@ -7,7 +7,7 @@
 
 'use strict';
 
-const beaker = require('../../src/test-utils');
+const beaker = require('../../../src/test-utils');
 
 describe('test-utils', () => {
     beforeEach(() => {
