@@ -93,6 +93,7 @@
         "raw-loader": "^0.5.1",
         "react": "0.13.3",
         "rewire": "^2.3.4",
+        "rewire-webpack": "^1.0.0",
         "style-loader": "^0.8.3",
         "webpack": "^1.8.11",
         "yaml-loader": "^0.1.0"
