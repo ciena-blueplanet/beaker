@@ -7,9 +7,9 @@
 
 var path = require('path');
 var webpack = require('webpack');
-var RewirePlugin = require('rewire-webpack');
 var loaders = require('../webpack/loaders');
 var resolve = require('../webpack/resolve');
+var webpackPlugins = require('../webpack/karma-plugins');
 
 var USE_SOURCE_MAPS = process.env.MAPS === 'on';
 var KARMA_BROWSER = process.env.KARMA_BROWSER || 'Chrome';
@@ -124,14 +124,7 @@ module.exports = function (config) {
                 ],
                 loaders: loaders,
             },
-            plugins: [
-                new webpack.DefinePlugin({
-                    'process.env': {
-                        'JASMINE': process.env.JASMINE,
-                    },
-                }),
-                new RewirePlugin(),
-            ],
+            plugins: webpackPlugins,
             resolve: resolve,
             devtool: USE_SOURCE_MAPS ? 'inline-cheap-module-source-map' : 'eval',
         },
