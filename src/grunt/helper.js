@@ -15,6 +15,7 @@ var webpack = require('webpack');
 var configDir = path.join(__dirname, '../../config');
 var webpackLoaders = require(path.join(configDir, 'webpack/loaders'));
 var webpackResolve = require(path.join(configDir, 'webpack/resolve'));
+var webpackPlugins = require(path.join(configDir, 'webpack/karma-plugins'));
 
 var USE_SOURCE_MAPS = process.env.MAPS === 'on';
 
@@ -147,7 +148,7 @@ ns.init = function (grunt) {
                             },
                         ],
                     },
-
+                    plugins: webpackPlugins,
                     resolve: webpackResolve,
                 },
             },

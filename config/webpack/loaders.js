@@ -5,7 +5,7 @@
 
 'use strict';
 
-var loaders = [
+module.exports = [
     {
         test: /\.css$/,
         loader: 'style!css!autoprefixer',
@@ -29,5 +29,3 @@ var loaders = [
         loader: 'file',
     },
 ];
-
-module.exports = loaders;
