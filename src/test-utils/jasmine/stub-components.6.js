@@ -6,16 +6,18 @@
 
 'use strict';
 
+const _ = require('lodash');
 const React = require('react');
 const stubDeps = require('./stub-deps');
 
 /**
  * Create a stub component
  * @param {String} name - the name of the component
+ * @param {Object} props - props to set on React class
  * @returns {ReactComponent} the stubbed component
  */
-function createStubComponent(name) {
-    return React.createClass({
+function createStubComponent(name, props) {
+    return React.createClass(_.assign({
         displayName: name,
         render: function () {
             const className = `stub ${name}`;
@@ -24,19 +26,26 @@ function createStubComponent(name) {
                 </div>
             );
         },
-    });
+    }, props));
 }
 
 /**
  * Stub out components within the rewired module with simple react components that don't do anything
  * @param {Module} rewiredModule - the module loaded with rewire()
- * @param {String[]} components - the components you want to stub out within rewiredModule
+ * @param {Object|String[]} components - the components you want to stub out within rewiredModule
  */
 function stubComponents(rewiredModule, components) {
     const stubs = {};
-    components.forEach(name => {
-        stubs[name] = createStubComponent(name);
-    });
+
+    if (_.isArray(components)) {
+        components.forEach(name => {
+            stubs[name] = createStubComponent(name, {});
+        });
+    } else {
+        _.forIn(components, (props, name) => {
+            stubs[name] = createStubComponent(name, props);
+        });
+    }
 
     stubDeps(rewiredModule, stubs);
 }
