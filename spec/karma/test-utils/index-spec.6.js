@@ -18,6 +18,34 @@ describe('test-utils', () => {
         jasmine.clock().uninstall();
     });
 
+    describe('.e2e.getUrl()', () => {
+        let testConfig;
+
+        beforeEach(() => {
+            testConfig = {
+                http: {
+                    entryPoint: 'services',
+                    host: 'localhost',
+                    port: '80',
+                },
+            };
+        });
+
+        it('returns proper URL', () => {
+            expect(beaker.e2e.getUrl(testConfig)).toEqual('http://localhost:80/services');
+        });
+
+        it('removes double forward slash from entry point', () => {
+            testConfig.http.entryPoint = '/services';
+            expect(beaker.e2e.getUrl(testConfig)).toEqual('http://localhost:80/services');
+        });
+
+        it('removes double forward slash between entry point and extra', () => {
+            testConfig.http.entryPoint = 'services/';
+            expect(beaker.e2e.getUrl(testConfig, '/view-service')).toEqual('http://localhost:80/services/view-service');
+        });
+    });
+
     describe('.wait()', () => {
         let doneSpy;
         beforeEach(() => {
