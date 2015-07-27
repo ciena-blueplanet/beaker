@@ -194,14 +194,14 @@ ns.e2e = {
         var http = testConfig.http;
         var entryPoint = http.entryPoint;
 
-        // Prevent double backslash in URL
+        // Prevent double forward slash in URL
         if (entryPoint.length !== 0 && entryPoint[0] === '/') {
             entryPoint = entryPoint.substring(1);
         }
 
         var url = 'http://' + http.host + ':' + http.port + '/' + entryPoint;
         if (extra) {
-            // Prevent double backslash in URL
+            // Prevent double forward slash in URL
             if (url[url.length - 1] === '/' && extra[0] === '/') {
                 extra = extra.substring(1);
             }
