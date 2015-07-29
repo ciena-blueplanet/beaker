@@ -10,19 +10,15 @@ var tester = t.require('../webdriverio-tester');
 var cli = t.require('./index');
 
 describe('cli.webdriverioTester', function () {
-    var argv, ret;
+    var argv;
 
     beforeEach(function () {
         argv = {_: ['init']};
-        spyOn(tester, 'command').and.returnValue(13);
-        ret = cli.webdriverioTester(argv);
+        spyOn(tester, 'command');
+        cli.webdriverioTester(argv);
     });
 
     it('calls tester method', function () {
         expect(tester.command).toHaveBeenCalledWith(argv);
-    });
-
-    it('returns result of init', function () {
-        expect(ret).toBe(13);
     });
 });

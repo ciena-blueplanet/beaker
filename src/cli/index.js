@@ -6,13 +6,6 @@
 'use strict';
 
 /**
- * The argv object returned by 'minimist'
- * @external MinimistArgv
- * @see {@link https://github.com/substack/minimist#example}
- * @return foobar
- */
-
-/**
  * namespace for all cli modules
  */
 module.exports = {

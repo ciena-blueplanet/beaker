@@ -9,6 +9,7 @@ var path = require('path');
 var webpack = require('webpack');
 var loaders = require('../webpack/loaders');
 var resolve = require('../webpack/resolve');
+var webpackPlugins = require('../webpack/karma-plugins');
 
 var USE_SOURCE_MAPS = process.env.MAPS === 'on';
 var KARMA_BROWSER = process.env.KARMA_BROWSER || 'Chrome';
@@ -21,6 +22,42 @@ var entryPointFull = path.join(BEAKER_DIR, 'config/karma', entryPoint);
 var preprocessors = {};
 preprocessors[entryPointFull] = ['webpack', 'sourcemap'];
 
+var frameworks = [];
+var plugins = [
+    require('karma-chrome-launcher'),
+    require('karma-firefox-launcher'),
+    require('karma-js-coverage'),
+    require('karma-sourcemap-loader'),
+    require('karma-spec-reporter'),
+    require('karma-webpack'),
+];
+
+if (process.env.TEST_FRAMEWORK === 'mocha') {
+    frameworks.push(
+        'mocha',
+        'chai-jquery',
+        'sinon-chai',
+        'jquery-2.1.0'
+    );
+
+    plugins.push(
+        require('karma-chai-jquery'),
+        require('karma-jquery'),
+        require('karma-mocha'),
+        require('karma-sinon-chai')
+    );
+} else {
+    frameworks.push(
+        'jasmine-jquery',
+        'jasmine'
+    );
+
+    plugins.push(
+        require('karma-jasmine-jquery'),
+        require('karma-jasmine')
+    );
+}
+
 module.exports = function (config) {
     config.set({
         // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -28,7 +65,7 @@ module.exports = function (config) {
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['jasmine-jquery', 'jasmine'],
+        frameworks: frameworks,
 
         // list of files / patterns to load in the browser
         files: [
@@ -87,13 +124,7 @@ module.exports = function (config) {
                 ],
                 loaders: loaders,
             },
-            plugins: [
-                new webpack.DefinePlugin({
-                    'process.env': {
-                        'JASMINE': process.env.JASMINE,
-                    },
-                }),
-            ],
+            plugins: webpackPlugins,
             resolve: resolve,
             devtool: USE_SOURCE_MAPS ? 'inline-cheap-module-source-map' : 'eval',
         },
@@ -102,16 +133,7 @@ module.exports = function (config) {
             noInfo: false,
         },
 
-        plugins: [
-            require('karma-chrome-launcher'),
-            require('karma-firefox-launcher'),
-            require('karma-jasmine-jquery'),
-            require('karma-jasmine'),
-            require('karma-js-coverage'),
-            require('karma-sourcemap-loader'),
-            require('karma-spec-reporter'),
-            require('karma-webpack'),
-        ],
+        plugins: plugins,
 
     });
 };

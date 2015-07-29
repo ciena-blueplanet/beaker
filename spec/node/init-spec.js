@@ -18,6 +18,7 @@ var config = require('./sample-config.json');
 var t = require('../../src/transplant')(__dirname);
 var init = t.require('./init');
 var utils = t.require('./utils');
+var cliUtils = t.require('./cli/utils');
 var CWD = process.cwd();
 
 describe('init', function () {
@@ -26,6 +27,7 @@ describe('init', function () {
     beforeEach(function () {
         testConfig = config;
 
+        spyOn(cliUtils, 'throwCliError');
         spyOn(console, 'info');
         spyOn(console, 'error');
         spyOn(_config, 'load').and.callFake(function () {
@@ -34,8 +36,8 @@ describe('init', function () {
     });
 
     describe('.cleanupCruft()', function () {
-        it('returns NON-APP for repository not named as cy-<project-name>-ui', function () {
-            expect(init.cleanupCruft('project-name')).toEqual('NON-APP');
+        it('returns <project-name> for repository not named as cy-<project-name>-ui', function () {
+            expect(init.cleanupCruft('project-name-ui')).toEqual('project-name-ui');
         });
 
         it('returns project name for repository named as cy-<project-name>-ui', function () {
@@ -56,14 +58,14 @@ describe('init', function () {
             githubUser: config.github.user,
             npmRegistry: config.npm.registry,
             beakerVersion: t.require('../package.json').version,
-            cruftlessName: 'NON-APP',
+            cruftlessName: 'beaker',
             seleniumHost: 'localhost',
             seleniumPort: 4444,
             seleniumBrowser: 'chrome',
             templateDir: path.join(CWD, 'files/project-templates'),
         };
 
-        var returnValue, symlinks, originalSymlinks;
+        var symlinks, originalSymlinks;
 
         beforeEach(function () {
             symlinks = [
@@ -80,19 +82,16 @@ describe('init', function () {
         });
 
         describe('if config fails to load', function () {
-            beforeEach(function () {
+            beforeEach(function (done) {
                 testConfig = null;
-                returnValue = init.command({
+                init.command({
                     projectType: 'app',
                 });
+                setTimeout(done, 1);
             });
 
-            it('logs to console.error', function () {
-                expect(console.error).toHaveBeenCalled();
-            });
-
-            it('returns 1', function () {
-                expect(returnValue).toEqual(1);
+            it('throws an error', function () {
+                expect(cliUtils.throwCliError).toHaveBeenCalled();
             });
         });
 
@@ -102,7 +101,7 @@ describe('init', function () {
                     templateData.projectType = projectType;
                     originalSymlinks = symlinks;
                     symlinks = []; // so the exists calls all return false
-                    returnValue = init.command({
+                    init.command({
                         type: projectType,
                     });
                 });

@@ -56,7 +56,10 @@ init-test: webpack.init-test node.init-test app.init-test
 	$(HIDE)./bin/post-publish.sh
 	$(HIDE)npm cache clean beaker
 
-test: lint jasmine-test karma-test
+test-cli-errors:
+	$(HIDE)./bin/test-error-handling.sh
+
+test: lint jasmine-test karma-test test-cli-errors
 
 coverage: node-coverage
 

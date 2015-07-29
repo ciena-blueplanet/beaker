@@ -129,6 +129,43 @@ This is a simple make target that does a `grunt karma:unit watch:karma`. This wi
 start and a watcher to be placed on all the files in `src/`. So, when any file is changed, all your karma tests
 will be run. It's still a little slow because of the source-maps being generated.
 
+## Testing Framework
+By default `beaker` uses `Jasmine` for tests. If you prefer to use `mocha` you can simply follow the below steps.
+
+1. Add the following to the top of your `Makefile`:
+
+    ```
+    TESTING_FRAMEWORK := mocha
+    ```
+
+2. Add the following `devDependencies` to your `package.json`:
+    * `karma-chai-jquery`
+    * `karma-jquery`
+    * `karma-mocha`
+    * `karma-sinon-chai`
+    * `mocha`
+
+3. Update your `spec/.eslintrc` file to be:
+
+    ```
+    {
+        "globals": {
+            "describe": false,
+            "xdescribe": false,
+            "beforeEach": false,
+            "afterEach": false,
+            "it": false,
+            "xit": false,
+            "expect": false,
+            "console": false,
+            "sinon": false
+        },
+        "rules": {
+            "max-nested-callbacks": 0,
+            "no-unused-expressions": 0
+        }
+    ```
+
 ## Contributing
 
 If you are going to be adding functionality to `beaker` keep in mind the following regarding dependencies.
@@ -210,10 +247,10 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
 #### Code
  * [jade-loader](https://github.com/webpack/jade-loader) so you can use client-side
    [`jade` templates](http://jade-lang.com)
- * [babel-loader](https://github.com/babel/babel-loade://github.com/babel/babel-loader) so you can write the code of
+ * [babel-loader](https://github.com/babel/babel-loader) so you can write the code of
    tomorrow, today with [`babel`](https://github.com/babel/babel)
  * [imports-loader](https://github.com/webpack/imports-loader) so you can include code that was intended to be
-   included directly in a `<script>` tag. 
+   included directly in a `<script>` tag.
 
 ### Task Management
 * [grunt](https://github.com/gruntjs/grunt)
@@ -235,6 +272,11 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
 * [karma-js-coverage](https://github.com/danielflower/karma-js-coverage)
 * [karma-jasmine](https://github.com/karma-runner/karma-jasmine)
 * [karma-spec-reporter](https://github.com/mlex/karma-spec-reporter)
+* [rewire](https://github.com/jhnns/rewire)
+* [rewire-webpack](https://github.com/jhnns/rewire-webpack)
+
+### Views
+ * [react](https://github.com/facebook/react)
 
 ## Additional References
 We also include code from the following sources.

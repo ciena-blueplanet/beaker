@@ -15,6 +15,7 @@ var webpack = require('webpack');
 var configDir = path.join(__dirname, '../../config');
 var webpackLoaders = require(path.join(configDir, 'webpack/loaders'));
 var webpackResolve = require(path.join(configDir, 'webpack/resolve'));
+var webpackPlugins = require(path.join(configDir, 'webpack/karma-plugins'));
 
 var USE_SOURCE_MAPS = process.env.MAPS === 'on';
 
@@ -147,7 +148,7 @@ ns.init = function (grunt) {
                             },
                         ],
                     },
-
+                    plugins: webpackPlugins,
                     resolve: webpackResolve,
                 },
             },
@@ -157,12 +158,6 @@ ns.init = function (grunt) {
             options: webpackConfig,
             build: {
                 plugins: webpackConfig.plugins.concat(
-                    new webpack.DefinePlugin({
-                        'process.env': {
-                            // This has effect on the react lib size
-                            'NODE_ENV': JSON.stringify('production'),
-                        },
-                    }),
                     new webpack.optimize.DedupePlugin(),
                     new webpack.optimize.UglifyJsPlugin()
                 ),

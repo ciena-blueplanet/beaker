@@ -12,6 +12,7 @@ var sh = require('execSync');
 var sleep = require('sleep');
 
 var t = require('../../src/transplant')(__dirname);
+var utils = t.require('./cli/utils');
 var tester = t.require('./webdriverio-tester');
 
 /**
@@ -50,7 +51,7 @@ function verifyCommands(ctx) {
  * @param {String[]} ctx.extras - expected extra files/folders
  */
 function itCallsTheRightMethods(ctx) {
-    var argv, ret, filename, timestamp, server, initialSleep, pollInterval, extras, isApp;
+    var argv, filename, timestamp, server, initialSleep, pollInterval, extras, isApp;
     describe('(shared) .command() specs', function () {
         beforeEach(function () {
             argv = ctx.argv;
@@ -69,9 +70,9 @@ function itCallsTheRightMethods(ctx) {
             });
             spyOn(tester, 'remove');
             spyOn(tester, 'waitForResults');
-            spyOn(tester, 'processResults').and.returnValue(321);
+            spyOn(tester, 'processResults');
 
-            ret = tester.command(argv);
+            tester.command(argv);
         });
 
         it('creates a tarball', function () {
@@ -102,10 +103,6 @@ function itCallsTheRightMethods(ctx) {
         it('processes the results', function () {
             expect(tester.processResults).toHaveBeenCalledWith(timestamp, server);
         });
-
-        it('returns the result of processResults()', function () {
-            expect(ret).toBe(321);
-        });
     });
 }
 
@@ -116,6 +113,7 @@ describe('webdriverio-tester', function () {
     beforeEach(function () {
         results = {};
 
+        spyOn(utils, 'throwCliError');
         spyOn(console, 'log');
         spyOn(sh, 'exec').and.callFake(function (command) {
             var result = results[command];
