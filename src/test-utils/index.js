@@ -7,10 +7,34 @@
 
 /* global expect */
 
+/**
+ * @typedef Resolver
+ * @param {Function} resolve - resolve the promise
+ * @param {Function} reject - reject the promise
+ * @param {Function} notify - notify of progress on the promise
+ */
+
 var _ = require('lodash');
+var Q = require('q');
 
 /** @exports testUtils */
 var ns = {};
+
+
+/**
+ * Create a Promise that can be resolved by the given resolver object
+ * @param {Resolver} resolver - the reference of the resolver to update (methods don't have to exist)
+ * @returns {Q.Promise} the promise that is created
+ */
+ns.makePromise = function (resolver) {
+    /* eslint-disable new-cap */
+    return Q.Promise(function (resolve, reject, notify) {
+        resolver.resolve = resolve;
+        resolver.reject = reject;
+        resolver.notify = notify;
+    });
+    /* eslint-enable new-cap */
+};
 
 // ------------------------------------------------------------------------------------------------
 // Waiting
@@ -168,8 +192,20 @@ ns.e2e = {
      */
     getUrl: function (testConfig, extra) {
         var http = testConfig.http;
-        var url = 'http://' + http.host + ':' + http.port + '/' + http.entryPoint;
+        var entryPoint = http.entryPoint;
+
+        // Prevent double forward slash in URL
+        if (entryPoint.length !== 0 && entryPoint[0] === '/') {
+            entryPoint = entryPoint.substring(1);
+        }
+
+        var url = 'http://' + http.host + ':' + http.port + '/' + entryPoint;
         if (extra) {
+            // Prevent double forward slash in URL
+            if (url[url.length - 1] === '/' && extra[0] === '/') {
+                extra = extra.substring(1);
+            }
+
             url = url + extra;
         }
 

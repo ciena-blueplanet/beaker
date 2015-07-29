@@ -17,6 +17,7 @@ SELENIUM_BROWSER ?= chrome
 	start-httpserver \
 	e2e-test \
 	create-config \
+	clean-screenshots \
 	remote-e2e-test
 
 #######################################################################
@@ -48,6 +49,11 @@ create-config:
 	$(HIDE)echo "    \"url\": \"http://$(HOSTNAME):$(TEST_PORT)/demo\"" >> $(TEST_CONFIG) # for backwrd-compatibility
 	$(HIDE)echo "}" >> $(TEST_CONFIG)
 
+SCREENSHOTS_DIR := spec/e2e/screenshots
+clean-screenshots:
+	$(HIDE)echo "Removing everything but *.baseline.png files from $(SCREENSHOTS_DIR)"
+	$(HIDE)find $(SCREENSHOTS_DIR) -type f ! -name *.baseline.png -exec rm -f {} \; || echo "No screenshots present"
+
 do-e2e-test:
 ifndef JASMINE_CONFIG_FILE
 	$(error JASMINE_CONFIG_FILE variable needs to be set. Maybe include 'node-targets.mk' first?)
@@ -62,7 +68,7 @@ endif
 e2e-test: kill-httpserver build-mock start-httpserver create-config do-e2e-test
 
 remote-e2e-test: build-mock do-remote-e2e-test
-do-remote-e2e-test: create-config
+do-remote-e2e-test: clean-screenshots create-config
 ifndef WEBDRIVERIO_SERVER
 	$(error WEBDRIVERIO_SERVER variable needs to be set)
 else

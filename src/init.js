@@ -5,10 +5,14 @@
 
 'use strict';
 
+require('./typedefs');
+
 var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
 var changeCase = require('change-case');
+
+var cliUtils = require('./cli/utils');
 var config = require('./config');
 var utils = require('./utils');
 
@@ -30,7 +34,7 @@ ns.cleanupCruft = function (projectName) {
     var match = projectName.match(/^cy\-(.+)\-ui$/);
 
     if (match === null) {
-        return 'NON-APP';
+        return projectName;
     }
 
     return match[1];
@@ -38,16 +42,18 @@ ns.cleanupCruft = function (projectName) {
 
 /**
  * Actual functionality of the 'init' command
- * @param {Ojbect} argv - the minimist arguments object
- * @returns {Number} 0 on success, 1 on error
+ * @param {MinimistArgv} argv - the minimist arguments object
+ * @throws {CliError}
 */
 ns.command = function (argv) {
     var _config = config.load(CWD);
 
     if (!_config) {
-        console.error('beaker.json missing');
-        console.info('To create a default beaker.json file run the following command: beaker newConfig');
-        return 1;
+        var msg = 'beaker.json missing\n';
+        msg += 'To create a default beaker.json file, run the following command: beaker newConfig';
+
+        cliUtils.throwCliError(msg);
+        return; // not really needed, but it is for testing when you spyOn throwCliError
     }
 
     // get today's year for copyright headers, etc.
@@ -84,8 +90,6 @@ ns.command = function (argv) {
             fs.unlink(fullPath);
         }
     });
-
-    return 0;
 };
 
 module.exports = ns;

@@ -1,189 +1,125 @@
 /**
  * @author Matthew Dahl [@sandersky](https://github.com/sandersky)
+ * @author Adam Meadows [@job13er](https://github.com/job13er)
  * @copyright 2015 Cyan, Inc. All rights reserved
  */
 
 'use strict';
 
-var sh = require('execSync');
-var fs = require('fs');
-var path = require('path');
 var _ = require('lodash');
-var request = require('superagent');
-var httpSync = require('http-sync');
+var Q = require('q');
+var exec = require('child_process').exec;
+
+var http = require('q-io/http');
+var fs = require('q-io/fs');
 var versiony = require('versiony');
 
+var utils = require('./cli/utils');
 var config = require('./config');
-
-// 'Constants' to store some info so we don't calculate it more than once
-var CWD = process.cwd();
-
-var _config;
-
-/**
- * Retrieve configuration from config file but only load file once
- * @returns {Object} configuration
- */
-function getConfig() {
-    if (!_config) {
-        _config = config.load(CWD);
-
-        if (!_config) {
-            throw new Error('beaker.json missing');
-        }
-    }
-
-    _config.urlBase = 'https://' + _config.github.host + '/api/v3';
-
-    return _config;
-}
 
 /** @exports github */
 var ns = {};
 
 /**
- * Handle a response from superagent, log the response to
- * the console, so the user knows what happened.
- * @param {Object} res - the response from superagent
- * @throws an Error when response indicates failure
+ * Initialize the module
+ * @returns {github} the instance
  */
-ns.onResponse = function (res) {
-    var msg = 'Status Code: ' + res.status + '\n' +
-        'Response Body:\n' + JSON.stringify(res.body, null, 2);
+ns.init = function () {
 
-    if (!res.ok) {
-        throw new Error(msg);
-    } else {
-        console.info(msg);
+    // this is on the object for eaiser mocking
+    this.exec = Q.denodeify(exec);
+
+    this.config = config.load(process.cwd());
+
+    if (!this.config) {
+        throw new Error('beaker.json missing');
     }
+
+    this.config.urlBase = 'https://' + this.config.github.host + '/api/v3';
+
+    return this;
 };
+
 
 /**
  * Create a new release
  * @param {Object} argv - the minimist arguments object
+ * @throws CliError
  */
 ns.createRelease = function (argv) {
-    _.defaults(argv, {
-        branch: 'master',
-        description: '',
-    });
-
-    var url = getConfig().urlBase + '/repos/' + argv.repo + '/releases';
-    var body = {
-        'tag_name': argv.version,
-        'target_commitish': argv.branch,
-        name: argv.version,
-        body: argv.description,
-        draft: false,
-        prerelease: false,
-    };
-
-    request
-        .post(url)
-        .auth(getConfig().github.token, 'x-oauth-basic')
-        .send(body)
-        .end(ns.onResponse);
+    utils.throwCliError(argv._[1] + ' currently unavailable, hopefully coming back soon', 1);
 };
 
 /**
  * Make GitHub API GET request
  * @param {String} apiPath - path to desired GitHub API
- * @throws an Error when response indicates failure
- * @returns {Object} JSON object
+ * @returns {Q.Promise} a promise that will be resolved with the result of the request
  */
 ns.getRequest = function (apiPath) {
-    var msg;
-
-    var host = getConfig().github.host;
-    var urlPath = '/api/v3/' + apiPath;
-    var protocol = 'https';
-
-    console.info(protocol + '://' + host + urlPath);
-
-    var req = httpSync.request({
-        host: host,
-        path: urlPath,
-        protocol: protocol,
+    var url = this.config.urlBase + apiPath;
+    return http.request(url).then(function (res) {
+        // NOTE: this is all within this then() because the inner one needs
+        // access to the res object and I wasn't sure how to do that if I returned
+        // res.body.read() here and used chaining -- ARM
+        return res.body.read().then(function (content) {
+            return {
+                status: res.status,
+                data: JSON.parse(content),
+            };
+        });
     });
-
-    req.setTimeout(10000, function () {
-        msg = 'Request timed out: ' + protocol + '://' + host + urlPath;
-        throw new Error(msg);
-    });
-
-    var res = req.end();
-
-    if (res.statusCode !== 200) {
-        msg = 'Status Code: ' + res.statusCode + '\n' +
-            'Response Body:\n' + res.body.toString();
-        throw new Error(msg);
-    }
-
-    return JSON.parse(res.body.toString());
 };
 
 /**
  * Get list of commits for repository
  * @param {String} repo - repsitory name (including owner)
- * @throws an Error when response indicates failure
- * @returns {Array<Object>} commits for repository
+ * @param {String} branch - branch name
+ * @returns {Q.Promise} a promise that will be resolved with the results of the commits API
  */
-ns.getCommits = function (repo) {
-    return ns.getRequest('repos/' + repo + '/commits');
+ns.getCommits = function (repo, branch) {
+    return this.getRequest('/repos/' + repo + '/commits?sha=' + branch);
 };
 
 /**
  * Get single pull request for repository
  * @param {String} repo - repsitory name (including owner)
  * @param {String} number - pull request number
- * @throws an Error when response indicates failure
- * @returns {Object} single pull request for repository
+ * @returns {Q.Promise} a promise that will be resolved with the results of the commits API
  */
 ns.getPullRequest = function (repo, number) {
-    return ns.getRequest('repos/' + repo + '/pulls/' + number);
+    return this.getRequest('/repos/' + repo + '/pulls/' + number);
 };
 
 /**
  * Get list of pull requests for repository
  * @param {String} repo - repsitory name (including owner)
- * @param {Boolean} searchAll - whether or not to search open and closed pull requests or just open
- * @throws an Error when response indicates failure
- * @returns {Array<Object>} open pull requests for repository
+ * @returns {Q.Promise} a promise that will be resolved with the results of the pulls API
  */
-ns.getPullRequests = function (repo, searchAll) {
-    var apiPath = 'repos/' + repo + '/pulls';
-
-    if (searchAll) {
-        apiPath += '?state=all';
-    }
-
-    return ns.getRequest(apiPath);
+ns.getPullRequests = function (repo) {
+    return this.getRequest('/repos/' + repo + '/pulls');
 };
 
 /**
  * Get pull request for repository that's head is at specific commit
  * @param {String} repo - repsitory name (including owner)
  * @param {String} sha - commit hash
- * @param {Boolean} searchAll - whether or not to search open and closed pull requests or just open
- * @returns {Object} pull request information (null if PR not found for SHA)
+ * @returns {Q.Promise} a promise that will be resolved with the pull request for the given SHA
  */
-ns.getPullRequestForSHA = function (repo, sha, searchAll) {
+ns.getPullRequestForSha = function (repo, sha) {
     console.info('Looking for PR on repository ' + repo + ' with HEAD at commit ' + sha);
+    return this.getPullRequests(repo).then(function (resp) {
+        var result = null;
+        resp.data.forEach(function (pr) {
+            // If pull request is at specific commit
+            if (pr.head.sha === sha || pr.merge_commit_sha === sha) {
+                console.info('Found PR at commit: ' + pr.id);
+                result = pr;
+                return false;
+            }
+        });
 
-    var result = null;
-    var pullRequests = ns.getPullRequests(repo, searchAll);
-
-    // Iterate over all open pull requests
-    _.forEach(pullRequests, function (pr) {
-        // If pull request is at specific commit
-        if (pr.head.sha === sha || pr.merge_commit_sha === sha) {
-            console.info('Found PR at commit: ' + pr.id);
-            result = pr;
-            return false;
-        }
+        return result;
     });
-
-    return result;
 };
 
 /**
@@ -203,59 +139,55 @@ ns.getVersionBumpLevel = function (pr) {
 };
 
 /**
- * Whether or not version bump level was specified in pull request
+ * obvious
  * @param {Object} pr - pull request information
  * @returns {Boolean} whether or not version bump comment is present in pull request
  */
-ns.specifiesVersionBumpLevel = function (pr) {
-    return ns.getVersionBumpLevel(pr) !== null;
+ns.hasVersionBumpComment = function (pr) {
+    return this.getVersionBumpLevel(pr) !== null;
 };
 
 /**
  * Determine if all required arguments are present for bump commands
  * @param {Object} argv - the minimist arguments object
- * @param {Array<String>} required - list of required arguments
- * @returns {Boolean} whether or not required arguments are missing
+ * @param {String[]} requiredArgs - list of required arguments
+ * @throws CliError
  */
-ns.missingArgs = function (argv, required) {
-    var argsMissing = false;
+ns.verifyRequiredArgs = function (argv, requiredArgs) {
+    var errors = [];
 
-    _.forEach(required, function (arg) {
+    requiredArgs.forEach(function (arg) {
         if (!_.has(argv, arg)) {
-            console.error(arg + ' argument is required');
-            argsMissing = true;
+            errors.push(arg + ' argument is required');
         }
     });
 
-    return argsMissing;
+    if (errors.length > 0) {
+        utils.throwCliError(errors.join('\n'), 1);
+    }
 };
 
 /**
  * Determine if version is bumped
  * @param {Object} argv - the minimist arguments object
- * @returns {Number} return value (1 for failure, 0 for success)
  */
 ns.versionBumped = function (argv) {
-    // If missing required command line arguments
-    if (ns.missingArgs(argv, ['repo', 'sha'])) {
-        return 1;
-    }
+    var self = this;
+    this.verifyRequiredArgs(argv, ['repo', 'sha']);
 
-    var pr = ns.getPullRequestForSHA(argv.repo, argv.sha, false);
-
-    // If pull request not found
-    if (!pr) {
-        console.error('Could not find PR on repository ' + argv.repo + ' with commit ' + argv.sha);
-        return 1;
-    }
-
-    return ns.specifiesVersionBumpLevel(pr) ? 0 : 1;
+    this.getPullRequestForSha(argv.repo, argv.sha)
+        .then(function (pr) {
+            if (!self.hasVersionBumpComment(pr)) {
+                utils.throwCliError('Missing version bump comment', 1);
+            }
+        })
+        .catch(console.error.bind(console));
 };
 
 /**
  * Bump version in bower.json and package.json files
  * @param {String} bump - version bump level
- * @returns {Boolean} whether or not file bump succeeded
+ * @throws CliError
  */
 ns.bumpFiles = function (bump) {
 
@@ -280,91 +212,70 @@ ns.bumpFiles = function (bump) {
             break;
 
         default:
-            console.error('Missing version bump comment');
-            return false;
+            utils.throwCliError('Missing version bump comment', 1);
+            break;
     }
 
     // Update package.json with bumped version
     v.to('package.json').end();
+};
 
-    return true;
+/**
+ * Get the current branch (based on last commit) only valid for merge scenario, not PRs
+ * @returns {Q.Promise} a promise resolved with the the name of the branch
+ */
+ns.getBranch = function () {
+    return this.exec('git rev-parse --abbrev-ref HEAD').then(function (result) {
+        return result[0].replace('\n', '');
+    });
 };
 
 /**
  * Push local Git changes to remote
- * @returns {Boolean} whether or not push succeeded
+ * @param {String} branch - the branch to push to
+ * @returns {Q.Promise} a promise resolved with the results of pushing the changes to origin
  */
-ns.pushChanges = function () {
-    var branch,
-        result;
-
-    result = sh.exec('git rev-parse --abbrev-ref HEAD');
-
-    if (result.code !== 0) {
-        console.error('Failed to get branch name with error: ' + result.stdout);
-        return false;
-    } else {
-        branch = result.stdout;
-    }
-
+ns.pushChanges = function (branch) {
     var cmd = 'git push origin ' + branch;
     console.info(cmd);
-
-    // Push local changes to remote
-    result = sh.exec(cmd);
-
-    if (result.code !== 0) {
-        console.error('Failed to push to remote with error: ' + result.stdout);
-        return false;
-    }
-
-    return true;
+    return this.exec(cmd);
 };
 
 /**
  * Commit changes to bower.json and package.json
- * @returns {Boolean} whether or not commit succeeded
+ * @returns {Q.Promise} a promise that is resolved when the files have been committed
  */
 ns.commitBumpedFiles = function () {
-    _.forEach(['bower.json', 'package.json'], function (file) {
-        var filePath = path.join(CWD, file);
-
-        // If file exists make sure to add it to git
-        if (fs.existsSync(filePath)) {
-            sh.run('git add ' + file);
-        }
+    var self = this;
+    var promises = [];
+    ['bower.json', 'package.json'].forEach(function (file) {
+        var promise = fs.exists(file).then(function (exists) {
+            if (exists) {
+                return self.exec('git add ' + file);
+            }
+        });
+        promise.done();
+        promises.push(promise);
     });
 
-    var result = sh.exec('git commit -m "bump version"');
-
-    if (result.code !== 0) {
-        console.error('git commit failed with error: ' + result.stdout);
-        return false;
-    }
-
-    // Return whether or not local changes were successfully pushed to remote
-    return ns.pushChanges();
+    return Q.allSettled(promises).then(function () {
+        return self.exec('git commit -m "bump version"');
+    });
 };
 
 /**
- * Bump version based on comment in pull request
- * @param {Object} argv - the minimist arguments object
- * @returns {Number} return value (1 for failure, 0 for success)
+ * Collect all the version bumps in the list of commits
+ * @param {String} repo - the repository name (including owner)
+ * @param {Object[]} commits - the array of commits to go through
+ * @returns {Q.Promsie} a promise resolved with the array of version bumps to be made
  */
-ns.bumpVersion = function (argv) {
-    // If missing required command line arguments
-    if (ns.missingArgs(argv, ['repo'])) {
-        return 1;
-    }
+ns.getVersionBumps = function (repo, commits) {
+    var self = this;
 
-    var commits = ns.getCommits(argv.repo);
-    var error = false;
-
-    var bumps = [];
-
-    _.forEach(commits, function (commitObj) {
-        // If commit was made by buildbot we can ignore all previous commits
-        if (commitObj.commit.author.email === getConfig().github.email) {
+    var prPromises = [];
+    _.forEach(commits, function (commitObj, index) {
+        // If commit was made by the CI system we can ignore all previous commits
+        if (commitObj.commit.author.email === self.config.github.email) {
             return false;
         }
 
@@ -373,74 +284,115 @@ ns.bumpVersion = function (argv) {
 
         // If commit is for a pull request merge
         if (matches) {
-            var pr = ns.getPullRequest(argv.repo, matches[1]);
+            var prPromise = self.getPullRequest(repo, matches[1]).then(function (resp) {
+                return {
+                    index: index,
+                    resp: resp,
+                };
+            });
+            prPromises.push(prPromise);
+            prPromise.done();
+        }
+    });
 
-            // If pull request not found
-            if (!pr) {
-                console.warn('Could not find PR #' + matches[1] + ' on repository ' + argv.repo);
-                // Note: Do not change error b/c a repo could have older PR's that are from before
-                // the version-bump comment
-                return true;
+    return Q.all(prPromises).then(function (resolutions) {
+        var responses = _(resolutions).sortBy('index').pluck('resp').pluck('data').value();
+
+        // reverse it since we need to bump versions from oldest to newest
+        return responses.map(self.getVersionBumpLevel).reverse();
+    });
+};
+
+/**
+ * Bump the version for the given repo/branch
+ * @param {String} repo - the repository (including owner)
+ * @param {String} branch - the branch to bump
+ * @returns {Q.Promise} a promise resolved when bump is finished
+ */
+ns.bumpVersionForBranch = function (repo, branch) {
+    var self = this;
+    return this.getCommits(repo, branch)
+        .then(function (resp) {
+            return self.getVersionBumps(repo, resp.data);
+        })
+        .then(function (bumps) {
+            bumps.forEach(function (bump) {
+                self.bumpFiles(bump);
+            });
+        })
+        .then(function () {
+            return self.commitBumpedFiles(branch);
+        })
+        .then(function () {
+            return self.pushChanges(branch);
+        })
+        .then(function (result) {
+            if (result.code > 0) {
+                utils.throwCliError('Failed to push changes to ' + branch + ': ' + result.stdout, 1);
             }
+        });
+};
 
-            var bump = ns.getVersionBumpLevel(pr);
+/**
+ * Bump version based on comment in pull request
+ * @param {Object} argv - the minimist arguments object
+ * @throws CliError
+ */
+ns.bumpVersion = function (argv) {
+    var self = this;
 
-            // Add to beginning of array since we need to bump versions from oldest to newest
-            bumps.unshift(bump);
-        }
-    });
+    this.verifyRequiredArgs(argv, ['repo']);
 
-    _.forEach(bumps, function (bump) {
-        // If failed to bump files
-        if (!ns.bumpFiles(bump)) {
-            error = true;
-        }
-    });
-
-    // If failed to commit changes
-    if (error || !ns.commitBumpedFiles()) {
-        return 1;
-    }
-
-    return 0;
+    this.getBranch()
+        .then(function (branch) {
+            if (branch === null) {
+                utils.throwCliError('Unable to lookup branch', 1);
+            }
+            return branch;
+        })
+        .then(function (branch) {
+            return self.bumpVersionForBranch(argv.repo, branch);
+        })
+        .catch(console.error.bind(console));
 };
 
 /**
  * Actual functionality of the 'github' command
  * @param {Ojbect} argv - the minimist arguments object
- * @returns {Number} 0 on success, 1 on error
+ * @throws CliError
 */
 ns.command = function (argv) {
     if (argv._.length !== 2) {
-        console.error('Invalid command: ' + JSON.stringify(argv._));
-        return 1;
+        utils.throwCliError('Invalid command: ' + JSON.stringify(argv._), 1);
     }
 
     console.info(argv);
 
     var command = argv._[1];
-    var ret = 0;
 
     switch (command) {
         case 'bump-version':
-            ret = ns.bumpVersion(argv);
+            this.bumpVersion(argv);
             break;
 
         case 'version-bumped':
-            ret = ns.versionBumped(argv);
+            this.versionBumped(argv);
             break;
 
         case 'release':
-            ns.createRelease(argv);
+            this.createRelease(argv);
             break;
 
         default:
-            console.error('Unknown command: ' + command);
-            ret = 1;
+            utils.throwCliError('Unknown command: ' + command, 1);
             break;
     }
-
-    return ret;
 };
 
-module.exports = ns;
+function factory() {
+    return Object.create(ns).init();
+}
+
+factory.proto = ns;
+
+module.exports = factory;

@@ -11,17 +11,17 @@ var cli = t.require('./index');
 
 
 describe('cli.help', function () {
-    var argv, ret;
+    var argv;
 
     beforeEach(function () {
         argv = {
             _: ['help'],
         };
         spyOn(console, 'log');
+        cli.help(argv);
     });
 
-    it('returns 0', function () {
-        ret = cli.help(argv);
-        expect(ret).toBe(0);
+    it('does not blow up', function () {
+        expect(true).toBeTruthy();
     });
 });

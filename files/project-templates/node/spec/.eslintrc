@@ -1,7 +1,6 @@
 {
     "globals": {
         "describe": false,
-        "fdescribe": false,
         "xdescribe": false,
         "beforeEach": false,
         "afterEach": false,
