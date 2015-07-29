@@ -4,6 +4,7 @@
         "binaryLiterals": true,
         "blockBindings": true,
         "defaultParams": true,
+        "destructuring": true,
         "forOf": true,
         "generators": true,
         "globalReturn": true,
@@ -15,10 +16,11 @@
         "octalLiterals": true,
         "regexUFlag": true,
         "regexYFlag": true,
+        "restParams": true,
+        "spread": true,
         "superInFunctions": true,
         "templateStrings": true,
-        "unicodeCodePointEscapes": true,
-        "destructuring": true
+        "unicodeCodePointEscapes": true
     },
     "env": {
         "amd": true,
