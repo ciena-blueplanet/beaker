@@ -181,7 +181,7 @@ ns.versionBumped = function (argv) {
                 utils.throwCliError('Missing version bump comment', 1);
             }
         })
-        .catch(console.error.bind(console));
+        .done();
 };
 
 /**
@@ -353,7 +353,7 @@ ns.bumpVersion = function (argv) {
         .then(function (branch) {
             return self.bumpVersionForBranch(argv.repo, branch);
         })
-        .catch(console.error.bind(console));
+        .done();
 };
 
 /**
