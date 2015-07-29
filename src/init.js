@@ -34,7 +34,7 @@ ns.cleanupCruft = function (projectName) {
     var match = projectName.match(/^cy\-(.+)\-ui$/);
 
     if (match === null) {
-        return 'NON-APP';
+        return projectName;
     }
 
     return match[1];

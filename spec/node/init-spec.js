@@ -36,8 +36,8 @@ describe('init', function () {
     });
 
     describe('.cleanupCruft()', function () {
-        it('returns NON-APP for repository not named as cy-<project-name>-ui', function () {
-            expect(init.cleanupCruft('project-name')).toEqual('NON-APP');
+        it('returns <project-name> for repository not named as cy-<project-name>-ui', function () {
+            expect(init.cleanupCruft('project-name-ui')).toEqual('project-name-ui');
         });
 
         it('returns project name for repository named as cy-<project-name>-ui', function () {
@@ -58,7 +58,7 @@ describe('init', function () {
             githubUser: config.github.user,
             npmRegistry: config.npm.registry,
             beakerVersion: t.require('../package.json').version,
-            cruftlessName: 'NON-APP',
+            cruftlessName: 'beaker',
             seleniumHost: 'localhost',
             seleniumPort: 4444,
             seleniumBrowser: 'chrome',
