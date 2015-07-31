@@ -90,6 +90,7 @@
         "less-loader": "^2.0.0",
         "lodash": "^3.2.0",
         "matchdep": "^0.3.0",
+        "nan": "<2.0.0",
         "nock": "^0.59.1",
         "postcss-loader": "^0.4.3",
         "raw-loader": "^0.5.1",
