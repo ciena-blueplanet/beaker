@@ -7,8 +7,8 @@
 
 require('./style/main.less');
 
-let $ = require('jquery');
-let template = require('./tmpl/main.jade');
+import $ from 'jquery';
+import template from './tmpl/main.jade';
 
 module.exports = {
     render: function (element) {
