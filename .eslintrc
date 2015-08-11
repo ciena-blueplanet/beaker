@@ -9,6 +9,7 @@
         "generators": true,
         "globalReturn": true,
         "jsx": true,
+        "modules": true,
         "objectLiteralComputedProperties": true,
         "objectLiteralDuplicateProperties": true,
         "objectLiteralShorthandMethods": true,

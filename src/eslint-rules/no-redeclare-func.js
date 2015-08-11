@@ -7,9 +7,9 @@
 // Rule Definition
 //------------------------------------------------------------------------------
 
-module.exports = function (context) {
+'use strict';
 
-    'use strict';
+module.exports = function (context) {
 
     var functionAssignments = {};
 
