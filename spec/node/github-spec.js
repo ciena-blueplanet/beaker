@@ -8,8 +8,6 @@
 
 /* eslint-disable new-cap */ // <-- for Q()
 
-'use strict';
-
 var _ = require('lodash');
 var Q = require('q');
 

@@ -3,8 +3,6 @@
  * @copyright {{ year }} {{ company }}. All rights reserved.
  */
 
-'use strict';
-
 /* eslint-disable max-nested-callbacks */
 
 import $ from 'jquery';

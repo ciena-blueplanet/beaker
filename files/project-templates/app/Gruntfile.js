@@ -3,8 +3,6 @@
  * @copyright {{ year }} {{ company }}. All rights reserved.
 */
 
-'use strict';
-
 var beaker = require('beaker');
 
 module.exports = function (grunt) {

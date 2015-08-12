@@ -3,8 +3,6 @@
  * @copyright 2015 Cyan, Inc. All rights reserved
  */
 
-'use strict';
-
 /**
  * @typedef Result
  * @property {Number} code - the exit code of the command

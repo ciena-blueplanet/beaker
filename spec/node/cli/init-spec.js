@@ -3,8 +3,6 @@
  * @copyright 2015 Cyan, Inc. All rights reserved.
 */
 
-'use strict';
-
 var t = require('../../../src/transplant')(__dirname);
 var init = t.require('../init');
 var cli = t.require('./index');

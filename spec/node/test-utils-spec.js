@@ -5,8 +5,6 @@
 
 /* eslint-disable max-nested-callbacks */
 
-'use strict';
-
 var t = require('../../src/transplant')(__dirname);
 var utils = t.require('./test-utils');
 

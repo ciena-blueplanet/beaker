@@ -3,8 +3,6 @@
  * @author Nodeca Team <https://github.com/nodeca>
  */
 
-'use strict';
-
 var LODASH_FN_ALIASES = {
     drop: 'rest',
     head: 'first',
