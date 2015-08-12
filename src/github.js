@@ -4,8 +4,6 @@
  * @copyright 2015 Cyan, Inc. All rights reserved
  */
 
-'use strict';
-
 var _ = require('lodash');
 var Q = require('q');
 var exec = require('child_process').exec;
@@ -181,7 +179,7 @@ ns.versionBumped = function (argv) {
                 utils.throwCliError('Missing version bump comment', 1);
             }
         })
-        .catch(console.error.bind(console));
+        .done();
 };
 
 /**
@@ -199,21 +197,21 @@ ns.bumpFiles = function (bump) {
     var v = versiony.from('package.json').indent(jsonIndent);
 
     switch (bump) {
-        case 'major':
-            v.newMajor();
-            break;
+    case 'major':
+        v.newMajor();
+        break;
 
-        case 'minor':
-            v.minor().patch(0);
-            break;
+    case 'minor':
+        v.minor().patch(0);
+        break;
 
-        case 'patch':
-            v.patch();
-            break;
+    case 'patch':
+        v.patch();
+        break;
 
-        default:
-            utils.throwCliError('Missing version bump comment', 1);
-            break;
+    default:
+        utils.throwCliError('Missing version bump comment', 1);
+        break;
     }
 
     // Update package.json with bumped version
@@ -353,7 +351,7 @@ ns.bumpVersion = function (argv) {
         .then(function (branch) {
             return self.bumpVersionForBranch(argv.repo, branch);
         })
-        .catch(console.error.bind(console));
+        .done();
 };
 
 /**
@@ -371,21 +369,21 @@ ns.command = function (argv) {
     var command = argv._[1];
 
     switch (command) {
-        case 'bump-version':
-            this.bumpVersion(argv);
-            break;
+    case 'bump-version':
+        this.bumpVersion(argv);
+        break;
 
-        case 'version-bumped':
-            this.versionBumped(argv);
-            break;
+    case 'version-bumped':
+        this.versionBumped(argv);
+        break;
 
-        case 'release':
-            this.createRelease(argv);
-            break;
+    case 'release':
+        this.createRelease(argv);
+        break;
 
-        default:
-            utils.throwCliError('Unknown command: ' + command, 1);
-            break;
+    default:
+        utils.throwCliError('Unknown command: ' + command, 1);
+        break;
     }
 };
 

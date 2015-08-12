@@ -3,12 +3,10 @@
  * @copyright {{ year }} {{ company }}. All rights reserved.
  */
 
-'use strict';
-
 /* eslint-disable max-nested-callbacks */
 
-let $ = require('jquery');
-let main = require('{{ projectName }}');
+import $ from 'jquery';
+import main from '{{ projectName }}';
 
 describe('main', () => {
     let $container;

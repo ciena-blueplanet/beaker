@@ -5,8 +5,6 @@
 
 /* eslint-disable max-nested-callbacks */
 
-'use strict';
-
 const rewire = require('rewire');
 const $ = require('jquery');
 const React = require('react/addons');

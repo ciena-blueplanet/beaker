@@ -3,8 +3,6 @@
  * @copyright 2014-2015 Cyan, Inc. All rights reserved
 */
 
-'use strict';
-
 var t = require('../../../src/transplant')(__dirname);
 var noAliases = t.require('./no-lodash-aliases');
 

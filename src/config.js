@@ -3,8 +3,6 @@
  * @copyright 2015 Cyan, Inc. All rights reserved
  */
 
-'use strict';
-
 var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');

@@ -4,8 +4,6 @@
  * @copyright {{ year }} {{ company }}. All rights reserved.
  */
 
-'use strict';
-
 var t = require('beaker').transplant(__dirname);
 var foo = t.require('./foo');
 
