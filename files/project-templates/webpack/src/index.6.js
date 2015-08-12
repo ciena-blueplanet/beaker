@@ -3,8 +3,6 @@
  * @copyright {{ year }} {{ company }}. All rights reserved.
  */
 
-'use strict';
-
 require('./style/main.less');
 
 import $ from 'jquery';

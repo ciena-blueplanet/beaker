@@ -3,8 +3,6 @@
  * @copyright 2015 Cyan, Inc. All rights reserved.
 */
 
-'use strict';
-
 var t = require('../../../src/transplant')(__dirname);
 var tester = t.require('../webdriverio-tester');
 var cli = t.require('./index');

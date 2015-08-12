@@ -5,8 +5,6 @@
 
 /* eslint-disable max-nested-callbacks */
 
-'use strict';
-
 var _ = require('lodash');
 var fs = require('fs');
 var matchdep = require('matchdep');

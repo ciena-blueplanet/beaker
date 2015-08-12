@@ -5,8 +5,6 @@
 
 /* eslint-disable max-nested-callbacks */
 
-'use strict';
-
 const _ = require('lodash');
 const React = require('react');
 const customMatchers = require('../../../../src/test-utils/jasmine/custom-matchers');

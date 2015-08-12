@@ -4,8 +4,6 @@
  * @copyright 2015 Cyan, Inc. All rights reserved.
  */
 
-'use strict';
-
 const _ = require('lodash');
 const React = require('react');
 const stubDeps = require('./stub-deps');

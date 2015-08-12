@@ -5,8 +5,6 @@
 
 /* eslint-disable max-nested-callbacks */
 
-'use strict';
-
 const beaker = require('../../../src/test-utils');
 
 describe('test-utils', () => {

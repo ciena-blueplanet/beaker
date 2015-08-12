@@ -3,8 +3,6 @@
  * @copyright {{ year }} {{ company }}. All rights reserved.
  */
 
-'use strict';
-
 var path = require('path');
 var autoprefixer = require('autoprefixer-core');
 var csswring = require('csswring');
