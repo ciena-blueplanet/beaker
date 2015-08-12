@@ -4,8 +4,6 @@
  * @copyright {{ year }} {{ company }}. All rights reserved.
  */
 
-'use strict';
-
 var _ = require('lodash');
 
 var ns = {};

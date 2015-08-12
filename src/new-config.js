@@ -3,8 +3,6 @@
  * @copyright 2015 Cyan, Inc. All rights reserved
  */
 
-'use strict';
-
 require('./typedefs');
 
 var fs = require('fs');

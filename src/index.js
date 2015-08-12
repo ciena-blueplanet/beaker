@@ -3,8 +3,6 @@
  * @copyright 2015 Cyan, Inc. All rights reserved.
  */
 
-'use strict';
-
 var gruntHelper = require('./grunt/helper');
 var testUtils = require('./test-utils');
 

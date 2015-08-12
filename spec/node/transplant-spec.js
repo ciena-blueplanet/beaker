@@ -5,8 +5,6 @@
 
 /* eslint-disable max-nested-callbacks */
 
-'use strict';
-
 var transplantModule = require('../../src/transplant');
 
 describe('transplant', function () {

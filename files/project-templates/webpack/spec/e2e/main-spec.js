@@ -5,8 +5,6 @@
 
 /* eslint-disable max-nested-callbacks */
 
-'use strict';
-
 var webdriverio = require('webdriverio');
 var webdrivercss = require('webdrivercss');
 var utils = require('beaker/src/test-utils').e2e;
