@@ -3,8 +3,6 @@
  * @copyright {{ year }} {{ company }}. All rights reserved.
  */
 
-'use strict';
-
 var path = require('path');
 var loaders = require('beaker/config/webpack/loaders');
 var resolve = require('beaker/config/webpack/resolve');

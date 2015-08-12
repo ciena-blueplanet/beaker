@@ -5,8 +5,6 @@
 
 /* eslint max-nested-callbacks: 0 */
 
-'use strict';
-
 var _ = require('lodash');
 var sh = require('execSync');
 var sleep = require('sleep');

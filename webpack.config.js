@@ -3,8 +3,6 @@
  * @copyright 2105 Cyan, Inc. All rights reserved.
  */
 
-'use strict';
-
 var path = require('path');
 var loaders = require('./config/webpack/loaders');
 var resolve = require('./config/webpack/resolve');
