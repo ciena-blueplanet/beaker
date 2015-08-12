@@ -4,8 +4,6 @@
  * @copyright {{ year }} {{ company }}. All rights reserved.
  */
 
-'use strict';
-
 module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-eslint');

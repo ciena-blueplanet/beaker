@@ -7,8 +7,6 @@
 // Rule Definition
 //------------------------------------------------------------------------------
 
-'use strict';
-
 module.exports = function (context) {
 
     var functionAssignments = {};
