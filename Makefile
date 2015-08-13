@@ -65,9 +65,11 @@ coverage: node-coverage
 
 report-coverage: jasmine-coveralls
 
-ci-test: lint jasmine-test jasmine-coverage karma-test report-coverage
+dump-env:
 	$(HIDE)echo "dumping environment"
 	$(HIDE)./bin/env.js
+
+ci-test: dump-env lint jasmine-test jasmine-coverage karma-test report-coverage
 
 release:
 	$(HIDE)echo "Publishing version $(VERSION)"
