@@ -12,7 +12,10 @@ var packageName = require(rootPath + '/package.json').name;
 
 module.exports = function (source) {
     /* eslint-disable quotes */
-    var regex = new RegExp("require\\('" + packageName + "(\/[^']*)?'\\)", 'g');
+    var requireRegex = new RegExp("require\\('" + packageName + "(\/[^']*)?'\\)", 'g');
+    var importRegex = new RegExp("(import|from) '" + packageName + "(\/[^']*)?'", 'g');
     /* eslint-enable quotes */
-    return source.replace(regex, 'require(\'' + rootPath + '$1\')');
+    return source
+        .replace(requireRegex, 'require(\'' + rootPath + '$1\')')
+        .replace(importRegex, '$1 \'' + rootPath + '$2\'');
 };
