@@ -97,4 +97,55 @@ module.exports = {
             },
         };
     },
+
+    /**
+     * Ensure the react component validates propTypes appropriately
+     * @returns {Matcher} the actual matcher
+     */
+    toHaveCorrectPropTypes: function () {
+        return {
+            /**
+             * Actually compare the actual value against the expected value
+             * @param {ReactComponent} component - component to validate propTypes of
+             * @param {Object} expected - expected propType validations
+             * @returns {MatcherResult} the result of the comparison
+             */
+            compare: function (component, expected) {
+                const result = {
+                    message: '',
+                    pass: false,
+                };
+                const actual = component.propTypes;
+                const errors = [];
+
+                // Make sure each propType has correct validation and make sure test doesn't have extra keys
+                Object.keys(expected).forEach(key => {
+                    if (key in actual) {
+                        if (actual[key] !== expected[key]) {
+                            errors.push(`Validation for key "${ key }" does not match expected validation`);
+                        }
+                    } else {
+                        errors.push(`Unknown key "${ key }" in propTypes`);
+                    }
+                });
+
+                // Make sure test isn't missing any keys from propTypes
+                Object.keys(actual).forEach(key => {
+                    if (key in expected) {
+                        return;
+                    }
+
+                    errors.push(`Expected key "${ key }" in propTypes`);
+                });
+
+                result.pass = (errors.length === 0);
+
+                if (!result.pass) {
+                    result.message = errors.join('\n');
+                }
+
+                return result;
+            },
+        };
+    },
 };
