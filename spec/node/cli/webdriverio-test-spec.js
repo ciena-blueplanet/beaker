@@ -4,7 +4,7 @@
 */
 
 var t = require('../../../src/transplant')(__dirname);
-var tester = t.require('../webdriverio-tester');
+var testerProto = t.require('../webdriverio-tester').proto;
 var cli = t.require('./index');
 
 describe('cli.webdriverioTester', function () {
@@ -12,11 +12,11 @@ describe('cli.webdriverioTester', function () {
 
     beforeEach(function () {
         argv = {_: ['init']};
-        spyOn(tester, 'command');
+        spyOn(testerProto, 'command');
         cli.webdriverioTester(argv);
     });
 
     it('calls tester method', function () {
-        expect(tester.command).toHaveBeenCalledWith(argv);
+        expect(testerProto.command).toHaveBeenCalledWith(argv);
     });
 });
