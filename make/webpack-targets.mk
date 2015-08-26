@@ -15,25 +15,12 @@ SELENIUM_BROWSER ?= chrome
 .PHONY: \
 	webpack-test \
 	webpack-coverage \
-	webdriver \
-	kill-httpserver \
-	start-httpserver \
-	e2e-test \
 	create-config \
 	remote-e2e-test
 
 #######################################################################
 #                          e2e test targets                           #
 #######################################################################
-
-webdriver:
-	$(ENV)webdriver-manager start
-
-kill-httpserver:
-	$(ENV)kill $$(lsof -t -i:$(TEST_PORT)) || echo 'nothing to kill'
-
-start-httpserver:
-	$(ENV)http-server -s -c-1 -p $(TEST_PORT) &
 
 create-config:
 	$(HIDE)echo "{" > $(TEST_CONFIG)
@@ -50,15 +37,6 @@ create-config:
 	$(HIDE)echo "    \"seleniumServer\": \"$(SELENIUM_HOST)\"," >> $(TEST_CONFIG) # for backward-compatibility
 	$(HIDE)echo "    \"url\": \"http://$(HOSTNAME):$(TEST_PORT)/demo\"" >> $(TEST_CONFIG) # for backwrd-compatibility
 	$(HIDE)echo "}" >> $(TEST_CONFIG)
-
-do-e2e-test:
-	$(HIDE)echo "Running jasmine-node tests on port $(TEST_PORT)"
-	$(ENV)jasmine-node $(JASMINE_NODE_OPTS) $(NODE_SPECS) || ($(ENV)kill $$(lsof -t -i:$(TEST_PORT)) && false)
-	$(ENV)kill $$(lsof -t -i:$(TEST_PORT)) || echo 'nothing to kill'
-
-# TODO: deprecate this and replace with a `make local-e2e-test` or something that
-# spawns http-server and seleinum in the background, then runs the test
-e2e-test: kill-httpserver build-mock start-httpserver create-config do-e2e-test
 
 remote-e2e-test: build-mock do-remote-e2e-test
 do-remote-e2e-test: create-config
