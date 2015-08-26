@@ -8,10 +8,16 @@
 module.exports = [
     {
         test: /\.css$/,
-        loader: 'style!css!autoprefixer',
+        loader: 'style!css!postcss',
     }, {
         test: /\.less$/,
-        loader: 'style!css!autoprefixer!less',
+        loader: 'style!css!postcss!less',
+    }, {
+        test: /\.scss$/,
+        loader: 'style!css!postcss!sass',
+    }, {
+        test: /\.sass$/,
+        loader: 'style!css!postcss!sass?indentedSyntax',
     }, {
         test: /\.jade$/,
         loader: 'jade',

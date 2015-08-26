@@ -3,7 +3,8 @@
  * @copyright {{ year }} {{ company }}. All rights reserved.
  */
 
-'use strict';
+var autoprefixer = require('autoprefixer-core');
+var csswring = require('csswring');
 
 var loaders = require('beaker/config/webpack/loaders');
 var resolve = require('beaker/config/webpack/resolve');
@@ -27,6 +28,8 @@ module.exports = {
     module: {
         loaders: loaders,
     },
+
+    postcss: [autoprefixer, csswring],
 
     resolve: resolve,
 };

@@ -4,8 +4,6 @@
  * @copyright 2015 Cyan, Inc. All rights reserved
  */
 
-'use strict';
-
 var _ = require('lodash');
 var Q = require('q');
 var exec = require('child_process').exec;

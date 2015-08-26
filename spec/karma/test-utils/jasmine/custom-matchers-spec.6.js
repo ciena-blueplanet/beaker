@@ -5,8 +5,6 @@
 
 /* eslint-disable max-nested-callbacks */
 
-'use strict';
-
 const _ = require('lodash');
 const React = require('react');
 const customMatchers = require('../../../../src/test-utils/jasmine/custom-matchers');
@@ -135,6 +133,109 @@ describe('customMatchers', () => {
 
             it('returns an appropriate error message', () => {
                 let error = 'Expected component className "stub FooBar" to be "stub MyComponent"';
+                expect(result.message).toBe(error);
+            });
+        });
+    });
+
+    describe('.toHaveCorrectPropTypes()', () => {
+        let component, expected, fn, result;
+
+        beforeEach(() => {
+            fn = function () {
+                return 1;
+            };
+
+            component = {
+                propTypes: {
+                    a: 1,
+                    b: 'test',
+                    c: fn,
+                },
+            };
+
+            expected = {
+                a: 1,
+                b: 'test',
+                c: fn,
+            };
+
+            matcher = customMatchers.toHaveCorrectPropTypes();
+        });
+
+        describe('when no errors', () => {
+            beforeEach(() => {
+                result = matcher.compare(component, expected);
+            });
+
+            it('returns a passing result', () => {
+                expect(result.pass).toBeTruthy();
+            });
+        });
+
+        describe('when unknown property in expected', () => {
+            beforeEach(() => {
+                expected.d = 'unknown';
+                result = matcher.compare(component, expected);
+            });
+
+            it('returns a failing result', () => {
+                expect(result.pass).toBeFalsy();
+            });
+
+            it('returns appropriate error message', () => {
+                const error = 'Unknown key "d" in propTypes';
+                expect(result.message).toBe(error);
+            });
+        });
+
+        describe('when property missing from expected', () => {
+            beforeEach(() => {
+                delete expected.c;
+                result = matcher.compare(component, expected);
+            });
+
+            it('returns a failing result', () => {
+                expect(result.pass).toBeFalsy();
+            });
+
+            it('returns appropriate error message', () => {
+                const error = 'Expected key "c" in propTypes';
+                expect(result.message).toBe(error);
+            });
+        });
+
+        describe('when expected validation does not match actual validation', () => {
+            beforeEach(() => {
+                expected.c = function () {
+                    return 4;
+                };
+                result = matcher.compare(component, expected);
+            });
+
+            it('returns a failing result', () => {
+                expect(result.pass).toBeFalsy();
+            });
+
+            it('returns appropriate error message', () => {
+                const error = 'Validation for key "c" does not match expected validation';
+                expect(result.message).toBe(error);
+            });
+        });
+
+        describe('when multiple errors', () => {
+            beforeEach(() => {
+                expected.d = 'unknown';
+                delete expected.c;
+                result = matcher.compare(component, expected);
+            });
+
+            it('returns a failing result', () => {
+                expect(result.pass).toBeFalsy();
+            });
+
+            it('returns appropriate error message', () => {
+                const error = 'Unknown key "d" in propTypes\nExpected key "c" in propTypes';
                 expect(result.message).toBe(error);
             });
         });

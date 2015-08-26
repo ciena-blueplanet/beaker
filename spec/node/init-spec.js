@@ -5,8 +5,6 @@
 
 /* eslint max-nested-callbacks: 0 */
 
-'use strict';
-
 var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');

@@ -233,6 +233,7 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
 #### Styles
 
  * [less-loader](https://github.com/webpack/less-loader) so you can use [LESS](http://lesscss.org)
+ * [sass-loader](https://github.com/jtangelder/sass-loader) so you can use [SASS/SCSS](http://sass-lang.com/)
  * [autoprefixer-loader](https://github.com/passy/autoprefixer-loader) so you never have to use browser prefixes.
  * [css-loader](https://github.com/webpack/css-loader) how else are you gonna deliver your styles?
  * [style-loader](https://github.com/webpack/style-loader) so you never have to add another `<link>` tag

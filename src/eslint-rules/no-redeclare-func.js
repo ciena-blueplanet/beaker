@@ -9,8 +9,6 @@
 
 module.exports = function (context) {
 
-    'use strict';
-
     var functionAssignments = {};
 
     return {
