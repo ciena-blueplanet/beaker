@@ -265,7 +265,7 @@ var ns = {
         return this.getResults(url)
             .then(function (results) {
                 var url = server + '/' + results.output;
-                return self.getTarball(url, results).then(function () {
+                return self.getTarball(url).then(function () {
                     return results;
                 });
             })
