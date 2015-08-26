@@ -6,12 +6,23 @@
 /* eslint max-nested-callbacks: 0 */
 
 var _ = require('lodash');
-var sh = require('execSync');
+var Q = require('q');
 var sleep = require('sleep');
 
 var t = require('../../src/transplant')(__dirname);
 var utils = t.require('./cli/utils');
-var tester = t.require('./webdriverio-tester');
+var tester = t.require('./webdriverio-tester')();
+
+/**
+ * Helper for creating a promise (so I don't need to disable new-cap everywhere)
+ * @param {*} resolution - what to resolve the promise with
+ * @returns {Promise} the promise
+ */
+function makePromise(resolution) {
+    /* eslint-disable new-cap */
+    return Q(resolution);
+    /* eslint-enable new-cap */
+}
 
 /**
  * Verify the given commands were executed in-order
@@ -26,12 +37,12 @@ function verifyCommands(ctx) {
         });
 
         it('calls the right number of commands', function () {
-            expect(sh.exec.calls.count()).toBe(commands.length);
+            expect(tester.exec.calls.count()).toBe(commands.length);
         });
 
         it('calls the correct commands in order', function () {
             _.forEach(commands, function (command, index) {
-                expect(sh.exec.calls.argsFor(index)[0]).toBe(command);
+                expect(tester.exec.calls.argsFor(index)[0]).toBe(command);
             });
         });
     });
@@ -49,11 +60,10 @@ function verifyCommands(ctx) {
  * @param {String[]} ctx.extras - expected extra files/folders
  */
 function itCallsTheRightMethods(ctx) {
-    var argv, filename, timestamp, server, initialSleep, pollInterval, extras, isApp;
+    var argv, timestamp, server, initialSleep, pollInterval, extras, isApp;
     describe('(shared) .command() specs', function () {
-        beforeEach(function () {
+        beforeEach(function (done) {
             argv = ctx.argv;
-            filename = 'tarball-name';
             timestamp = 'my-timestamp';
             server = ctx.server;
             initialSleep = ctx.initialSleep;
@@ -61,16 +71,16 @@ function itCallsTheRightMethods(ctx) {
             extras = ctx.extras;
             isApp = ctx.isApp;
 
-            spyOn(tester, 'createTarball').and.returnValue(filename);
-            spyOn(tester, 'submitTarball').and.returnValue({
-                code: 0,
-                stdout: timestamp,
-            });
-            spyOn(tester, 'remove');
-            spyOn(tester, 'waitForResults');
-            spyOn(tester, 'processResults');
+            spyOn(tester, 'createTarball').and.returnValue(makePromise());
+            spyOn(tester, 'submitTarball').and.returnValue(makePromise(timestamp));
+            spyOn(tester, 'remove').and.returnValue(makePromise());
+            spyOn(tester, 'waitForResults').and.returnValue(makePromise());
+            spyOn(tester, 'processResults').and.returnValue(makePromise());
 
             tester.command(argv);
+            setTimeout(function () {
+                done();
+            }, 1);
         });
 
         it('creates a tarball', function () {
@@ -78,15 +88,11 @@ function itCallsTheRightMethods(ctx) {
         });
 
         it('submits the tarball', function () {
-            expect(tester.submitTarball).toHaveBeenCalledWith(filename, server);
-        });
-
-        it('outputs the timestamp', function () {
-            expect(console.log).toHaveBeenCalledWith('TIMESTAMP: ' + timestamp);
+            expect(tester.submitTarball).toHaveBeenCalledWith(server);
         });
 
         it('removes the tarball', function () {
-            expect(tester.remove).toHaveBeenCalledWith(filename);
+            expect(tester.remove).toHaveBeenCalledWith('test.tar.gz');
         });
 
         it('waits for results', function () {
@@ -113,9 +119,9 @@ describe('webdriverio-tester', function () {
 
         spyOn(utils, 'throwCliError');
         spyOn(console, 'log');
-        spyOn(sh, 'exec').and.callFake(function (command) {
+        spyOn(tester, 'exec').and.callFake(function (command) {
             var result = results[command];
-            return _.isArray(result) ? result.shift() : result;
+            return makePromise(_.isArray(result) ? result.shift() : result);
         });
     });
 
@@ -123,13 +129,16 @@ describe('webdriverio-tester', function () {
         var newExtras;
 
         describe('when no extras are provided', function () {
-            beforeEach(function () {
+            beforeEach(function (done) {
                 ctx.commands = [
                     'mkdir demo',
                     'cp -a index.html bundle demo',
                 ];
 
-                newExtras = tester.prepareDemoDirectory([]);
+                tester.prepareDemoDirectory([]).then(function (resolution) {
+                    newExtras = resolution;
+                    done();
+                });
             });
 
             verifyCommands(ctx);
@@ -140,13 +149,16 @@ describe('webdriverio-tester', function () {
         });
 
         describe('when extras are provided', function () {
-            beforeEach(function () {
+            beforeEach(function (done) {
                 ctx.commands = [
                     'mkdir demo',
                     'cp -a index.html bundle foo bar baz demo',
                 ];
 
-                newExtras = tester.prepareDemoDirectory(['foo', 'bar', 'baz']);
+                tester.prepareDemoDirectory(['foo', 'bar', 'baz']).then(function (resolution) {
+                    newExtras = resolution;
+                    done();
+                });
             });
 
             verifyCommands(ctx);
@@ -162,48 +174,42 @@ describe('webdriverio-tester', function () {
     });
 
     describe('.createTarball()', function () {
-        var filename;
-
         beforeEach(function () {
-            spyOn(tester, 'prepareDemoDirectory').and.returnValue(['dd/foo', 'dd/bar']);
+            spyOn(tester, 'prepareDemoDirectory').and.returnValue(makePromise(['dd/foo', 'dd/bar']));
         });
 
         describe('for app', function () {
-            beforeEach(function () {
+            beforeEach(function (done) {
                 ctx.commands = [
                     'tar --exclude="*.map" -czf test.tar.gz spec demo/index.html demo/bundle dd/foo dd/bar',
                     'rm -rf demo',
                 ];
 
-                filename = tester.createTarball(true, ['foo', 'bar']);
+                tester.createTarball(true, ['foo', 'bar']).then(function () {
+                    done();
+                });
             });
 
             it('prepares a demo directory', function () {
                 expect(tester.prepareDemoDirectory).toHaveBeenCalledWith(['foo', 'bar']);
             });
 
-            it('returns the proper filename', function () {
-                expect(filename).toBe('test.tar.gz');
-            });
-
             verifyCommands(ctx);
         });
 
         describe('for component', function () {
-            beforeEach(function () {
+            beforeEach(function (done) {
                 ctx.commands = [
                     'tar --exclude="*.map" -czf test.tar.gz spec demo/index.html demo/bundle foo bar',
                 ];
 
-                filename = tester.createTarball(false, ['foo', 'bar']);
+                tester.createTarball(false, ['foo', 'bar']).then(function () {
+                    done();
+                });
             });
 
             it('does not prepare a demo directory', function () {
                 expect(tester.prepareDemoDirectory).not.toHaveBeenCalled();
-            });
-
-            it('returns the proper filename', function () {
-                expect(filename).toBe('test.tar.gz');
             });
 
             verifyCommands(ctx);
@@ -212,14 +218,22 @@ describe('webdriverio-tester', function () {
 
     describe('.submitTarball()', function () {
         var result;
-        beforeEach(function () {
-            var command = 'curl -s -F "tarball=@foo-bar.tar.gz" -F "entry-point=demo/" https://server.com/';
-            results[command] = 'command-results';
+        beforeEach(function (done) {
+            var command = 'curl -s -F "tarball=@test.tar.gz" -F "entry-point=demo/" https://server.com/';
+
+            // because of how the exec() mocking is done, if you want to return an array, you need to wrap it
+            // in another array (ewww). TODO: fix that
+            results[command] = [
+                ['command-results', ''],
+            ];
             ctx.commands = [
                 command,
             ];
 
-            result = tester.submitTarball('foo-bar.tar.gz', 'https://server.com');
+            tester.submitTarball('https://server.com').then(function (resolution) {
+                result = resolution;
+                done();
+            });
         });
 
         it('returns the result of the command', function () {
@@ -230,12 +244,12 @@ describe('webdriverio-tester', function () {
     });
 
     describe('.waitForResults()', function () {
-        beforeEach(function () {
+        beforeEach(function (done) {
             var command = 'curl -s server/status/timestamp';
             results[command] = [
-                {stdout: 'Not Found'},
-                {stdout: 'Not found'},
-                {stdout: 'finished'},
+                ['Not Found', ''],
+                ['Not found', ''],
+                ['finished', ''],
             ];
 
             spyOn(sleep, 'sleep');
@@ -251,6 +265,8 @@ describe('webdriverio-tester', function () {
                 server: 'server',
                 initialSleep: 123,
                 pollInterval: 456,
+            }).then(function () {
+                done();
             });
         });
 
@@ -274,21 +290,20 @@ describe('webdriverio-tester', function () {
     });
 
     describe('.remove()', function () {
-        beforeEach(function () {
+        beforeEach(function (done) {
             ctx.commands = [
-                'rm -f my-file',
+                'rm -rf my-file',
             ];
 
-            tester.remove('my-file');
+            tester.remove('my-file').then(done);
         });
 
         verifyCommands(ctx);
     });
 
     describe('.processResults()', function () {
-        var ret;
-        beforeEach(function () {
-            spyOn(tester, 'remove');
+        beforeEach(function (done) {
+            spyOn(tester, 'remove').and.returnValue(makePromise());
 
             var getJsonCommand = 'curl -s my-server/screenshots/output-my-timestamp.json';
             ctx.commands = [
@@ -297,15 +312,20 @@ describe('webdriverio-tester', function () {
                 'tar -xf bundle.tar.gz',
             ];
 
-            results[getJsonCommand] = {
-                stdout: JSON.stringify({
-                    output: 'some-dir/bundle.tar.gz',
-                    info: 'output from the test run',
-                    exitCode: 12345,
-                }),
-            };
+            // because of how the exec() mocking is done, if you want to return an array, you need to wrap it
+            // in another array (ewww). TODO: fix that
+            results[getJsonCommand] = [
+                [
+                    JSON.stringify({
+                        output: 'some-dir/bundle.tar.gz',
+                        info: 'output from the test run',
+                        exitCode: 0,
+                    }),
+                    '',
+                ],
+            ];
 
-            ret = tester.processResults('my-timestamp', 'my-server');
+            tester.processResults('my-timestamp', 'my-server').then(done).done();
         });
 
         it('removes the tarball', function () {
@@ -314,10 +334,6 @@ describe('webdriverio-tester', function () {
 
         it('logs the json info to console', function () {
             expect(console.log).toHaveBeenCalledWith('output from the test run');
-        });
-
-        it('returns the exit code from json', function () {
-            expect(ret).toBe(12345);
         });
 
         verifyCommands(ctx);

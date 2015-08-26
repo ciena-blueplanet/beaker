@@ -62,7 +62,7 @@ var ns = {
     /**
      * if we're an app, remove the demo directory
      * @param {Boolean} isApp - true if app project
-     * @param {AsyncCallback} callback - the async.waterfall callback to call when done or on error
+     * @returns {Promise} resolved with result of exec
      */
     maybeRemoveDemoDirectory: function (isApp) {
         if (isApp) {
@@ -113,14 +113,14 @@ var ns = {
         if (isApp) {
             return this.prepareDemoDirectory(extras);
         } else {
-            return extras;
+            return makePromise(extras);
         }
     },
 
     /**
      * obvious
      * @param {String[]} extras - extra files/directories to include in tarball
-     * @param {AsyncCallaback} callback - callback to call once we're done
+     * @returns {Promise} resolved when done
      */
     tarUpDemoDirectory: function (extras) {
 
@@ -168,8 +168,9 @@ var ns = {
             server + '/',
         ];
 
-        return this.exec(cmd.join(' ')).then(function (stdout) {
-            timestamp = stdout.toString();
+        return this.exec(cmd.join(' ')).then(function (res) {
+            var stdout = res[0];
+            var timestamp = stdout.toString();
             console.log('TIMESTAMP: ' + timestamp);
             return timestamp;
         });
@@ -184,7 +185,8 @@ var ns = {
     checkForResults: function (cmd, pollInterval) {
         var self = this;
         console.log('Checking for results...');
-        return this.exec(cmd).then(function (stdout) {
+        return this.exec(cmd).then(function (res) {
+            var stdout = res[0];
             if (stdout.toString().toLowerCase() === 'not found') {
                 sleep.sleep(pollInterval);
                 return self.checkForResults(cmd, pollInterval);
@@ -217,20 +219,21 @@ var ns = {
      * @returns {Promise} resolved when done
      */
     getResults: function (url) {
-        return this.exec('curl -s ' + url, function (err, stdout) {
+        return this.exec('curl -s ' + url).then(function (res) {
+            var stdout = res[0];
             console.log('Parsing results...');
-            return JSON.parse(stdout.toString());
+            var obj = JSON.parse(stdout.toString());
+            return obj;
         });
     },
 
     /**
      * obvious
      * @param {String} url - the URL to get the tarball from
-     * @param {WebdriverioServerTestResults} results - details of the test results
      * @returns {Promise} resolved when done
      */
-    getTarball: function (url, results) {
-        return this.exec('curl -s -O' + url);
+    getTarball: function (url) {
+        return this.exec('curl -s -O ' + url);
     },
 
     /**
@@ -241,7 +244,7 @@ var ns = {
     extractTarball: function (results) {
 
         var filename = path.basename(results.output);
-        return this.exec('tar -xf' + filename).then(function () {
+        return this.exec('tar -xf ' + filename).then(function () {
             return {
                 filename: filename,
                 results: results,
@@ -249,7 +252,6 @@ var ns = {
         });
     },
 
-    // ARM IS HERE
     /**
      * Parse and output the results
      * @param {String} timestamp - the timestamp of the results we're processing
@@ -257,37 +259,25 @@ var ns = {
      * @returns {Promise} resolved when done
      */
     processResults: function (timestamp, server) {
+        var self = this;
+        var url = server + '/screenshots/output-' + timestamp + '.json';
 
-        async.waterfall([
-            function (cb) {
-                var url = server + '/screenshots/output-' + timestamp + '.json';
-                getResults(url, cb);
-            },
-
-            function (results, cb) {
+        return this.getResults(url)
+            .then(function (results) {
                 var url = server + '/' + results.output;
-                getTarball(url, results, cb);
-            },
-
-            function (results, cb) {
-                extractTarball(results, cb);
-            },
-
-            function (filename, results, cb) {
-                // remove the tarball
-                remove(filename, function (err) {
-                    if (err) {
-                        cb(err);
-                    } else {
-                        cb(null, results);
-                    }
+                return self.getTarball(url, results).then(function () {
+                    return results;
                 });
-            },
-
-        ], function (err, results) {
-            if (err) {
-                callback(err);
-            } else {
+            })
+            .then(function (results) {
+                return self.extractTarball(results);
+            })
+            .then(function (params) {
+                return self.remove(params.filename).then(function () {
+                    return params.results;
+                });
+            })
+            .then(function (results) {
                 console.log(results.info);
 
                 console.log('----------------------------------------------------------------------');
@@ -295,15 +285,11 @@ var ns = {
 
                 if (results.exitCode === 0) {
                     console.log('Tests Pass.');
-                    callback(null);
                 } else {
-                    callback({
-                        message: 'ERRORS Encountered.',
-                        exitCode: results.exitCode,
-                    });
+                    console.error('throwing cli error: ' + results.exitCode);
+                    throwCliError('ERRORS Encountered.', results.exitCode);
                 }
-            }
-        });
+            });
     },
 
     /**
@@ -313,6 +299,8 @@ var ns = {
     */
     command: function (argv) {
 
+        var self = this;
+
         _.defaults(argv, {
             initialSleep: 10,
             pollInterval: 3,
@@ -321,45 +309,33 @@ var ns = {
 
         var extras = argv._.slice(1);
 
-        async.waterfall([
-            function (callback) {
-                createTarball(argv.app, extras, callback);
-            },
-
-            function (callback) {
-                submitTarball(argv.server, callback);
-            },
-
-            function (timestamp, callback) {
-                remove('test.tar.gz', function (err) {
-                    if (err) {
-                        callback(err);
-                    } else {
-                        callback(null, timestamp);
-                    }
+        this.createTarball(argv.app, extras)
+            .then(function () {
+                return self.submitTarball(argv.server)
+            })
+            .then(function (timestamp) {
+                return self.remove('test.tar.gz').then(function () {
+                    return timestamp;
                 });
-            },
-
-            function (timestamp, callback) {
-                waitForResults({
+            })
+            .then(function (timestamp) {
+                var params = {
                     timestamp: timestamp,
                     server: argv.server,
                     pollInterval: argv.pollInterval,
                     initialSleep: argv.initialSleep,
-                    callback: callback,
+                };
+
+                return self.waitForResults(params).then(function () {
+                    return timestamp;
                 });
-            },
-
-            function (timestamp, callback) {
-                processResults(timestamp, argv.server, callback);
-            },
-
-        ], function (err) {
-            throwCliError(err.message, err.exitCode || 1);
-        });
+            })
+            .then(function (timestamp) {
+                return self.processResults(timestamp, argv.server);
+            })
+            .done();
     },
 };
-
 
 function factory() {
     return Object.create(ns).init();

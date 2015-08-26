@@ -5,7 +5,7 @@
 
 require('../typedefs');
 
-var tester = require('../webdriverio-tester');
+var tester = require('../webdriverio-tester')();
 
 /**
  * Process command line arguments and execute library code
