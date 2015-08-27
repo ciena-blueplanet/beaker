@@ -41,13 +41,18 @@ clean-screenshots:
 	$(HIDE)echo "Removing everything but *.baseline.png files from $(SCREENSHOTS_DIR)"
 	$(HIDE)find $(SCREENSHOTS_DIR) -type f ! -name *.baseline.png -exec rm -f {} \; || echo "No screenshots present"
 
-remote-e2e-test: build-mock do-remote-e2e-test
+cleanup-existing-screenshots:
+	$(HIDE)echo "Reverting any changes in $(SCREENSHOTS_DIR)"
+	$(HIDE)git checkout $(SCREENSHOTS_DIR)
+
+remote-e2e-test: build-mock do-remote-e2e-test cleanup-existing-screenshots
 do-remote-e2e-test: clean-screenshots create-config
 ifndef WEBDRIVERIO_SERVER
 	$(error WEBDRIVERIO_SERVER variable needs to be set)
 else
 	$(ENV)$(BEAKER_BIN) webdriverioTester --server $(WEBDRIVERIO_SERVER) $(WEBDRIVERIO_SERVER_EXTRAS)
 endif
+
 
 update-screenshots:
 	$(HIDE)for i in $$(find spec/e2e/screenshots -name '*.regression.png'); do mv $$i $${i/regression/baseline}; done
