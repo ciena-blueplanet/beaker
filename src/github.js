@@ -182,7 +182,7 @@ var ns = {
     },
 
     /**
-     * Bump version in bower.json and package.json files
+     * Bump version in package.json files
      * @param {String} bump - version bump level
      * @throws CliError
      */
@@ -239,13 +239,13 @@ var ns = {
     },
 
     /**
-     * Commit changes to bower.json and package.json
+     * Commit changes to package.json
      * @returns {Q.Promise} a promise that is resolved when the files have been committed
      */
     commitBumpedFiles: function () {
         var self = this;
         var promises = [];
-        ['bower.json', 'package.json'].forEach(function (file) {
+        ['package.json'].forEach(function (file) {
             var promise = fs.exists(file).then(function (exists) {
                 if (exists) {
                     return self.exec('git add ' + file);

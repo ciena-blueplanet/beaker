@@ -8,5 +8,5 @@
 module.exports = {
     alias: {},
     extensions: ['', '.webpack.js', '.web.js', '.js', '.6.js'],
-    modulesDirectories: ['node_modules', 'bower_components'],
+    modulesDirectories: ['node_modules'],
 };
