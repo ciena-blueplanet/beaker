@@ -523,13 +523,11 @@ describe('github', function () {
         beforeEach(function () {
             resolvers = {
                 pkg: {},
-                bower: {},
                 commit: {},
             };
 
             existingFiles = {
                 'package.json': true,
-                'bower.json': true,
             };
 
             spyOn(fs, 'exists').and.callFake(function (filename) {
@@ -539,64 +537,9 @@ describe('github', function () {
             spyOn(github, 'exec').and.callFake(function (cmd) {
                 if (cmd === 'git add package.json') {
                     return makePromise(resolvers.pkg);
-                } else if (cmd === 'git add bower.json') {
-                    return makePromise(resolvers.bower);
                 } else {
                     return makePromise(resolvers.commit);
                 }
-            });
-        });
-
-        describe('when both files exist', function () {
-            var result;
-            beforeEach(function (done) {
-                github.commitBumpedFiles().then(function (resp) {
-                    result = resp;
-                });
-                setTimeout(done, 1);
-            });
-
-            it('checks if package.json exists', function () {
-                expect(fs.exists).toHaveBeenCalledWith('package.json');
-            });
-
-            it('checks if bower.json exists', function () {
-                expect(fs.exists).toHaveBeenCalledWith('bower.json');
-            });
-
-            it('adds package.json', function () {
-                expect(github.exec).toHaveBeenCalledWith('git add package.json');
-            });
-
-            it('adds bower.json', function () {
-                expect(github.exec).toHaveBeenCalledWith('git add bower.json');
-            });
-
-            it('does not yet commit the files', function () {
-                expect(github.exec).not.toHaveBeenCalledWith('git commit -m "bump version"');
-            });
-
-            describe('when both files have been added', function () {
-                beforeEach(function (done) {
-                    resolvers.pkg.resolve();
-                    resolvers.bower.resolve();
-                    setTimeout(done, 1);
-                });
-
-                it('commits the files', function () {
-                    expect(github.exec).toHaveBeenCalledWith('git commit -m "bump version"');
-                });
-
-                describe('when commit finishes', function () {
-                    beforeEach(function (done) {
-                        resolvers.commit.resolve('commit-result');
-                        setTimeout(done, 1);
-                    });
-
-                    it('resolves with the result of the commit', function () {
-                        expect(result).toBe('commit-result');
-                    });
-                });
             });
         });
     });
