@@ -43,7 +43,7 @@ clean-screenshots:
 
 cleanup-existing-screenshots:
 	$(HIDE)echo "Reverting any changes in $(SCREENSHOTS_DIR)"
-	$(HIDE)git checkout $(SCREENSHOTS_DIR) || "Not using git"
+	$(HIDE)git checkout $(SCREENSHOTS_DIR) || echo "Not using git"
 
 remote-e2e-test: build-mock do-remote-e2e-test cleanup-existing-screenshots
 do-remote-e2e-test: clean-screenshots create-config
