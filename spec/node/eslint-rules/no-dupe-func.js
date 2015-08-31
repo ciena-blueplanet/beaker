@@ -1,6 +1,6 @@
 /**
  * @file spec for no-dupe-func eslint rule
- * @copyright 2015 Cyan, Inc. All rights reserved
+ * @copyright 2015 Ciena Corporation. All rights reserved
 */
 
 var t = require('../../../src/transplant')(__dirname);

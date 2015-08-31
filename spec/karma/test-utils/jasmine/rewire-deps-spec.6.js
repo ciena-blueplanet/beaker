@@ -1,6 +1,6 @@
 /**
  * @author Adam Meadows [@job13er](https://github.com/job13er)
- * @copyright 2015 Cyan, Inc. All rightst reserverd.
+ * @copyright 2015 Ciena Corporation. All rightst reserverd.
  */
 
 /* eslint-disable max-nested-callbacks */
@@ -29,7 +29,7 @@ describe('resetDeps()', () => {
     let module;
     beforeEach(() => {
         module = jasmine.createSpyObj('module', ['__ResetDependency__']);
-        rewireDeps(module, {
+        resetDeps(module, {
             Foo: {displayName: 'Foo'},
             Bar: {displayName: 'Bar'},
             Baz: {displayName: 'Baz'},

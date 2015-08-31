@@ -1,6 +1,6 @@
 {
     "name": "beaker",
-    "version": "4.4.0",
+    "version": "5.0.0",
     "description": "Toolkit for building web interfaces",
     "keywords": [
         "tools",
@@ -92,8 +92,6 @@
         "postcss-loader": "^0.4.3",
         "raw-loader": "^0.5.1",
         "react": "0.13.3",
-        "rewire": "^2.3.4",
-        "rewire-webpack": "^1.0.0",
         "sass-loader": "^2.0.1",
         "style-loader": "^0.12.3",
         "webpack": "^1.11.0",
@@ -140,8 +138,6 @@
         "postcss-loader": "^0.4.3",
         "raw-loader": "^0.5.1",
         "react": "0.13.3",
-        "rewire": "^2.3.4",
-        "rewire-webpack": "^1.0.0",
         "sass-loader": "^2.0.1",
         "style-loader": "^0.12.3",
         "webpack": "^1.11.0",

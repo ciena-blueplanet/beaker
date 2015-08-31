@@ -1,12 +1,12 @@
 /**
- * Stub react components
+ * Rewire React components
  * @author Adam Meadows [@job13er](https://github.com/job13er)
- * @copyright 2015 Ciena Corporation. All rights reserved.
+ * @copyright 2015 Cyan, Inc. All rights reserved.
  */
 
 import _ from 'lodash';
 import React from 'react';
-import stubDeps from './stub-deps';
+import {rewireDeps, resetDeps} from './rewire';
 
 /**
  * Create a stub component
@@ -28,11 +28,11 @@ export function createStubComponent(name, props) {
 }
 
 /**
- * Stub out components within the rewired module with simple react components that don't do anything
- * @param {Module} rewiredModule - the module loaded with rewire()
- * @param {Object|String[]} components - the components you want to stub out within rewiredModule
+ * Rewire components within the given module with simple react components that don't do anything
+ * @param {Module} module - the module loaded with babel-plugin-rewire
+ * @param {Object|String[]} components - the components you want to stub out
  */
-export default function stubComponents(rewiredModule, components) {
+export default function rewireComponents(module, components) {
     const stubs = {};
 
     if (_.isArray(components)) {
@@ -45,5 +45,5 @@ export default function stubComponents(rewiredModule, components) {
         });
     }
 
-    stubDeps(rewiredModule, stubs);
+    rewireDeps(module, stubs);
 }
