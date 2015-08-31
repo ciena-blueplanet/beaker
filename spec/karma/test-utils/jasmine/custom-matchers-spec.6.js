@@ -1,6 +1,6 @@
 /**
  * @author Adam Meadows [@job13er](https://github.com/job13er)
- * @copyright 2015 Cyan, Inc. All rightst reserverd.
+ * @copyright 2015 Ciena Corporation. All rightst reserverd.
  */
 
 /* eslint-disable max-nested-callbacks */

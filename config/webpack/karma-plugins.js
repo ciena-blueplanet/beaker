@@ -5,7 +5,6 @@
 
 'use strict';
 
-var RewirePlugin = require('rewire-webpack');
 var webpack = require('webpack');
 
 module.exports = [
@@ -14,5 +13,4 @@ module.exports = [
             'JASMINE': process.env.JASMINE,
         },
     }),
-    new RewirePlugin(),
 ];
