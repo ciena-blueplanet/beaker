@@ -23,7 +23,7 @@ module.exports = [
         loader: 'jade',
     }, {
         test: /\.6\.js$/,
-        loader: 'babel',
+        loader: 'babel?plugins=babel-plugin-rewire',
     }, {
         test: /\.json$/,
         loader: 'json',

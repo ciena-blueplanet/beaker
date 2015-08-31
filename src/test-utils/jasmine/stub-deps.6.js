@@ -1,26 +1,29 @@
 /**
  * Stub rewire dependencies
  * @author Adam Meadows [@job13er](https://github.com/job13er)
- * @copyright 2015 Cyan, Inc. All rights reserved.
+ * @copyright 2015 Ciena Corporation. All rights reserved.
  */
 
 /* global beforeEach, afterEach */
 
+import _ from 'lodash';
+
 /**
  * Stub dependencies of a rewired module
- * @param {Module} rewiredModule - the module loaded with rewire()
+ * @param {Module} rewiredModule - the module loaded with babel-plugin-rewire
  * @param {Object} deps - key-value pairs of dependencies to stub out and what to stub them with
  */
-function stubDeps(rewiredModule, deps) {
-    let revert;
+export default function stubDeps(rewiredModule, deps) {
 
     beforeEach(() => {
-        revert = rewiredModule.__set__(deps);
+        _.forIn(deps, (value, key) => {
+            rewiredModule.__Rewire__(key, value);
+        });
     });
 
     afterEach(() => {
-        revert();
+        _.forIn(deps, (value, key) => {
+            rewiredModule.__ResetDependency__(key);
+        });
     });
 }
-
-module.exports = stubDeps;

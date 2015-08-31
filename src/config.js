@@ -1,6 +1,6 @@
 /**
  * @author Matthew Dahl [@sandersky](https://github.com/sandersky)
- * @copyright 2015 Cyan, Inc. All rights reserved
+ * @copyright 2015 Ciena Corporation. All rights reserved
  */
 
 var _ = require('lodash');

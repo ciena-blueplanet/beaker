@@ -1,12 +1,12 @@
 /**
  * Stub react components
  * @author Adam Meadows [@job13er](https://github.com/job13er)
- * @copyright 2015 Cyan, Inc. All rights reserved.
+ * @copyright 2015 Ciena Corporation. All rights reserved.
  */
 
-const _ = require('lodash');
-const React = require('react');
-const stubDeps = require('./stub-deps');
+import _ from 'lodash';
+import React from 'react';
+import stubDeps from './stub-deps';
 
 /**
  * Create a stub component
@@ -14,7 +14,7 @@ const stubDeps = require('./stub-deps');
  * @param {Object} props - props to set on React class
  * @returns {ReactComponent} the stubbed component
  */
-function createStubComponent(name, props) {
+export function createStubComponent(name, props) {
     return React.createClass(_.assign({
         displayName: name,
         render: function () {
@@ -32,7 +32,7 @@ function createStubComponent(name, props) {
  * @param {Module} rewiredModule - the module loaded with rewire()
  * @param {Object|String[]} components - the components you want to stub out within rewiredModule
  */
-function stubComponents(rewiredModule, components) {
+export default function stubComponents(rewiredModule, components) {
     const stubs = {};
 
     if (_.isArray(components)) {
@@ -47,5 +47,3 @@ function stubComponents(rewiredModule, components) {
 
     stubDeps(rewiredModule, stubs);
 }
-
-module.exports = stubComponents;
