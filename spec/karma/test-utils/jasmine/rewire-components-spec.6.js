@@ -5,9 +5,10 @@
 
 /* eslint-disable max-nested-callbacks */
 
+import _ from 'lodash';
 import $ from 'jquery';
 import React from 'react/addons';
-import rewireComponents from 'beaker/src/test-utils/jasmine/rewire-components';
+import rewireComponents, {createStubComponent} from 'beaker/src/test-utils/jasmine/rewire-components';
 
 describe('rewireComponents()', () => {
     let rewireDepsSpy, createStubComponentSpy, rewiredModule;
@@ -57,5 +58,20 @@ describe('rewireComponents()', () => {
                 'Baz': {name: 'Baz', baz: 'baz'},
             });
         });
+    });
+});
+
+describe('createStubComponent()', () => {
+    let component, ComponentClass;
+    beforeEach(() => {
+        ComponentClass = createStubComponent('ComponentClass');
+        component = React.addons.TestUtils.renderIntoDocument(
+            <ComponentClass />
+        );
+    });
+
+    it('renders expected DOM', () => {
+        expect($(React.findDOMNode(component))).toHaveClass('stub');
+        expect($(React.findDOMNode(component))).toHaveClass('ComponentClass');
     });
 });

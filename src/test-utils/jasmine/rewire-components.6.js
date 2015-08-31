@@ -6,7 +6,7 @@
 
 import _ from 'lodash';
 import React from 'react';
-import {rewireDeps, resetDeps} from './rewire';
+import {rewireDeps} from './rewire';
 
 /**
  * Create a stub component

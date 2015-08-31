@@ -4,8 +4,6 @@
  * @copyright 2015 Ciena Corporation. All rights reserved.
  */
 
-/* global beforeEach, afterEach */
-
 import _ from 'lodash';
 
 /**
