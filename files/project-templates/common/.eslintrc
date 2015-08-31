@@ -3,6 +3,7 @@
         "arrowFunctions": true,
         "binaryLiterals": true,
         "blockBindings": true,
+        "classes": true,
         "defaultParams": true,
         "destructuring": true,
         "forOf": true,
