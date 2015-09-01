@@ -4,27 +4,39 @@
  */
 
 var LODASH_FN_ALIASES = {
-    drop: 'rest',
+    // Array
     head: 'first',
     object: 'zipObject',
     tail: 'rest',
-    take: 'first',
     unique: 'uniq',
-    unzip: 'zip',
+
+    // Collection
     all: 'every',
     any: 'some',
     collect: 'map',
+    contains: 'includes',
     detect: 'find',
     each: 'forEach',
     eachRight: 'forEachRight',
-    findWhere: 'find',
     foldl: 'reduce',
     foldr: 'reduceRight',
-    include: 'contains',
+    include: 'includes',
     inject: 'reduce',
     select: 'filter',
+
+    // Function
+    backflow: 'flowRight',
+    compose: 'flowRight',
+
+    // Lang
+    eq: 'isEqual',
+
+    // Object
     extend: 'assign',
     methods: 'functions',
+
+    // Utility
+    iteratee: 'callback',
 };
 
 var LODASH_NAMES = ['lodash', '_'];
