@@ -270,7 +270,7 @@ sense to have the same package in both `dependencies` and `devDependencies`, sin
 * [karma-chrome-launcher](https://github.com/karma-runner/karma-chrome-launcher)
 * [karma-cli](https://github.com/karma-runner/karma-cli)
 * [karma-firefox-launcher](https://github.com/karma-runner/karma-firefox-launcher)
-* [karma-js-coverage](https://github.com/danielflower/karma-js-coverage)
+* [karma-coverage](https://github.com/karma-runner/karma-coverage)
 * [karma-jasmine](https://github.com/karma-runner/karma-jasmine)
 * [karma-spec-reporter](https://github.com/mlex/karma-spec-reporter)
 * [rewire](https://github.com/jhnns/rewire)
