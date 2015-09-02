@@ -124,6 +124,9 @@ ns.init = function (grunt) {
                             type: 'html',
                             dir: path.join(process.cwd(), 'coverage'),
                         },
+                        {
+                            type: 'lcovonly',
+                        },
                     ],
                 },
 
@@ -136,13 +139,10 @@ ns.init = function (grunt) {
                                 test: /\.js$/,
                                 loader: path.join(process.cwd(), BEAKER_DIR, 'config/karma/self-loader.js'),
                             },
-                        ],
-
-                        postLoaders: [
                             {
                                 test: /\.js$/,
                                 exclude: /(spec|node_modules|karma)/,
-                                loader: 'istanbul-instrumenter',
+                                loader: 'isparta',
                             },
                         ],
                     },
