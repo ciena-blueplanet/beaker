@@ -26,7 +26,7 @@ var frameworks = [];
 var plugins = [
     require('karma-chrome-launcher'),
     require('karma-firefox-launcher'),
-    require('karma-js-coverage'),
+    require('karma-coverage'),
     require('karma-sourcemap-loader'),
     require('karma-spec-reporter'),
     require('karma-webpack'),
