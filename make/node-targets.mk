@@ -5,7 +5,7 @@
 
 NODE_SPECS ?= spec
 NODE_COVERAGE_DIR ?= .coverage
-NODE_COVERAGE_OPTS ?= -x **/spec/** --report cobertura --report lcov $(NODE_COVERAGE_DIR)
+NODE_COVERAGE_OPTS ?= -x **/spec/** --report cobertura --report lcov --dir $(NODE_COVERAGE_DIR)
 JASMINE_CONFIG_FILE ?= $(NODE_SPECS)/jasmine.json
 
 .PHONY: \
@@ -40,7 +40,7 @@ jasmine-coverage: export JASMINE=1
 jasmine-coverage:
 	$(HIDE)echo "Running istanbul coverage on jasmine node specs"
 	$(HIDE)echo "Running jasmine node specs"
-	$(ENV)isparta cover $(NODE_COVERAGE_OPTS) jasmine
+	$(ENV)istanbul cover $(NODE_COVERAGE_OPTS) jasmine
 
 jasmine-test: export JASMINE=1
 jasmine-test:
