@@ -35,11 +35,15 @@ describe('init', function () {
 
     describe('.cleanupCruft()', function () {
         it('returns <project-name> for repository not named as cy-<project-name>-ui', function () {
-            expect(init.cleanupCruft('project-name-ui')).toEqual('project-name-ui');
+            expect(init.cleanupCruft('project-name')).toEqual('project-name');
         });
 
         it('returns project name for repository named as cy-<project-name>-ui', function () {
             expect(init.cleanupCruft('cy-project-name-ui')).toEqual('project-name');
+        });
+
+        it('returns project name for repository named as <project-name>-ui', function () {
+            expect(init.cleanupCruft('project-name-ui')).toEqual('project-name');
         });
     });
 

@@ -32,10 +32,10 @@ ns.cleanupCruft = function (projectName) {
     var match = projectName.match(/^cy\-(.+)\-ui$/);
 
     if (match === null) {
-        return projectName;
+        match = projectName.match(/^(.+)\-ui$/);
     }
 
-    return match[1];
+    return (match === null) ? projectName : match[1];
 };
 
 /**
