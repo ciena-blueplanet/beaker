@@ -5,6 +5,14 @@
 
 'use strict';
 
+var es6Loader;
+
+if (process.env.JASMINE) {
+    es6Loader = 'babel?plugins[]=rewire&plugins[]=object-assign';
+} else {
+    es6Loader = 'babel?plugins=object-assign';
+}
+
 module.exports = [
     {
         test: /\.css$/,
@@ -23,7 +31,7 @@ module.exports = [
         loader: 'jade',
     }, {
         test: /\.6\.js$/,
-        loader: process.env.JASMINE ? 'babel?plugins=babel-plugin-rewire' : 'babel',
+        loader: es6Loader,
     }, {
         test: /\.json$/,
         loader: 'json',
