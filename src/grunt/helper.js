@@ -199,6 +199,20 @@ ns.init = function (grunt) {
         },
     });
 
+    // @source https://coderwall.com/p/i1bg2q/creating-a-force-task-in-grunt
+    grunt.registerTask('forceOn', 'turns the --force option ON', function () {
+        if (!grunt.option('force')) {
+            grunt.config.set('forceStatus', true);
+            grunt.option('force', true);
+        }
+    });
+
+    grunt.registerTask('forceOff', 'turns the --force option Off', function () {
+        if (grunt.config.get('forceStatus')) {
+            grunt.option('force', false);
+        }
+    });
+
     // =======================================================================
     // Building Tasks
     // =======================================================================
@@ -231,7 +245,7 @@ ns.init = function (grunt) {
     });
 
     // Single run of unit tests where code coverage is calculated
-    grunt.registerTask('test-coverage', ['karma:coverage', 'post-coverage']);
+    grunt.registerTask('test-coverage', ['forceOn', 'karma:coverage', 'post-coverage', 'forceOff']);
 
 };
 
