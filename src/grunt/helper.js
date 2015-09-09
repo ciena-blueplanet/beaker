@@ -142,7 +142,7 @@ ns.init = function (grunt) {
                             {
                                 test: /\.js$/,
                                 exclude: /(spec|node_modules|karma)/,
-                                loader: 'isparta',
+                                loader: 'isparta?{ babel: {plugins: ["rewire"] } }',
                             },
                         ],
                     },
