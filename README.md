@@ -42,6 +42,10 @@ the following dependencies as well: `graphicsmagick` and `cairo`
     sudo apt-get install graphicsmagick cairo
 
 ### Install `beaker`
+Before installing Beaker, make sure you have a `node_modules` directory in your project folder:
+
+    mkdir node_modules
+
 Run the following command in your project directory to install this package and all of its dependencies:
 
     npm install beaker
@@ -72,6 +76,8 @@ If you are unfamiliar with Grunt you may want to head over to
 
 
 ### Verify
+After installing beaker, make sure to `npm install` in order to get the packages in the `package.json` placed by Beaker.
+
 We should now have our basic project setup. Try running the following command to see if everything works:
 
     source env.sh
