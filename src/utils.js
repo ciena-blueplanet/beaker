@@ -108,7 +108,7 @@ ns.copyFile = function (filename, destination, data) {
     var extension = filename.split('.').pop().toLowerCase();
 
     var contents;
-    if (_.contains(['png', 'gif', 'jpg', 'jpeg'], extension)) {
+    if (_.includes(['png', 'gif', 'jpg', 'jpeg'], extension)) {
         contents = fs.readFileSync(srcPath);
         fs.writeFileSync(dstPath, contents);
     } else {

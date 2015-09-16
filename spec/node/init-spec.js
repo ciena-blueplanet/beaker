@@ -77,7 +77,7 @@ describe('init', function () {
             ];
 
             spyOn(fs, 'existsSync').and.callFake(function (fullPath) {
-                return _.contains(symlinks, fullPath);
+                return _.includes(symlinks, fullPath);
             });
             spyOn(fs, 'unlink');
             spyOn(utils, 'copyDir');
