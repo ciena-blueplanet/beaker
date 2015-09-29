@@ -5,52 +5,57 @@
 
 /* eslint max-nested-callbacks: 0 */
 
-var _ = require('lodash');
-var fs = require('fs');
-var path = require('path');
-var changeCase = require('change-case');
+// For some reason, eslint thinks that specs are modules and don't need 'use strict' but node disagrees
+/* eslint-disable strict */
+'use strict';
+/* eslint-enable strict */
 
-var _config = require('../../src/config');
-var config = require('./sample-config.json');
+const _ = require('lodash');
+const fs = require('fs');
+const path = require('path');
+const changeCase = require('change-case');
 
-var t = require('../../src/transplant')(__dirname);
-var init = t.require('./init');
-var utils = t.require('./utils');
-var cliUtils = t.require('./cli/utils');
-var CWD = process.cwd();
+const _config = require('../../src/config');
+const config = require('./sample-config.json');
 
-describe('init', function () {
-    var testConfig;
+const t = require('../../src/transplant')(__dirname);
+const init = t.require('./init');
+const utils = t.require('./utils');
+const cliUtils = t.require('./cli/utils');
+const CWD = process.cwd();
 
-    beforeEach(function () {
+describe('init', () => {
+    let testConfig;
+
+    beforeEach(() => {
         testConfig = config;
 
         spyOn(cliUtils, 'throwCliError');
         spyOn(console, 'info');
         spyOn(console, 'error');
-        spyOn(_config, 'load').and.callFake(function () {
+        spyOn(_config, 'load').and.callFake(() => {
             return testConfig;
         });
     });
 
-    describe('.cleanupCruft()', function () {
-        it('returns <project-name> for repository not named as cy-<project-name>-ui', function () {
+    describe('.cleanupCruft()', () => {
+        it('returns <project-name> for repository not named as cy-<project-name>-ui', () => {
             expect(init.cleanupCruft('project-name')).toEqual('project-name');
         });
 
-        it('returns project name for repository named as cy-<project-name>-ui', function () {
+        it('returns project name for repository named as cy-<project-name>-ui', () => {
             expect(init.cleanupCruft('cy-project-name-ui')).toEqual('project-name');
         });
 
-        it('returns project name for repository named as <project-name>-ui', function () {
+        it('returns project name for repository named as <project-name>-ui', () => {
             expect(init.cleanupCruft('project-name-ui')).toEqual('project-name');
         });
     });
 
-    describe('.command()', function () {
-        var year = new Date().getFullYear();
-        var projectName = path.basename(CWD);
-        var templateData = {
+    describe('.command()', () => {
+        const year = new Date().getFullYear();
+        const projectName = path.basename(CWD);
+        const templateData = {
             author: config.author,
             company: config.company,
             year: year,
@@ -67,24 +72,24 @@ describe('init', function () {
             templateDir: path.join(CWD, 'files/project-templates'),
         };
 
-        var symlinks, originalSymlinks;
+        let symlinks, originalSymlinks;
 
-        beforeEach(function () {
+        beforeEach(() => {
             symlinks = [
                 path.join(CWD, 'src', 'project-name'),
                 path.join(CWD, 'spec', 'project-name'),
                 path.join(CWD, 'node-spec', 'project-name'),
             ];
 
-            spyOn(fs, 'existsSync').and.callFake(function (fullPath) {
+            spyOn(fs, 'existsSync').and.callFake((fullPath) => {
                 return _.includes(symlinks, fullPath);
             });
             spyOn(fs, 'unlink');
             spyOn(utils, 'copyDir');
         });
 
-        describe('if config fails to load', function () {
-            beforeEach(function (done) {
+        describe('if config fails to load', () => {
+            beforeEach((done) => {
                 testConfig = null;
                 init.command({
                     projectType: 'app',
@@ -92,14 +97,14 @@ describe('init', function () {
                 setTimeout(done, 1);
             });
 
-            it('throws an error', function () {
+            it('throws an error', () => {
                 expect(cliUtils.throwCliError).toHaveBeenCalled();
             });
         });
 
-        _.forEach(['app', 'node', 'webpack'], function (projectType) {
-            describe(projectType + ' project', function () {
-                beforeEach(function () {
+        _.forEach(['app', 'node', 'webpack'], (projectType) => {
+            describe(projectType + ' project', () => {
+                beforeEach(() => {
                     templateData.projectType = projectType;
                     originalSymlinks = symlinks;
                     symlinks = []; // so the exists calls all return false
@@ -108,20 +113,20 @@ describe('init', function () {
                     });
                 });
 
-                afterEach(function () {
+                afterEach(() => {
                     symlinks = originalSymlinks;
                 });
 
-                it('calls utils.copyDir for common project files', function () {
+                it('calls utils.copyDir for common project files', () => {
                     expect(utils.copyDir).toHaveBeenCalledWith('common', CWD, templateData);
                 });
 
-                it('calls utils.copyDir for ' + projectType + ' project files', function () {
+                it('calls utils.copyDir for ' + projectType + ' project files', () => {
                     expect(utils.copyDir).toHaveBeenCalledWith(projectType, CWD, templateData);
                 });
 
-                it('checks for symlinks', function () {
-                    _.forEach(originalSymlinks, function (symlink) {
+                it('checks for symlinks', () => {
+                    _.forEach(originalSymlinks, (symlink) => {
                         expect(fs.existsSync).toHaveBeenCalledWith(symlink);
                         expect(fs.unlink).not.toHaveBeenCalledWith(symlink);
                     });

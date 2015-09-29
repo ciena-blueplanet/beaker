@@ -1,6 +1,6 @@
 #
 # Makefile to define some common beaker make targets for working with gh-pages
-# Copyright (c) 2015 Cyan, Inc. All rights reserved.
+# Copyright (c) 2015 Ciena Corporation. All rights reserved.
 #
 
 GHP_COPY := $(HIDE)/bin/cp -r

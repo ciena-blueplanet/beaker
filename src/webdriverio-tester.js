@@ -3,6 +3,8 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
  */
 
+'use strict';
+
 /**
  * @typedef Result
  * @property {Number} code - the exit code of the command
@@ -11,13 +13,13 @@
 
 require('./typedefs');
 
-var _ = require('lodash');
-var Q = require('q');
-var path = require('path');
-var exec = require('child_process').exec;
-var sleep = require('sleep');
+const _ = require('lodash');
+const Q = require('q');
+const path = require('path');
+const exec = require('child_process').exec;
+const sleep = require('sleep');
 
-var throwCliError = require('./cli/utils').throwCliError;
+const throwCliError = require('./cli/utils').throwCliError;
 
 /**
  * Helper for creating a promise (so I don't need to disable new-cap everywhere)
@@ -25,18 +27,16 @@ var throwCliError = require('./cli/utils').throwCliError;
  * @returns {Promise} the promise
  */
 function makePromise(resolution) {
-    /* eslint-disable new-cap */
-    return Q(resolution);
-    /* eslint-enable new-cap */
+    return Q(resolution); // eslint-disable-line new-cap
 }
 
 /** @alias tester */
-var ns = {
+const ns = {
     /**
      * Initialize the module
      * @returns {tester} the tester instance
      */
-    init: function () {
+    init() {
         // this is on the object for eaiser mocking
         this.exec = Q.denodeify(exec);
         return this;
@@ -46,7 +46,7 @@ var ns = {
      * Obvious
      * @returns {Promise} resolved when exec finishes
      */
-    makeDemoDirectory: function () {
+    makeDemoDirectory() {
         return this.exec('mkdir demo');
     },
 
@@ -55,7 +55,7 @@ var ns = {
      * @param {String} filename - the filename to remove
      * @returns {Promise} resolved with result of exec
      */
-    remove: function (filename) {
+    remove(filename) {
         return this.exec('rm -rf ' + filename);
     },
 
@@ -64,7 +64,7 @@ var ns = {
      * @param {Boolean} isApp - true if app project
      * @returns {Promise} resolved with result of exec
      */
-    maybeRemoveDemoDirectory: function (isApp) {
+    maybeRemoveDemoDirectory(isApp) {
         if (isApp) {
             return this.remove('demo');
         } else {
@@ -77,13 +77,13 @@ var ns = {
      * @param {String[]} extras - extra files/directories to include in tarball
      * @returns {Promise} resolves when done
      */
-    copyFilesToDemoDirectory: function (extras) {
-        var cmd = ['cp', '-a', 'index.html', 'bundle'];
+    copyFilesToDemoDirectory(extras) {
+        const cmd = ['cp', '-a', 'index.html', 'bundle'];
         cmd = cmd.concat(extras);
         cmd.push('demo');
 
-        return this.exec(cmd.join(' ')).then(function () {
-            var newExtras = _.map(extras, function (extra) {
+        return this.exec(cmd.join(' ')).then(() => {
+            const newExtras = _.map(extras, (extra) => {
                 return 'demo/' + extra;
             });
 
@@ -95,11 +95,10 @@ var ns = {
      * @param {String[]} extras - extra files/directories to include in tarball
      * @returns {Promise} resolved when done
      */
-    prepareDemoDirectory: function (extras) {
-        var self = this;
+    prepareDemoDirectory(extras) {
         return this.makeDemoDirectory()
-            .then(function () {
-                return self.copyFilesToDemoDirectory(extras);
+            .then(() => {
+                return this.copyFilesToDemoDirectory(extras);
             });
     },
 
@@ -109,7 +108,7 @@ var ns = {
      * @param {String[]} extras - optional extra files/directories to include in tarball
      * @returns {Promise} resolved when done
      */
-    maybePrepareDemoDirectory: function (isApp, extras) {
+    maybePrepareDemoDirectory(isApp, extras) {
         if (isApp) {
             return this.prepareDemoDirectory(extras);
         } else {
@@ -122,9 +121,9 @@ var ns = {
      * @param {String[]} extras - extra files/directories to include in tarball
      * @returns {Promise} resolved when done
      */
-    tarUpDemoDirectory: function (extras) {
+    tarUpDemoDirectory(extras) {
 
-        var cmd = ['tar', '--exclude="*.map"', '-czf', 'test.tar.gz', 'spec', 'demo/index.html', 'demo/bundle'];
+        let cmd = ['tar', '--exclude="*.map"', '-czf', 'test.tar.gz', 'spec', 'demo/index.html', 'demo/bundle'];
         cmd = cmd.concat(extras);
 
         return this.exec(cmd.join(' '));
@@ -136,16 +135,14 @@ var ns = {
      * @param {String[]} extras - optional extra files/directories to include in tarball
      * @returns {Promise} resolved when done
      */
-    createTarball: function (isApp, extras) {
-        var self = this;
-
+    createTarball(isApp, extras) {
         console.log('Creating bundle...');
         return this.maybePrepareDemoDirectory(isApp, extras)
-            .then(function (newExtras) {
-                return self.tarUpDemoDirectory(newExtras);
+            .then((newExtras) => {
+                return this.tarUpDemoDirectory(newExtras);
             })
-            .then(function () {
-                return self.maybeRemoveDemoDirectory(isApp);
+            .then(() => {
+                return this.maybeRemoveDemoDirectory(isApp);
             });
     },
 
@@ -154,11 +151,11 @@ var ns = {
      * @param {String} server - the protocol/host/port of the server
      * @returns {Promise} resolved when done
      */
-    submitTarball: function (server) {
+    submitTarball(server) {
 
         console.log('Submitting bundle to ' + server + ' for test...');
 
-        var cmd = [
+        const cmd = [
             'curl',
             '-s',
             '-F',
@@ -168,9 +165,9 @@ var ns = {
             server + '/',
         ];
 
-        return this.exec(cmd.join(' ')).then(function (res) {
-            var stdout = res[0];
-            var timestamp = stdout.toString();
+        return this.exec(cmd.join(' ')).then((res) => {
+            const stdout = res[0];
+            const timestamp = stdout.toString();
             console.log('TIMESTAMP: ' + timestamp);
             return timestamp;
         });
@@ -182,14 +179,13 @@ var ns = {
      * @param {Number} pollInterval - the poll interval in seconds
      * @returns {Promise} resolved when done
      */
-    checkForResults: function (cmd, pollInterval) {
-        var self = this;
+    checkForResults(cmd, pollInterval) {
         console.log('Checking for results...');
-        return this.exec(cmd).then(function (res) {
-            var stdout = res[0];
+        return this.exec(cmd).then((res) => {
+            const stdout = res[0];
             if (stdout.toString().toLowerCase() === 'not found') {
                 sleep.sleep(pollInterval);
-                return self.checkForResults(cmd, pollInterval);
+                return this.checkForResults(cmd, pollInterval);
             } else {
                 return makePromise();
             }
@@ -205,11 +201,11 @@ var ns = {
      * @param {Number} params.pollInterval - the poll interval in seconds
      * @returns {Promise} resolved when done
      */
-    waitForResults: function (params) {
+    waitForResults(params) {
         console.log('Waiting ' + params.initialSleep + 's before checking');
         sleep.sleep(params.initialSleep);
 
-        var cmd = 'curl -s ' + params.server + '/status/' + params.timestamp;
+        const cmd = 'curl -s ' + params.server + '/status/' + params.timestamp;
         return this.checkForResults(cmd, params.pollInterval);
     },
 
@@ -218,11 +214,11 @@ var ns = {
      * @param {String} url - the url to fetch results from
      * @returns {Promise} resolved when done
      */
-    getResults: function (url) {
-        return this.exec('curl -s ' + url).then(function (res) {
-            var stdout = res[0];
+    getResults(url) {
+        return this.exec('curl -s ' + url).then((res) => {
+            const stdout = res[0];
             console.log('Parsing results...');
-            var obj = JSON.parse(stdout.toString());
+            const obj = JSON.parse(stdout.toString());
             return obj;
         });
     },
@@ -232,7 +228,7 @@ var ns = {
      * @param {String} url - the URL to get the tarball from
      * @returns {Promise} resolved when done
      */
-    getTarball: function (url) {
+    getTarball(url) {
         return this.exec('curl -s -O ' + url);
     },
 
@@ -241,10 +237,10 @@ var ns = {
      * @param {WebdriverioServerTestResults} results - details of the test results
      * @returns {Promise} resolved when done
      */
-    extractTarball: function (results) {
+    extractTarball(results) {
 
-        var filename = path.basename(results.output);
-        return this.exec('tar -xf ' + filename).then(function () {
+        const filename = path.basename(results.output);
+        return this.exec('tar -xf ' + filename).then(() => {
             return {
                 filename: filename,
                 results: results,
@@ -258,26 +254,25 @@ var ns = {
      * @param {String} server - the protocol/host/port of the server
      * @returns {Promise} resolved when done
      */
-    processResults: function (timestamp, server) {
-        var self = this;
-        var url = server + '/screenshots/output-' + timestamp + '.json';
+    processResults(timestamp, server) {
+        const url = server + '/screenshots/output-' + timestamp + '.json';
 
         return this.getResults(url)
-            .then(function (results) {
-                var url = server + '/' + results.output;
-                return self.getTarball(url).then(function () {
+            .then((results) => {
+                const url = server + '/' + results.output;
+                return this.getTarball(url).then(() => {
                     return results;
                 });
             })
-            .then(function (results) {
-                return self.extractTarball(results);
+            .then((results) => {
+                return this.extractTarball(results);
             })
-            .then(function (params) {
-                return self.remove(params.filename).then(function () {
+            .then((params) => {
+                return this.remove(params.filename).then(() => {
                     return params.results;
                 });
             })
-            .then(function (results) {
+            .then((results) => {
                 console.log(results.info);
 
                 console.log('----------------------------------------------------------------------');
@@ -297,9 +292,7 @@ var ns = {
      * @param {MinimistArgv} argv - the minimist arguments object
      * @throws CliError
     */
-    command: function (argv) {
-
-        var self = this;
+    command(argv) {
 
         _.defaults(argv, {
             initialSleep: 10,
@@ -307,31 +300,31 @@ var ns = {
             server: 'http://localhost:3000',
         });
 
-        var extras = argv._.slice(1);
+        const extras = argv._.slice(1);
 
         this.createTarball(argv.app, extras)
-            .then(function () {
-                return self.submitTarball(argv.server)
+            .then(() => {
+                return this.submitTarball(argv.server)
             })
-            .then(function (timestamp) {
-                return self.remove('test.tar.gz').then(function () {
+            .then((timestamp) => {
+                return this.remove('test.tar.gz').then(() => {
                     return timestamp;
                 });
             })
-            .then(function (timestamp) {
-                var params = {
+            .then((timestamp) => {
+                const params = {
                     timestamp: timestamp,
                     server: argv.server,
                     pollInterval: argv.pollInterval,
                     initialSleep: argv.initialSleep,
                 };
 
-                return self.waitForResults(params).then(function () {
+                return this.waitForResults(params).then(() => {
                     return timestamp;
                 });
             })
-            .then(function (timestamp) {
-                return self.processResults(timestamp, argv.server);
+            .then((timestamp) => {
+                return this.processResults(timestamp, argv.server);
             })
             .done();
     },

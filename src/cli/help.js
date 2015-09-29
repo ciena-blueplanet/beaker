@@ -3,10 +3,12 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
 */
 
-var fs = require('fs');
-var path = require('path');
+'use strict'; // eslint-disable-line
 
-var throwCliError = require('./utils').throwCliError;
+const fs = require('fs');
+const path = require('path');
+
+const throwCliError = require('./utils').throwCliError;
 
 /**
  * Help command, read help documentaiton for command and output it
@@ -14,7 +16,7 @@ var throwCliError = require('./utils').throwCliError;
  * @throws {CliError}
 */
 module.exports = function (argv) {
-    var basePath, filePath;
+    let basePath, filePath;
 
     // filename format: command.command.txt
     filePath = argv._.slice(0);
@@ -26,7 +28,7 @@ module.exports = function (argv) {
     filePath = path.join(basePath, filePath);
 
     // get help info
-    fs.readFile(filePath, 'utf8', function (err, data) {
+    fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
             throwCliError(err.message);
         }

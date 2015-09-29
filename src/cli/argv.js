@@ -3,10 +3,12 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
 */
 
+'use strict';
+
 require('../typedefs');
 
-var _ = require('lodash');
-var utils = require('./utils');
+const _ = require('lodash');
+const utils = require('./utils');
 
 /** obvious */
 function showVersion() {
@@ -31,7 +33,7 @@ module.exports = function (argv) {
         argv._.push('help');
     }
 
-    var command = argv._[0];
+    const command = argv._[0];
 
     if (!_.has(this, command)) {
         utils.throwCliError('Invalid command "' + command + '"', 1);

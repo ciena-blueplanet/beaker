@@ -3,10 +3,12 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
  */
 
+'use strict';
+
 var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
-var sys = require('sys');
+var util = require('util');
 var childProcess = require('child_process');
 
 /** @exports utils */
@@ -161,7 +163,7 @@ ns.exec = function (type, filename, cwd) {
     var process = childProcess.spawn('bash', [srcPath], {cwd: cwd});
 
     process.stdout.on('data', function (data) {
-        sys.print(data);
+        util.print(data);
     });
 
     process.on('exit', function (code) {

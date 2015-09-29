@@ -25,13 +25,26 @@
         "unicodeCodePointEscapes": true
     },
     "env": {
-        "amd": true,
         "browser": true,
-        "node": true
+        "node": true,
+    },
+    "globals": {
+        "describe": false,
+        "xdescribe": false,
+        "beforeEach": false,
+        "afterEach": false,
+        "spyOn": false,
+        "it": false,
+        "fit": false,
+        "xit": false,
+        "expect": false,
+        "jasmine": false,
+        "console": false
     },
     "plugins": [
         "react"
     ],
+    "root": true,
     "rules": {
         "array-bracket-spacing": [2, "never"],
         "brace-style": [
@@ -58,7 +71,7 @@
         "max-depth": [2, 3],
         "max-len": [2, 120],
         "max-params": [2, 5],
-        "max-nested-callbacks": [2, 3],
+        "max-nested-callbacks": 0,
         "max-statements": [2, 50],
         "new-cap": 2,
         "no-bitwise": 2,
@@ -99,7 +112,7 @@
         "react/self-closing-comp": 1,
         "react/wrap-multilines": 1,
         "semi-spacing": 2,
-        "strict": 2,
+        "strict": [2, "global"],
         "space-after-keywords": [2, "always"],
         "space-before-function-paren": [
             2,

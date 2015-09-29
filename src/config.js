@@ -3,11 +3,13 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
  */
 
-var _ = require('lodash');
-var fs = require('fs');
-var path = require('path');
+'use strict';
 
-var ns = {};
+const _ = require('lodash');
+const fs = require('fs');
+const path = require('path');
+
+const ns = {};
 
 /**
  * Load config file from path (if not found checks parent directories)

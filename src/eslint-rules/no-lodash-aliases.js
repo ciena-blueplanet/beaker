@@ -3,6 +3,8 @@
  * @author Nodeca Team <https://github.com/nodeca>
  */
 
+'use strict';
+
 var LODASH_FN_ALIASES = {
     // Array
     head: 'first',

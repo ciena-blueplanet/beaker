@@ -1,6 +1,6 @@
 #
 # Makefile to define some karma make targets
-# Copyright (c) 2015 Cyan, Inc. All rights reserved.
+# Copyright (c) 2015 Ciena Corporation. All rights reserved.
 #
 
 TESTING_FRAMEWORK ?= jasmine
@@ -27,3 +27,7 @@ karma-test: export TEST_FRAMEWORK=$(TESTING_FRAMEWORK)
 karma-test:
 	$(HIDE)echo "Running Karma tests once"
 	$(ENV)grunt test
+
+karma-coveralls:
+	$(ENV)cat coverage/lcov.info | coveralls
+

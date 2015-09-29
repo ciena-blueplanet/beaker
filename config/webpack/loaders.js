@@ -1,17 +1,12 @@
 /**
  * @author Adam Meadows [@job13er](https://github.com/job13er)
- * @copyright 2015 Cyan, Inc. All rights reserved.
+ * @copyright 2015 Ciena Corporation. All rights reserved.
  */
 
 'use strict';
 
-var es6Loader;
-
-if (process.env.JASMINE) {
-    es6Loader = 'babel?plugins[]=rewire&plugins[]=object-assign';
-} else {
-    es6Loader = 'babel?plugins=object-assign';
-}
+const rewirePlugin = (process.env.JASMINE) ? 'plugins[]=rewire&' : '';
+const es6Loader = `babel?${rewirePlugin}plugins[]=object-assign`;
 
 module.exports = [
     {
@@ -32,6 +27,9 @@ module.exports = [
     }, {
         test: /\.6\.js$/,
         loader: es6Loader,
+    }, {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
     }, {
         test: /\.json$/,
         loader: 'json',

@@ -3,23 +3,28 @@
  * @copyright 2015 Ciena Corporation. All rights reserved.
 */
 
-var t = require('../../../src/transplant')(__dirname);
-var githubProto = t.require('../github').proto;
-var cli = t.require('./index');
-var config = t.require('../config');
-var _config = require('../sample-config.json');
+// For some reason, eslint thinks that specs are modules and don't need 'use strict' but node disagrees
+/* eslint-disable strict */
+'use strict';
+/* eslint-enable strict */
 
-describe('cli.github', function () {
-    var argv;
+const t = require('../../../src/transplant')(__dirname);
+const githubProto = t.require('../github').proto;
+const cli = t.require('./index');
+const config = t.require('../config');
+const _config = require('../sample-config.json');
 
-    beforeEach(function () {
+describe('cli.github', () => {
+    let argv;
+
+    beforeEach(() => {
         argv = {_: ['init']};
         spyOn(githubProto, 'command');
         spyOn(config, 'load').and.returnValue(_config);
         cli.github(argv);
     });
 
-    it('calls github method', function () {
+    it('calls github method', () => {
         expect(githubProto.command).toHaveBeenCalledWith(argv);
     });
 });

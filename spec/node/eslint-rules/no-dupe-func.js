@@ -3,15 +3,17 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
 */
 
-var t = require('../../../src/transplant')(__dirname);
-var noDupeFunc = t.require('./no-dupe-func');
+'use strict';
 
-describe('noDupeFunc', function () {
-    it('exists', function () {
+const t = require('../../../src/transplant')(__dirname);
+const noDupeFunc = t.require('./no-dupe-func');
+
+describe('noDupeFunc', () => {
+    it('exists', () => {
         expect(noDupeFunc).not.toBeUndefined();
     });
 
-    it('is a function', function () {
+    it('is a function', () => {
         expect(typeof noDupeFunc).toBe('function');
     });
 });

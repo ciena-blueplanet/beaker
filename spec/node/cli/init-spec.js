@@ -3,20 +3,25 @@
  * @copyright 2015 Ciena Corporation. All rights reserved.
 */
 
-var t = require('../../../src/transplant')(__dirname);
-var init = t.require('../init');
-var cli = t.require('./index');
+// For some reason, eslint thinks that specs are modules and don't need 'use strict' but node disagrees
+/* eslint-disable strict */
+'use strict';
+/* eslint-enable strict */
 
-describe('cli.init', function () {
-    var argv;
+const t = require('../../../src/transplant')(__dirname);
+const init = t.require('../init');
+const cli = t.require('./index');
 
-    beforeEach(function () {
+describe('cli.init', () => {
+    let argv;
+
+    beforeEach(() => {
         argv = {_: ['init']};
         spyOn(init, 'command');
         cli.init(argv);
     });
 
-    it('calls init method', function () {
+    it('calls init method', () => {
         expect(init.command).toHaveBeenCalledWith(argv);
     });
 });

@@ -3,11 +3,16 @@
  * @copyright 2015 Ciena Corporation. All rights reserved.
 */
 
-var _ = require('lodash');
+// For some reason, eslint thinks that specs are modules and don't need 'use strict' but node disagrees
+/* eslint-disable strict */
+'use strict';
+/* eslint-enable strict */
 
-var t = require('../../../src/transplant')(__dirname);
-var cli = t.require('./index');
-var utils = t.require('./utils');
+const _ = require('lodash');
+
+const t = require('../../../src/transplant')(__dirname);
+const cli = t.require('./index');
+const utils = t.require('./utils');
 
 /**
  * Construct an argv object
@@ -21,60 +26,60 @@ function constructArgv(args, options) {
     }, options);
 }
 
-describe('cli.argv', function () {
-    var versionStr;
+describe('cli.argv', () => {
+    let versionStr;
 
-    beforeEach(function () {
-        var packageJSON = t.require('../../package.json');
+    beforeEach(() => {
+        const packageJSON = t.require('../../package.json');
         versionStr = packageJSON.name + ' v' + packageJSON.version;
         spyOn(console, 'log');
         spyOn(console, 'error');
         spyOn(utils, 'throwCliError');
     });
 
-    it('help command calls cli.help()', function () {
+    it('help command calls cli.help()', () => {
         spyOn(cli, 'help');
         cli.argv(constructArgv(['help']));
         expect(cli.help).toHaveBeenCalledWith({_: ['help']});
     });
 
-    it('help of command calls cli.help() with that command', function () {
+    it('help of command calls cli.help() with that command', () => {
         spyOn(cli, 'help');
         cli.argv(constructArgv(['help', 'init']));
         expect(cli.help).toHaveBeenCalledWith({_: ['help', 'init']});
     });
 
-    it('init command calls cli.init()', function () {
+    it('init command calls cli.init()', () => {
         spyOn(cli, 'init');
         cli.argv(constructArgv(['init']));
         expect(cli.init).toHaveBeenCalled();
     });
 
-    it('github command calls cli.github() (and allows --version)', function () {
+    it('github command calls cli.github() (and allows --version)', () => {
         spyOn(cli, 'github');
         cli.argv(constructArgv(['github'], {version: '1.0'}));
         expect(cli.github).toHaveBeenCalled();
     });
 
-    it('shows version with -v', function () {
+    it('shows version with -v', () => {
         cli.argv(constructArgv([], {v: true}));
         expect(console.log).toHaveBeenCalledWith(versionStr);
     });
 
-    it('shows version with --version', function () {
+    it('shows version with --version', () => {
         cli.argv(constructArgv([], {version: true}));
         expect(console.log).toHaveBeenCalledWith(versionStr);
     });
 
-    it('defaults to help when no args', function () {
+    it('defaults to help when no args', () => {
         spyOn(cli, 'help');
         cli.argv(constructArgv());
         expect(cli.help).toHaveBeenCalled();
     });
 
-    it('indicates invalid command', function () {
+    it('indicates invalid command', () => {
         cli.argv(constructArgv(['foobar']));
-        var errorMsg = 'Invalid command "foobar"';
+        const errorMsg = 'Invalid command "foobar"';
         expect(utils.throwCliError).toHaveBeenCalledWith(errorMsg, 1);
     });
 });
