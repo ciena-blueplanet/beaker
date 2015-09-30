@@ -65,7 +65,7 @@
         "grunt-contrib-watch": "^0.6.1",
         "grunt-eslint": "^17.1.0",
         "grunt-filenames": "^0.4.0",
-        "grunt-karma": "^0.12.0",
+        "grunt-karma": "0.12.0",
         "grunt-webpack": "^1.0.11",
         "imports-loader": "^0.6.4",
         "isparta-loader": "^0.2.0",
