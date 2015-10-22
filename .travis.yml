@@ -9,3 +9,5 @@ env:
         - KARMA_BROWSER=Firefox
         - SELENIUM_BROWSER=firefox
         - TRAVIS_CI=true
+after_failure:
+    - "git reset --hard origin/master"
