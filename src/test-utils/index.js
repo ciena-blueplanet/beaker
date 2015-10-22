@@ -191,14 +191,14 @@ ns.e2e = {
      */
     getUrl(testConfig, extra) {
         const http = testConfig.http;
-        const entryPoint = http.entryPoint;
+        let entryPoint = http.entryPoint;
 
         // Prevent double forward slash in URL
         if (entryPoint.length !== 0 && entryPoint[0] === '/') {
             entryPoint = entryPoint.substring(1);
         }
 
-        const url = `http://${http.host}:${http.port}/${entryPoint}`;
+        let url = `http://${http.host}:${http.port}/${entryPoint}`;
         if (extra) {
             // Prevent double forward slash in URL
             if (url[url.length - 1] === '/' && extra[0] === '/') {

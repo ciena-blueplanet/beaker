@@ -3,15 +3,10 @@
  * @copyright 2015 Ciena Corporation. All rights reserved.
 */
 
-/* eslint-disable max-nested-callbacks */
-
-// For some reason, eslint thinks that specs are modules and don't need 'use strict' but node disagrees
-/* eslint-disable strict */
 'use strict';
-/* eslint-enable strict */
 
-const t = require('../../src/transplant')(__dirname);
-const utils = t.require('./test-utils');
+const t = require('../../../src/transplant')(__dirname);
+const utils = t.require('./index');
 
 /**
  * Shared behavior for wait method
@@ -211,6 +206,66 @@ describe('test-utils', () => {
             });
 
             sharedWaitForPromiseBehavior(ctx);
+        });
+    });
+});
+
+describe('test-utils', () => {
+    beforeEach(() => {
+        jasmine.clock().install();
+    });
+
+    afterEach(() => {
+        jasmine.clock().uninstall();
+    });
+
+    describe('.e2e.getUrl()', () => {
+        let testConfig;
+
+        beforeEach(() => {
+            testConfig = {
+                http: {
+                    entryPoint: 'services',
+                    host: 'localhost',
+                    port: '80',
+                },
+            };
+        });
+
+        it('returns proper URL', () => {
+            expect(utils.e2e.getUrl(testConfig)).toEqual('http://localhost:80/services');
+        });
+
+        it('removes double forward slash from entry point', () => {
+            testConfig.http.entryPoint = '/services';
+            expect(utils.e2e.getUrl(testConfig)).toEqual('http://localhost:80/services');
+        });
+
+        it('removes double forward slash between entry point and extra', () => {
+            testConfig.http.entryPoint = 'services/';
+            expect(utils.e2e.getUrl(testConfig, '/view-service')).toEqual('http://localhost:80/services/view-service');
+        });
+    });
+
+    describe('.wait()', () => {
+        let doneSpy;
+        beforeEach(() => {
+            doneSpy = jasmine.createSpy('doneSpy');
+            utils.wait(doneSpy, 500);
+        });
+
+        it('does not call done yet', () => {
+            expect(doneSpy).not.toHaveBeenCalled();
+        });
+
+        describe('after timeout passes', () => {
+            beforeEach(() => {
+                jasmine.clock().tick(500);
+            });
+
+            it('calls done', () => {
+                expect(doneSpy).toHaveBeenCalled();
+            });
         });
     });
 });

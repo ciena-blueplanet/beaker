@@ -180,7 +180,7 @@ module.exports = {
                 },
 
                 karma: {
-                    files: ['src/**/*', 'spec/**/*'],
+                    files: ['src/**/*', 'spec/**/*', 'lib/**/*'],
                     tasks: ['karma:unit:run'],
                 },
             },
