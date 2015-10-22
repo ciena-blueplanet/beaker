@@ -37,7 +37,7 @@ module.exports = {
             logFn('found coverage directory at: ' + fullSubDir);
         }
 
-        _.forEach(fs.readdirSync(fullSubDir), function (file) {
+        fs.readdirSync(fullSubDir).forEach(file => {
             var dest = path.join(coverageDir, file);
             rimraf.sync(dest);
             fs.renameSync(path.join(fullSubDir, file), dest);
