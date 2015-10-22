@@ -12,6 +12,7 @@ env:
         - KARMA_BROWSER=Firefox
         - SELENIUM_BROWSER=firefox
         - TRAVIS_CI=true
+        - CXX=g++-4.8
 
 addons:
     apt:
