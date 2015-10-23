@@ -4,7 +4,7 @@
 # Script to verify the proper versions of node/npm
 #
 
-declare -a SUPPORTED_NODE_VERSIONS=("v4.1.2" "v4.2.1")
+declare -a SUPPORTED_NODE_VERSIONS=("v4.2.1")
 declare -a SUPPORTED_NPM_VERSIONS=("3.3.9")
 
 nodeVersion=$(node -v)

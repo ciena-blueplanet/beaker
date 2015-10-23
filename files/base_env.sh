@@ -3,7 +3,8 @@
 # Copyright 2015 Ciena Corporation All rights reserved.
 #
 
-bin/check-env.sh
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+${DIR}/../bin/check-env.sh
 
 #
 # Utility to add a directory to PATH (if it's not there already)
