@@ -5,6 +5,4 @@
 
 source files/base_env.sh
 
-bin/check-env.sh
-
 export ESLINT_RULES_DIR="${PWD}/src/eslint-rules"
