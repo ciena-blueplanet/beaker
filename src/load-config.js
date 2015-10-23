@@ -3,9 +3,11 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
  */
 
-var _ = require('lodash');
-var fs = require('fs');
-var path = require('path');
+'use strict';
+
+const _ = require('lodash');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Load config file from path (if not found checks parent directories)
@@ -13,7 +15,7 @@ var path = require('path');
  * @returns {Object} configuraiton
  */
 module.exports = function (dir) {
-    var config;
+    let config;
 
     while (!config && dir.length > 1) {
         try {

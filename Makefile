@@ -2,6 +2,8 @@
 # Makefile for the beaker package
 #
 
+ESLINT_RULES_DIR := src/eslint-rules
+ESLINT_FILES := ./Gruntfile.js bin config lib src spec ./webpack.config.js
 NODE_SPECS := spec/node
 NODE_COVERAGE_DIR := node-coverage
 REPO := cyaninc/beaker
@@ -34,7 +36,7 @@ clean:
 	$(ENV)npm cache clean beaker
 
 INIT_TEST_DIR := /tmp/.init-test
-init-test: webpack.init-test node.init-test app.init-test
+init-test: webpack.init-test app.init-test
 
 %.init-test:
 	$(eval TYPE := $(subst .init-test,,$@))

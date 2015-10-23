@@ -5,27 +5,31 @@
 */
 
 /* eslint max-nested-callbacks: 0 */
-
 /* eslint-disable new-cap */ // <-- for Q()
 
-var _ = require('lodash');
-var Q = require('q');
+// For some reason, eslint thinks that specs are modules and don't need 'use strict' but node disagrees
+/* eslint-disable strict */
+'use strict';
+/* eslint-enable strict */
 
-var http = require('q-io/http');
-var fs = require('q-io/fs');
-var versiony = require('versiony');
+const _ = require('lodash');
+const Q = require('q');
 
-var t = require('../../src/transplant')(__dirname);
-var _config = t.require('./config');
-var githubFactory = t.require('./github');
-var utils = t.require('./cli/utils');
-var makePromise = t.require('./test-utils').makePromise;
+const http = require('q-io/http');
+const fs = require('q-io/fs');
+const versiony = require('versiony');
 
-var config = require('./sample-config.json');
+const t = require('../../src/transplant')(__dirname);
+const _config = t.require('./config');
+const githubFactory = t.require('./github');
+const utils = t.require('./cli/utils');
+const makePromise = t.require('./test-utils').makePromise;
 
-describe('github', function () {
-    var github;
-    beforeEach(function () {
+const config = require('./sample-config.json');
+
+describe('github', () => {
+    let github;
+    beforeEach(() => {
         spyOn(console, 'info');
         spyOn(console, 'error');
         spyOn(process, 'cwd').and.returnValue('/current/working/directory');
@@ -34,29 +38,29 @@ describe('github', function () {
 
     });
 
-    it('loads the config', function () {
+    it('loads the config', () => {
         expect(_config.load).toHaveBeenCalledWith('/current/working/directory');
     });
 
-    it('sets the urlBase', function () {
+    it('sets the urlBase', () => {
         expect(github.config.urlBase).toBe('https://our.github-enterprise.com/api/v3');
     });
 
-    describe('.createRelease()', function () {
-        beforeEach(function () {
+    describe('.createRelease()', () => {
+        beforeEach(() => {
             spyOn(utils, 'throwCliError');
             github.createRelease({_: ['github', 'create-release']});
         });
 
-        it('throws an error', function () {
-            var msg = 'create-release currently unavailable, hopefully coming back soon';
+        it('throws an error', () => {
+            const msg = 'create-release currently unavailable, hopefully coming back soon';
             expect(utils.throwCliError).toHaveBeenCalledWith(msg, 1);
         });
     });
 
-    describe('.getRequest()', function () {
-        var requestResolver, resp;
-        beforeEach(function () {
+    describe('.getRequest()', () => {
+        let requestResolver, resp;
+        beforeEach(() => {
             requestResolver = {};
 
             spyOn(http, 'request').and.returnValue(makePromise(requestResolver));
@@ -65,15 +69,15 @@ describe('github', function () {
             }).done();
         });
 
-        it('calls the http.request() method', function () {
+        it('calls the http.request() method', () => {
             expect(http.request).toHaveBeenCalledWith('https://our.github-enterprise.com/api/v3/repos');
         });
 
-        describe('when request comes back', function () {
-            var body;
+        describe('when request comes back', () => {
+            let body;
             beforeEach(function (done) {
                 body = ['foo', 'bar', 'baz'];
-                var response = {
+                const response = {
                     status: 200,
                     body: jasmine.createSpyObj('resp.body', ['read']),
                 };
@@ -84,7 +88,7 @@ describe('github', function () {
                 setTimeout(done, 1);
             });
 
-            it('resolves the original promise with proper response', function () {
+            it('resolves the original promise with proper response', () => {
                 expect(resp).toEqual({
                     status: 200,
                     data: body,
@@ -93,57 +97,57 @@ describe('github', function () {
         });
     });
 
-    describe('.getCommits()', function () {
-        var ret;
-        beforeEach(function () {
+    describe('.getCommits()', () => {
+        let ret;
+        beforeEach(() => {
             spyOn(github, 'getRequest').and.returnValue('a-promise');
             ret = github.getCommits('cyaninc/beaker', '3.x');
         });
 
-        it('calls getRequest with proper URL', function () {
+        it('calls getRequest with proper URL', () => {
             expect(github.getRequest).toHaveBeenCalledWith('/repos/cyaninc/beaker/commits?sha=3.x');
         });
 
-        it('returns the result of getRequest()', function () {
+        it('returns the result of getRequest()', () => {
             expect(ret).toBe('a-promise');
         });
     });
 
-    describe('.getPullRequest()', function () {
-        var ret;
-        beforeEach(function () {
+    describe('.getPullRequest()', () => {
+        let ret;
+        beforeEach(() => {
             spyOn(github, 'getRequest').and.returnValue('a-promise');
             ret = github.getPullRequest('cyaninc/beaker', '12345');
         });
 
-        it('calls getRequest with proper URL', function () {
+        it('calls getRequest with proper URL', () => {
             expect(github.getRequest).toHaveBeenCalledWith('/repos/cyaninc/beaker/pulls/12345');
         });
 
-        it('returns the result of getRequest()', function () {
+        it('returns the result of getRequest()', () => {
             expect(ret).toBe('a-promise');
         });
     });
 
-    describe('.getPullRequests()', function () {
-        var ret;
-        beforeEach(function () {
+    describe('.getPullRequests()', () => {
+        let ret;
+        beforeEach(() => {
             spyOn(github, 'getRequest').and.returnValue('a-promise');
             ret = github.getPullRequests('cyaninc/beaker');
         });
 
-        it('calls getRequest with proper URL', function () {
+        it('calls getRequest with proper URL', () => {
             expect(github.getRequest).toHaveBeenCalledWith('/repos/cyaninc/beaker/pulls');
         });
 
-        it('returns the result of getRequest()', function () {
+        it('returns the result of getRequest()', () => {
             expect(ret).toBe('a-promise');
         });
     });
 
-    describe('.getPullRequestForSha()', function () {
-        var pr, prsResolver, prs;
-        beforeEach(function () {
+    describe('.getPullRequestForSha()', () => {
+        let pr, prsResolver, prs;
+        beforeEach(() => {
             prsResolver = {};
             spyOn(github, 'getPullRequests').and.returnValue(makePromise(prsResolver));
             github.getPullRequestForSha('cyaninc/beaker', 'abcde').then(function (resp) {
@@ -151,16 +155,16 @@ describe('github', function () {
             });
         });
 
-        it('says what it is doing', function () {
-            var msg = 'Looking for PR on repository cyaninc/beaker with HEAD at commit abcde';
+        it('says what it is doing', () => {
+            const msg = 'Looking for PR on repository cyaninc/beaker with HEAD at commit abcde';
             expect(console.info).toHaveBeenCalledWith(msg);
         });
 
-        it('fetches the pull requests', function () {
+        it('fetches the pull requests', () => {
             expect(github.getPullRequests).toHaveBeenCalledWith('cyaninc/beaker');
         });
 
-        describe('when the sha is present on head', function () {
+        describe('when the sha is present on head', () => {
             beforeEach(function (done) {
                 prs = [
                     {id: 1, head: {sha: 'sha-1'}, 'merge_commit_sha': 'sha-2'},
@@ -176,16 +180,16 @@ describe('github', function () {
                 setTimeout(done, 1);
             });
 
-            it('says "I found it"', function () {
+            it('says "I found it"', () => {
                 expect(console.info).toHaveBeenCalledWith('Found PR at commit: 2');
             });
 
-            it('resolves with the pr', function () {
+            it('resolves with the pr', () => {
                 expect(pr).toBe(prs[1]);
             });
         });
 
-        describe('when the sha is present on merge commit', function () {
+        describe('when the sha is present on merge commit', () => {
             beforeEach(function (done) {
                 prs = [
                     {id: 1, head: {sha: 'sha-1'}, 'merge_commit_sha': 'abcde'},
@@ -201,16 +205,16 @@ describe('github', function () {
                 setTimeout(done, 1);
             });
 
-            it('says "I found it"', function () {
+            it('says "I found it"', () => {
                 expect(console.info).toHaveBeenCalledWith('Found PR at commit: 1');
             });
 
-            it('resolves with the pr', function () {
+            it('resolves with the pr', () => {
                 expect(pr).toBe(prs[0]);
             });
         });
 
-        describe('when the sha is not present', function () {
+        describe('when the sha is not present', () => {
             beforeEach(function (done) {
                 prs = [
                     {id: 1, head: {sha: 'sha-1'}, 'merge_commit_sha': 'sha-2'},
@@ -226,75 +230,75 @@ describe('github', function () {
                 setTimeout(done, 1);
             });
 
-            it('resolves with null', function () {
+            it('resolves with null', () => {
                 expect(pr).toBe(null);
             });
         });
 
     });
 
-    describe('.getVersionBumpLevel()', function () {
-        it('finds major bump comment', function () {
+    describe('.getVersionBumpLevel()', () => {
+        it('finds major bump comment', () => {
             var pr = {body: '#MAJOR#'};
             expect(github.getVersionBumpLevel(pr)).toEqual('major');
         });
 
-        it('finds minor bump comment', function () {
+        it('finds minor bump comment', () => {
             var pr = {body: '#MINOR#'};
             expect(github.getVersionBumpLevel(pr)).toEqual('minor');
         });
 
-        it('finds patch bump comment', function () {
+        it('finds patch bump comment', () => {
             var pr = {body: '#PATCH#'};
             expect(github.getVersionBumpLevel(pr)).toEqual('patch');
         });
 
-        it('returns null if no bump comment found', function () {
+        it('returns null if no bump comment found', () => {
             var pr = {body: '#FAKE#'};
             expect(github.getVersionBumpLevel(pr)).toEqual(null);
         });
 
-        it('finds bump comment sourrounded by other text', function () {
+        it('finds bump comment sourrounded by other text', () => {
             var pr = {body: 'Blah blah blah\n#MAJOR#blah blah blah'};
             expect(github.getVersionBumpLevel(pr)).toEqual('major');
         });
     });
 
-    describe('.hasVersionBumpComment()', function () {
+    describe('.hasVersionBumpComment()', () => {
         var level, ret;
-        beforeEach(function () {
+        beforeEach(() => {
             level = 'minor';
-            spyOn(github, 'getVersionBumpLevel').and.callFake(function () {
+            spyOn(github, 'getVersionBumpLevel').and.callFake(() => {
                 return level;
             });
 
             ret = github.hasVersionBumpComment('foo');
         });
 
-        it('looks up the version bump level', function () {
+        it('looks up the version bump level', () => {
             expect(github.getVersionBumpLevel).toHaveBeenCalledWith('foo');
         });
 
-        it('returns true', function () {
+        it('returns true', () => {
             expect(ret).toBe(true);
         });
 
-        describe('when no bump level found', function () {
-            beforeEach(function () {
+        describe('when no bump level found', () => {
+            beforeEach(() => {
                 level = null;
                 ret = github.hasVersionBumpComment('foo');
             });
 
-            it('returns false', function () {
+            it('returns false', () => {
                 expect(ret).toBe(false);
             });
         });
     });
 
-    describe('.verifyRequiredArgs()', function () {
+    describe('.verifyRequiredArgs()', () => {
         var argv;
 
-        beforeEach(function () {
+        beforeEach(() => {
             spyOn(utils, 'throwCliError');
             argv = {
                 repo: 'cyaninc/my-repo-name',
@@ -302,31 +306,31 @@ describe('github', function () {
             };
         });
 
-        describe('when everything is fine', function () {
-            beforeEach(function () {
+        describe('when everything is fine', () => {
+            beforeEach(() => {
                 github.verifyRequiredArgs(argv, ['repo', 'sha']);
             });
 
-            it('does not throw a CLI error', function () {
+            it('does not throw a CLI error', () => {
                 expect(utils.throwCliError).not.toHaveBeenCalled();
             });
         });
 
-        describe('when missing required arguments', function () {
-            beforeEach(function () {
+        describe('when missing required arguments', () => {
+            beforeEach(() => {
                 delete argv.repo;
                 delete argv.sha;
                 github.verifyRequiredArgs(argv, ['repo', 'sha']);
             });
 
-            it('throws a CLI error', function () {
+            it('throws a CLI error', () => {
                 var msg = 'repo argument is required\nsha argument is required';
                 expect(utils.throwCliError).toHaveBeenCalledWith(msg, 1);
             });
         });
     });
 
-    describe('.versionBumped()', function () {
+    describe('.versionBumped()', () => {
         var argv, pr;
 
         beforeEach(function (done) {
@@ -353,26 +357,26 @@ describe('github', function () {
             setTimeout(done, 1);
         });
 
-        it('verifies required arguments', function () {
+        it('verifies required arguments', () => {
             expect(github.verifyRequiredArgs).toHaveBeenCalledWith(argv, ['repo', 'sha']);
         });
 
-        it('fetches the pr', function () {
+        it('fetches the pr', () => {
             expect(github.getPullRequestForSha).toHaveBeenCalledWith(argv.repo, argv.sha);
         });
 
-        it('does not throw', function () {
+        it('does not throw', () => {
             expect(utils.throwCliError).not.toHaveBeenCalled();
         });
 
-        describe('when no version bump found', function () {
+        describe('when no version bump found', () => {
             beforeEach(function (done) {
                 pr.hasVersionBumpComment = false;
                 github.versionBumped(argv);
                 setTimeout(done, 1);
             });
 
-            it('throws an error', function () {
+            it('throws an error', () => {
                 expect(utils.throwCliError).toHaveBeenCalledWith('Missing version bump comment', 1);
             });
 
@@ -381,9 +385,9 @@ describe('github', function () {
         });
     });
 
-    describe('.bumpFiles()', function () {
+    describe('.bumpFiles()', () => {
         var versionySpy, jsonTabs, jsonIndent;
-        beforeEach(function () {
+        beforeEach(() => {
             var methods = ['to', 'end', 'indent', 'patch', 'minor', 'newMajor'];
             versionySpy = jasmine.createSpyObj('versiony', methods);
 
@@ -399,82 +403,82 @@ describe('github', function () {
             jsonIndent = '      ';
         });
 
-        afterEach(function () {
+        afterEach(() => {
             process.env.JSON_TABS = jsonTabs;
         });
 
-        describe('major bumps', function () {
-            beforeEach(function () {
+        describe('major bumps', () => {
+            beforeEach(() => {
                 github.bumpFiles('major');
             });
 
-            it('sets indentation', function () {
+            it('sets indentation', () => {
                 expect(versionySpy.indent).toHaveBeenCalledWith(jsonIndent);
             });
 
-            it('bumps the major', function () {
+            it('bumps the major', () => {
                 expect(versionySpy.newMajor).toHaveBeenCalled();
             });
 
-            it('does not throw', function () {
+            it('does not throw', () => {
                 expect(utils.throwCliError).not.toHaveBeenCalled();
             });
         });
 
-        describe('minor bumps', function () {
-            beforeEach(function () {
+        describe('minor bumps', () => {
+            beforeEach(() => {
                 github.bumpFiles('minor');
             });
 
-            it('sets indentation', function () {
+            it('sets indentation', () => {
                 expect(versionySpy.indent).toHaveBeenCalledWith(jsonIndent);
             });
 
-            it('bumps the minor', function () {
+            it('bumps the minor', () => {
                 expect(versionySpy.minor).toHaveBeenCalled();
             });
 
-            it('resets the patch', function () {
+            it('resets the patch', () => {
                 expect(versionySpy.patch).toHaveBeenCalledWith(0);
             });
 
-            it('does not throw', function () {
+            it('does not throw', () => {
                 expect(utils.throwCliError).not.toHaveBeenCalled();
             });
         });
 
-        describe('patch bumps', function () {
-            beforeEach(function () {
+        describe('patch bumps', () => {
+            beforeEach(() => {
                 github.bumpFiles('patch');
             });
 
-            it('sets indentation', function () {
+            it('sets indentation', () => {
                 expect(versionySpy.indent).toHaveBeenCalledWith(jsonIndent);
             });
 
-            it('bumps the patch', function () {
+            it('bumps the patch', () => {
                 expect(versionySpy.patch).toHaveBeenCalled();
             });
 
-            it('does not throw', function () {
+            it('does not throw', () => {
                 expect(utils.throwCliError).not.toHaveBeenCalled();
             });
         });
 
-        describe('unknown bumps', function () {
-            beforeEach(function () {
+        describe('unknown bumps', () => {
+            beforeEach(() => {
                 github.bumpFiles('non-existent-bump-type');
             });
 
-            it('throws an error', function () {
+            it('throws an error', () => {
                 expect(utils.throwCliError).toHaveBeenCalledWith('Missing version bump comment', 1);
             });
         });
     });
 
-    describe('.getBranch()', function () {
+    describe('.getBranch()', () => {
         var cmdResolver, branch;
-        beforeEach(function () {
+        beforeEach(() => {
             cmdResolver = {};
             spyOn(github, 'exec').and.returnValue(makePromise(cmdResolver));
             github.getBranch().then(function (result) {
@@ -482,11 +486,11 @@ describe('github', function () {
             });
         });
 
-        it('executes the git command', function () {
+        it('executes the git command', () => {
             expect(github.exec).toHaveBeenCalledWith('git rev-parse --abbrev-ref HEAD');
         });
 
-        describe('when command works', function () {
+        describe('when command works', () => {
             beforeEach(function (done) {
                 cmdResolver.resolve([
                     'my-branch\n',
@@ -496,31 +500,31 @@ describe('github', function () {
                 setTimeout(done, 1);
             });
 
-            it('resolves with the branch`', function () {
+            it('resolves with the branch`', () => {
                 expect(branch).toBe('my-branch');
             });
         });
     });
 
-    describe('.pushChanges()', function () {
+    describe('.pushChanges()', () => {
         var ret;
-        beforeEach(function () {
+        beforeEach(() => {
             spyOn(github, 'exec').and.returnValue('result');
             ret = github.pushChanges('my-branch');
         });
 
-        it('executes the command to push the branch', function () {
+        it('executes the command to push the branch', () => {
             expect(github.exec).toHaveBeenCalledWith('git push origin my-branch');
         });
 
-        it('returns the result of exec', function () {
+        it('returns the result of exec', () => {
             expect(ret).toBe('result');
         });
     });
 
-    describe('.commitBumpedFiles()', function () {
+    describe('.commitBumpedFiles()', () => {
         var existingFiles, resolvers;
-        beforeEach(function () {
+        beforeEach(() => {
             resolvers = {
                 pkg: {},
                 commit: {},
@@ -544,7 +548,7 @@ describe('github', function () {
         });
     });
 
-    describe('.getVersionBumps()', function () {
+    describe('.getVersionBumps()', () => {
         var commits, prs, bumps;
         beforeEach(function (done) {
             commits = [
@@ -600,13 +604,13 @@ describe('github', function () {
             setTimeout(done, 1);
         });
 
-        it('fetches all the appropriate PRs', function () {
+        it('fetches all the appropriate PRs', () => {
             expect(github.getPullRequest).toHaveBeenCalledWith('cyaninc/beaker', '6');
             expect(github.getPullRequest).toHaveBeenCalledWith('cyaninc/beaker', '5');
             expect(github.getPullRequest).toHaveBeenCalledWith('cyaninc/beaker', '4');
         });
 
-        it('resolves with the bumps', function () {
+        it('resolves with the bumps', () => {
             // NOTE: inverted order because we want to bump from oldest to newest
             expect(bumps).toEqual([
                 'major',
@@ -615,7 +619,7 @@ describe('github', function () {
             ]);
         });
 
-        describe('when a bump commit exists in the middle', function () {
+        describe('when a bump commit exists in the middle', () => {
             beforeEach(function (done) {
                 bumps = null;
                 commits[3].commit.author.email = github.config.github.email;
@@ -626,7 +630,7 @@ describe('github', function () {
                 setTimeout(done, 1);
             });
 
-            it('resolves with the bumps', function () {
+            it('resolves with the bumps', () => {
                 // NOTE: inverted order because we want to bump from oldest to newest
                 expect(bumps).toEqual([
                     'minor',
@@ -636,27 +640,27 @@ describe('github', function () {
         });
     });
 
-    describe('.bumpVersionForBranch()', function () {
+    describe('.bumpVersionForBranch()', () => {
         var commitsResolver, bumpFinished;
-        beforeEach(function () {
+        beforeEach(() => {
             commitsResolver = {};
             bumpFinished = false;
             spyOn(github, 'getCommits').and.returnValue(makePromise(commitsResolver));
-            github.bumpVersionForBranch('cyaninc/beaker', '3.x').then(function () {
+            github.bumpVersionForBranch('cyaninc/beaker', '3.x').then(() => {
                 bumpFinished = true;
             });
 
         });
 
-        it('looks up the commits', function () {
+        it('looks up the commits', () => {
             expect(github.getCommits).toHaveBeenCalledWith('cyaninc/beaker', '3.x');
         });
 
-        it('does not resolve original promise yet', function () {
+        it('does not resolve original promise yet', () => {
             expect(bumpFinished).toBe(false);
         });
 
-        describe('when commits are fetched', function () {
+        describe('when commits are fetched', () => {
             var bumpsResolver, commits;
             beforeEach(function (done) {
                 bumpsResolver = {};
@@ -666,15 +670,15 @@ describe('github', function () {
                 setTimeout(done, 1);
             });
 
-            it('looks up version bumps', function () {
+            it('looks up version bumps', () => {
                 expect(github.getVersionBumps).toHaveBeenCalledWith('cyaninc/beaker', commits);
             });
 
-            it('does not resolve original promise yet', function () {
+            it('does not resolve original promise yet', () => {
                 expect(bumpFinished).toBe(false);
             });
 
-            describe('when bumps are returned', function () {
+            describe('when bumps are returned', () => {
                 var commitBumpsResolver, bumps;
                 beforeEach(function (done) {
                     bumps = ['bump-1', 'bump-2', 'bump-3'];
@@ -685,7 +689,7 @@ describe('github', function () {
                     setTimeout(done, 1);
                 });
 
-                it('performs the bumps', function () {
+                it('performs the bumps', () => {
                     expect(github.bumpFiles.calls.allArgs()).toEqual([
                         ['bump-1'],
                         ['bump-2'],
@@ -693,15 +697,15 @@ describe('github', function () {
                     ]);
                 });
 
-                it('commits the files', function () {
+                it('commits the files', () => {
                     expect(github.commitBumpedFiles).toHaveBeenCalledWith('3.x');
                 });
 
-                it('does not resolve original promise yet', function () {
+                it('does not resolve original promise yet', () => {
                     expect(bumpFinished).toBe(false);
                 });
 
-                describe('when commit bumps finishes', function () {
+                describe('when commit bumps finishes', () => {
                     var pushChangesResolver;
                     beforeEach(function (done) {
                         pushChangesResolver = {};
@@ -710,15 +714,15 @@ describe('github', function () {
                         setTimeout(done, 1);
                     });
 
-                    it('pushes the changes', function () {
+                    it('pushes the changes', () => {
                         expect(github.pushChanges).toHaveBeenCalledWith('3.x');
                     });
 
-                    it('does not resolve original promise yet', function () {
+                    it('does not resolve original promise yet', () => {
                         expect(bumpFinished).toBe(false);
                     });
 
-                    describe('when pushing changes finishes', function () {
+                    describe('when pushing changes finishes', () => {
                         beforeEach(function (done) {
                             spyOn(utils, 'throwCliError');
                             pushChangesResolver.resolve({
@@ -727,16 +731,16 @@ describe('github', function () {
                             setTimeout(done, 1);
                         });
 
-                        it('does not throw an error', function () {
+                        it('does not throw an error', () => {
                             expect(utils.throwCliError).not.toHaveBeenCalled();
                         });
 
-                        it('resolves the original promise', function () {
+                        it('resolves the original promise', () => {
                             expect(bumpFinished).toBe(true);
                         });
                     });
 
-                    describe('when pushing changes fails', function () {
+                    describe('when pushing changes fails', () => {
                         beforeEach(function (done) {
                             spyOn(utils, 'throwCliError');
                             pushChangesResolver.resolve({
@@ -746,12 +750,12 @@ describe('github', function () {
                             setTimeout(done, 1);
                         });
 
-                        it('throws an error', function () {
+                        it('throws an error', () => {
                             var msg = 'Failed to push changes to 3.x: error-message';
                             expect(utils.throwCliError).toHaveBeenCalledWith(msg, 1);
                         });
 
-                        it('resolves the original promise', function () {
+                        it('resolves the original promise', () => {
                             expect(bumpFinished).toBe(true);
                         });
                     });
@@ -760,9 +764,9 @@ describe('github', function () {
         });
     });
 
-    describe('.bumpVersion()', function () {
+    describe('.bumpVersion()', () => {
         var argv, branchResolver;
-        beforeEach(function () {
+        beforeEach(() => {
             branchResolver = {};
             argv = {
                 _: ['github', 'bump-version'],
@@ -777,42 +781,42 @@ describe('github', function () {
             github.bumpVersion(argv);
         });
 
-        it('verifies required arguments', function () {
+        it('verifies required arguments', () => {
             expect(github.verifyRequiredArgs).toHaveBeenCalledWith(argv, ['repo']);
         });
 
-        describe('when branch is resolved', function () {
+        describe('when branch is resolved', () => {
             beforeEach(function (done) {
                 branchResolver.resolve('3.x');
                 setTimeout(done, 1);
             });
 
-            it('does not throw', function () {
+            it('does not throw', () => {
                 expect(utils.throwCliError).not.toHaveBeenCalled();
             });
 
-            it('bumps the version for the branch', function () {
+            it('bumps the version for the branch', () => {
                 expect(github.bumpVersionForBranch).toHaveBeenCalledWith(argv.repo, '3.x');
             });
         });
 
-        describe('when branch is null', function () {
+        describe('when branch is null', () => {
             beforeEach(function (done) {
                 branchResolver.resolve(null);
                 setTimeout(done, 1);
             });
 
-            it('throws an error', function () {
+            it('throws an error', () => {
                 var msg = 'Unable to lookup branch';
                 expect(utils.throwCliError).toHaveBeenCalledWith(msg, 1);
             });
         });
     });
 
-    describe('.command()', function () {
+    describe('.command()', () => {
         var argv;
 
-        beforeEach(function () {
+        beforeEach(() => {
             argv = {
                 _: ['github'],
             };
@@ -822,58 +826,58 @@ describe('github', function () {
             spyOn(utils, 'throwCliError');
         });
 
-        describe('when bad argument count', function () {
-            beforeEach(function () {
+        describe('when bad argument count', () => {
+            beforeEach(() => {
                 github.command(argv);
             });
 
-            it('throws an error', function () {
+            it('throws an error', () => {
                 var msg = 'Invalid command: ' + JSON.stringify(argv._);
                 expect(utils.throwCliError).toHaveBeenCalledWith(msg, 1);
             });
         });
 
-        describe('when invalid command', function () {
-            beforeEach(function () {
+        describe('when invalid command', () => {
+            beforeEach(() => {
                 argv._.push('foo-bar');
                 github.command(argv);
             });
 
-            it('throws an error', function () {
+            it('throws an error', () => {
                 var msg = 'Unknown command: foo-bar';
                 expect(utils.throwCliError).toHaveBeenCalledWith(msg, 1);
             });
         });
 
-        describe('release', function () {
-            beforeEach(function () {
+        describe('release', () => {
+            beforeEach(() => {
                 argv._.push('release');
                 github.command(argv);
             });
 
-            it('makes the call to createRelease', function () {
+            it('makes the call to createRelease', () => {
                 expect(github.createRelease).toHaveBeenCalledWith(argv);
             });
         });
 
-        describe('version-bumped', function () {
-            beforeEach(function () {
+        describe('version-bumped', () => {
+            beforeEach(() => {
                 argv._.push('version-bumped');
                 github.command(argv);
             });
 
-            it('makes the call to versionBumped', function () {
+            it('makes the call to versionBumped', () => {
                 expect(github.versionBumped).toHaveBeenCalledWith(argv);
             });
         });
 
-        describe('bump-version', function () {
-            beforeEach(function () {
+        describe('bump-version', () => {
+            beforeEach(() => {
                 argv._.push('bump-version');
                 github.command(argv);
             });
 
-            it('makes the call to bumpVersion', function () {
+            it('makes the call to bumpVersion', () => {
                 expect(github.bumpVersion).toHaveBeenCalledWith(argv);
             });
         });

@@ -1,13 +1,26 @@
 language: node_js
+
 node_js:
-    - "0.10"
+    - "4.1"
+
 before_script:
     - "export DISPLAY=:99.0"
     - "sh -e /etc/init.d/xvfb start"
+
 env:
     global:
         - KARMA_BROWSER=Firefox
         - SELENIUM_BROWSER=firefox
         - TRAVIS_CI=true
+        - CXX=g++-4.8
+
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - gcc-4.8
+            - g++-4.8
+
 after_failure:
     - "git reset --hard origin/master"

@@ -3,20 +3,25 @@
  * @copyright 2015 Ciena Corporation. All rights reserved.
 */
 
-var t = require('../../../src/transplant')(__dirname);
-var testerProto = t.require('../webdriverio-tester').proto;
-var cli = t.require('./index');
+// For some reason, eslint thinks that specs are modules and don't need 'use strict' but node disagrees
+/* eslint-disable strict */
+'use strict';
+/* eslint-enable strict */
 
-describe('cli.webdriverioTester', function () {
-    var argv;
+const t = require('../../../src/transplant')(__dirname);
+const testerProto = t.require('../webdriverio-tester').proto;
+const cli = t.require('./index');
 
-    beforeEach(function () {
+describe('cli.webdriverioTester', () => {
+    let argv;
+
+    beforeEach(() => {
         argv = {_: ['init']};
         spyOn(testerProto, 'command');
         cli.webdriverioTester(argv);
     });
 
-    it('calls tester method', function () {
+    it('calls tester method', () => {
         expect(testerProto.command).toHaveBeenCalledWith(argv);
     });
 });

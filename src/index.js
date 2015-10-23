@@ -3,24 +3,24 @@
  * @copyright 2015 Ciena Corporation. All rights reserved.
  */
 
-var gruntHelper = require('./grunt/helper');
-var testUtils = require('./test-utils');
+'use strict';
+
+const gruntHelper = require('./grunt/helper');
+const testUtils = require('./test-utils');
 
 /** @exports beaker */
-var ns = {
+module.exports = {
     gruntHelper: gruntHelper, // for backward compatibility
     testUtils: testUtils, // for backward compatibility
     transplant: require('./transplant'),
     jasmine: testUtils,
     e2e: testUtils.e2e,
-};
 
-/**
- * Better named wrapper around the grunt/helper module
- * @param {Grunt} grunt - the grunt instance to initialize
- */
-ns.pour = function (grunt) {
-    gruntHelper.init(grunt);
+    /**
+     * Better named wrapper around the grunt/helper module
+     * @param {Grunt} grunt - the grunt instance to initialize
+     */
+    pour(grunt) {
+        gruntHelper.init(grunt);
+    },
 };
-
-module.exports = ns;

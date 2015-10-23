@@ -5,34 +5,39 @@
 
 /* eslint-disable max-nested-callbacks */
 
-var transplantModule = require('../../src/transplant');
+// For some reason, eslint thinks that specs are modules and don't need 'use strict' but node disagrees
+/* eslint-disable strict */
+'use strict';
+/* eslint-enable strict */
 
-describe('transplant', function () {
-    var reqFunc, t, modulePath;
-    beforeEach(function () {
+const transplantModule = require('../../src/transplant');
+
+describe('transplant', () => {
+    let reqFunc, t, modulePath;
+    beforeEach(() => {
         reqFunc = jasmine.createSpy('reqFunc');
     });
 
-    describe('when specs live in "spec/"', function () {
-        beforeEach(function () {
+    describe('when specs live in "spec/"', () => {
+        beforeEach(() => {
             modulePath = '/path/to/spec/foo/bar';
             t = transplantModule(modulePath, reqFunc);
         });
 
-        it('moves from spec/ tree to src/ tree', function () {
+        it('moves from spec/ tree to src/ tree', () => {
             t.require('./baz');
             expect(reqFunc).toHaveBeenCalledWith('/path/to/src/foo/bar/baz');
         });
 
-        describe('and an invalid modulePath is given', function () {
-            beforeEach(function () {
+        describe('and an invalid modulePath is given', () => {
+            beforeEach(() => {
                 modulePath = '/path/to/src/foo/bar';
                 t = transplantModule(modulePath, reqFunc);
             });
 
-            it('throws an error if used outside spec/ tree', function () {
-                var errorMsg = 'Invalid modulePath "/path/to/src/foo/bar" no "spec" dir found!';
-                expect(function () {
+            it('throws an error if used outside spec/ tree', () => {
+                const errorMsg = 'Invalid modulePath "/path/to/src/foo/bar" no "spec" dir found!';
+                expect(() => {
                     t.require('./baz');
                 }).toThrowError(errorMsg);
             });

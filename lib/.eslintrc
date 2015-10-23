@@ -25,13 +25,13 @@
         "unicodeCodePointEscapes": true
     },
     "env": {
-        "amd": true,
         "browser": true,
-        "node": true
+        "node": true,
     },
     "plugins": [
         "react"
     ],
+    "root": true,
     "rules": {
         "array-bracket-spacing": [2, "never"],
         "brace-style": [
@@ -99,7 +99,7 @@
         "react/self-closing-comp": 1,
         "react/wrap-multilines": 1,
         "semi-spacing": 2,
-        "strict": 2,
+        "strict": [2, "global"],
         "space-after-keywords": [2, "always"],
         "space-before-function-paren": [
             2,

@@ -3,34 +3,35 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
  */
 
+'use strict';
+
 require('./typedefs');
 
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs');
+const path = require('path');
 
-var throwCliError = require('./cli/utils').throwCliError;
+const throwCliError = require('./cli/utils').throwCliError;
 
-var ns = {};
+module.exports = {
 
-/**
- * Create a default beaker.json file
- * @throws {CliError}
- */
-ns.command = function () {
-    var sourcePath = path.join(__dirname, '../files/beaker.json');
-    var targetPath = path.join(process.cwd(), 'beaker.json');
+    /**
+     * Create a default beaker.json file
+     * @throws {CliError}
+     */
+    command() {
+        var sourcePath = path.join(__dirname, '../files/beaker.json');
+        var targetPath = path.join(process.cwd(), 'beaker.json');
 
-    fs.readFile(sourcePath, function (err, data) {
-        if (err) {
-            throwCliError(err.message);
-        }
-
-        fs.writeFile(targetPath, data, function (err2) {
-            if (err2) {
-                throwCliError(err2.message);
+        fs.readFile(sourcePath, (err, data) => {
+            if (err) {
+                throwCliError(err.message);
             }
-        });
-    });
-};
 
-module.exports = ns;
+            fs.writeFile(targetPath, data, (err2) => {
+                if (err2) {
+                    throwCliError(err2.message);
+                }
+            });
+        });
+    },
+};

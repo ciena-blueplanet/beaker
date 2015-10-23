@@ -3,6 +3,8 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
 */
 
+'use strict';
+
 /**
  * namespace for all cli modules
  */

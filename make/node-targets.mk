@@ -1,6 +1,6 @@
 #
 # Makefile to define some node project make targets
-# Copyright (c) 2015 Cyan, Inc. All rights reserved.
+# Copyright (c) 2015 Ciena Corporation. All rights reserved.
 #
 
 NODE_SPECS ?= spec

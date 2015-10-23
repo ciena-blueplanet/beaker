@@ -7,15 +7,9 @@ GITHUB_HOST := {{ githubHost }}
 REPO := {{ githubUser }}/{{ projectName }}
 PROJECT_NAME := {{ projectName }}
 
-# Uncomment these if you want to override the default Selenium configs
-#SELENIUM_HOST ?= {{ seleniumHost }}
-#SELENIUM_PORT ?= {{ seleniumPort }}
-#SELENIUM_BROWSER ?= {{ seleniumBrowser }}
-
 -include node_modules/beaker/make/common.mk
 -include node_modules/beaker/make/gh-pages.mk
 -include node_modules/beaker/make/karma-targets.mk
--include node_modules/beaker/make/e2e-targets.mk
 
 .PHONY: install clean test coverage report-coverage release ghp-update
 
@@ -26,17 +20,15 @@ PROJECT_NAME := {{ projectName }}
 install:
 	$(HIDE)npm install
 	$(HIDE)cd node_modules/karma-jasmine-jquery && node install.js
-	$(HIDE)node node_modules/.bin/webdriver-manager update --standalone
 
 clean:
 	$(HIDE)rm -rf bundle coverage
 
-test: webpack-test
+test: karma-test
 
-coverage: webpack-coverage
+coverage: karma-coverage
 
-report-coverage:
-	$(HIDE)echo "Reporting Coverage not implemented yet"
+report-coverage: karma-coveralls
 
 release: build
 	$(HIDE)echo "Publishing version $(VERSION)"

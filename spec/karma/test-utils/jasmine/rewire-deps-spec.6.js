@@ -5,7 +5,7 @@
 
 /* eslint-disable max-nested-callbacks */
 
-import {rewireDeps, resetDeps} from 'beaker/src/test-utils/jasmine/rewire';
+import {rewireDeps, resetDeps} from 'beaker/lib/jasmine/rewire';
 
 describe('rewireDeps()', () => {
     let module;

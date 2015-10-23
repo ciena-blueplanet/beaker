@@ -3,7 +3,9 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
 */
 
-var github = require('../github');
+'use strict';
+
+const github = require('../github');
 
 /**
  * Process command line arguments and execute library code
