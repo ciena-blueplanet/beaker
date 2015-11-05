@@ -39,7 +39,7 @@ the following dependencies as well: `graphicsmagick` and `cairo`
 
 #### Ubuntu
 
-    sudo apt-get install graphicsmagick cairo
+    sudo apt-get install graphicsmagick libcairo2-dev
 
 ### Install `beaker`
 Run the following command in your project directory to install this package and all of its dependencies:
