@@ -87,73 +87,11 @@ describe('grunt helper', () => {
         });
 
         it('registers the post-coverage task', () => {
-            const description = 'Move coverage report to a more browser-friendly location';
-            expect(grunt.registerTask).toHaveBeenCalledWith('post-coverage', description, jasmine.any(Function));
-        });
-
-        it('gives post-coverage task a call to moveCoverageUp', () => {
-            spyOn(helper, 'moveCoverageUp');
-
-            const callback = grunt.registerTask.calls.argsFor(5)[2];
-            callback();
-
-            const coverageDir = path.join(process.cwd(), 'coverage');
-            expect(helper.moveCoverageUp).toHaveBeenCalledWith(coverageDir, grunt.log.writeln);
+            expect(grunt.registerTask).toHaveBeenCalledWith('post-coverage', '', jasmine.any(Function));
         });
 
         it('registers the test-coverage task', () => {
             expect(grunt.registerTask).toHaveBeenCalledWith('test-coverage', ['karma:coverage', 'post-coverage']);
-        });
-    });
-
-    describe('.moveCoverageUp()', () => {
-        let logFn, dirContents;
-
-        beforeEach(() => {
-            logFn = jasmine.createSpy('logFn');
-            dirContents = {
-                'coverage-dir': ['sub-dir'],
-                'coverage-dir/sub-dir': [
-                    'file1.txt',
-                    'sub-sub-dir',
-                    'file2.txt',
-                ],
-            };
-
-            spyOn(fs, 'readdirSync').and.callFake((dir) => {
-                return dirContents[dir];
-            });
-
-            spyOn(fs, 'renameSync');
-            spyOn(rimraf, 'sync');
-
-            helper.moveCoverageUp('coverage-dir', logFn);
-        });
-
-        it('outputs log info', () => {
-            expect(logFn).toHaveBeenCalledWith('found coverage directory at: coverage-dir/sub-dir');
-            expect(logFn).toHaveBeenCalledWith('moved all files to: coverage-dir');
-        });
-
-        it('moves all files', () => {
-            const src = (filename) => {
-                return 'coverage-dir/sub-dir/' + filename;
-            };
-
-            const dest = (filename) => {
-                return 'coverage-dir/' + filename;
-            };
-
-            const files = dirContents['coverage-dir/sub-dir'];
-
-            _.forEach(files, (filename) => {
-                expect(rimraf.sync).toHaveBeenCalledWith(dest(filename));
-                expect(fs.renameSync).toHaveBeenCalledWith(src(filename), dest(filename));
-            });
-        });
-
-        it('removes the sub-dir', () => {
-            expect(rimraf.sync).toHaveBeenCalledWith('coverage-dir/sub-dir');
         });
     });
 });
