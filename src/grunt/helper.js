@@ -6,10 +6,8 @@
 'use strict';
 
 const _ = require('lodash');
-const fs = require('fs');
 const matchdep = require('matchdep');
 const path = require('path');
-const rimraf = require('rimraf');
 const webpack = require('webpack');
 
 const configDir = path.join(__dirname, '../../config');

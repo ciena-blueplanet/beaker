@@ -10,11 +10,8 @@
 'use strict';
 /* eslint-enable strict */
 
-const _ = require('lodash');
-const fs = require('fs');
 const matchdep = require('matchdep');
 const path = require('path');
-const rimraf = require('rimraf');
 
 const t = require('../../../src/transplant')(__dirname);
 const helper = t.require('./helper');
