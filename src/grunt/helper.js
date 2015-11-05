@@ -6,10 +6,8 @@
 'use strict';
 
 const _ = require('lodash');
-const fs = require('fs');
 const matchdep = require('matchdep');
 const path = require('path');
-const rimraf = require('rimraf');
 const webpack = require('webpack');
 
 const configDir = path.join(__dirname, '../../config');
@@ -22,34 +20,6 @@ const USE_SOURCE_MAPS = process.env.MAPS === 'on';
 const BEAKER_DIR = (process.env.IS_BEAKER === '1') ? './' : 'node_modules/beaker';
 
 module.exports = {
-
-    /**
-     * Move all coverage data up one level (it's grouped under a directory named for the browser used)
-     * i.e, coverage/PhantomJS 1.9.7 (Linux)/index.html -> coverage/index.html
-     * @param {String} coverageDir - the full path to the coverage dir
-     * @param {Function} logFn - the logging function to use
-     */
-    moveCoverageUp(coverageDir, logFn) {
-        var subDir = fs.readdirSync(coverageDir)[0];
-        var fullSubDir = path.join(coverageDir, subDir);
-
-        if (logFn) {
-            logFn('found coverage directory at: ' + fullSubDir);
-        }
-
-        fs.readdirSync(fullSubDir).forEach(file => {
-            var dest = path.join(coverageDir, file);
-            rimraf.sync(dest);
-            fs.renameSync(path.join(fullSubDir, file), dest);
-        });
-
-        rimraf.sync(fullSubDir);
-
-        if (logFn) {
-            logFn('moved all files to: ' + coverageDir);
-        }
-    },
-
     /**
      * Initialize the helper module with the grunt instance
      * @param {Object} grunt - the grunt instance loaded in the Gruntfile
@@ -115,6 +85,9 @@ module.exports = {
                                 type: 'lcovonly',
                             },
                         ],
+                        subdir: function () {
+                            return '';
+                        },
                     },
 
                     webpack: {
@@ -213,8 +186,8 @@ module.exports = {
         grunt.registerTask('test', ['karma:ci']);
 
         // register the post-coverage task
-        grunt.registerTask('post-coverage', 'Move coverage report to a more browser-friendly location', () => {
-            this.moveCoverageUp(path.join(process.cwd(), 'coverage'), grunt.log.writeln);
+        grunt.registerTask('post-coverage', '', () => {
+            // TODO: remove this target on next major version bump
         });
 
         // Single run of unit tests where code coverage is calculated
