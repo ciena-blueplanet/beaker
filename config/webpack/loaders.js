@@ -29,7 +29,7 @@ module.exports = [
         loader: es6Loader,
     }, {
         test: /\.tsx?$/,
-        loader: 'ts-loader',
+        loader: 'babel?plugins=object-assign!ts-loader',
     }, {
         test: /\.json$/,
         loader: 'json',
