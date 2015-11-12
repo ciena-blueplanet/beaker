@@ -1,29 +1,29 @@
 /**
  * @author Adam Meadows [@job13er](https://github.com/job13er)
- * @copyright 2015 Cyan, Inc. All rights reserved.
+ * @copyright 2015 Ciena Corporation. All rights reserved.
 */
 
 'use strict';
 
-var path = require('path');
-var webpack = require('webpack');
-var loaders = require('../webpack/loaders');
-var resolve = require('../webpack/resolve');
-var webpackPlugins = require('../webpack/karma-plugins');
+const path = require('path');
+const loaders = require('../webpack/loaders');
+const resolve = require('../webpack/resolve');
+const webpackPlugins = require('../webpack/karma-plugins');
 
-var USE_SOURCE_MAPS = process.env.MAPS === 'on';
-var KARMA_BROWSER = process.env.KARMA_BROWSER || 'Chrome';
+const USE_SOURCE_MAPS = process.env.MAPS === 'on';
+const KARMA_BROWSER = process.env.KARMA_BROWSER || 'Chrome';
 
-var IS_BEAKER = process.env.IS_BEAKER === '1';
-var BEAKER_DIR = IS_BEAKER ? './' : 'node_modules/beaker/';
-var entryPoint = IS_BEAKER ? 'beaker-test-main.js' : 'test-main.js';
-var entryPointFull = path.join(BEAKER_DIR, 'config/karma', entryPoint);
+const IS_BEAKER = process.env.IS_BEAKER === '1';
+const BEAKER_DIR = IS_BEAKER ? './' : 'node_modules/beaker/';
+const entryPoint = IS_BEAKER ? 'beaker-test-main.js' : 'test-main.js';
+const entryPointFull = path.join(BEAKER_DIR, 'config/karma', entryPoint);
 
-var preprocessors = {};
-preprocessors[entryPointFull] = ['webpack', 'sourcemap'];
+const preprocessors = {
+    [entryPointFull]: ['webpack', 'sourcemap'],
+};
 
-var frameworks = [];
-var plugins = [
+const frameworks = [];
+const plugins = [
     require('karma-chrome-launcher'),
     require('karma-firefox-launcher'),
     require('karma-coverage'),
@@ -65,7 +65,7 @@ module.exports = function (config) {
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: frameworks,
+        frameworks,
 
         // list of files / patterns to load in the browser
         files: [
@@ -74,7 +74,7 @@ module.exports = function (config) {
 
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-        preprocessors: preprocessors,
+        preprocessors,
 
         // test results reporter to use
         // possible values: 'dots', 'progress'
@@ -122,10 +122,10 @@ module.exports = function (config) {
                         loader: path.join(__dirname, 'self-loader.js'),
                     },
                 ],
-                loaders: loaders,
+                loaders,
             },
             plugins: webpackPlugins,
-            resolve: resolve,
+            resolve,
             devtool: USE_SOURCE_MAPS ? 'inline-cheap-module-source-map' : 'eval',
         },
 
@@ -133,7 +133,7 @@ module.exports = function (config) {
             noInfo: false,
         },
 
-        plugins: plugins,
+        plugins,
 
     });
 };

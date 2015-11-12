@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import $ from 'jquery';
 import React from 'react/addons';
-import rewireComponents, {createStubComponent} from 'beaker/src/test-utils/jasmine/rewire-components';
+import rewireComponents, {createStubComponent} from 'beaker/lib/jasmine/rewire-components';
 
 describe('rewireComponents()', () => {
     let rewireDepsSpy, createStubComponentSpy, rewiredModule;

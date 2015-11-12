@@ -3,9 +3,11 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
 */
 
+'use strict';
+
 require('../typedefs');
 
-var newConfig = require('../new-config');
+const newConfig = require('../new-config');
 
 /**
  * Process command line arguments and execute library code

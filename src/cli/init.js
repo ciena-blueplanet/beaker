@@ -3,9 +3,11 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
 */
 
+'use strict';
+
 require('../typedefs');
 
-var init = require('../init');
+const init = require('../init');
 
 /**
  * Call the init command

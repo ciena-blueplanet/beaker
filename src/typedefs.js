@@ -27,28 +27,3 @@
  * @property {String} info - stdout/stderr from test run
  * @property {Number} exitCode - exit code of test run
  */
-
-// ========================================================
-// Jasmine Typedefs
-// ========================================================
-
-/**
- * @typedef MatchersUtil
- * {@link https://github.com/jasmine/jasmine/blob/master/src/core/matchers/matchersUtil.js}
- */
-
-/**
- * @typedef Matcher
- * @property {Function} compare - the compare function for the matcher
- */
-
-/**
- * @typedef MatcherResult
- * @property {Boolean} pass - true if matcher passes
- * @property {String} message - error message if matcher failed
- */
-
-/**
- * @typedef CustomEqualityTester
- * {@link http://jasmine.github.io/2.0/custom_equality.html}
- */

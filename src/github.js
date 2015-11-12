@@ -4,25 +4,27 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
  */
 
-var _ = require('lodash');
-var Q = require('q');
-var exec = require('child_process').exec;
+'use strict';
 
-var http = require('q-io/http');
-var fs = require('q-io/fs');
-var versiony = require('versiony');
+const _ = require('lodash');
+const Q = require('q');
+const exec = require('child_process').exec;
 
-var utils = require('./cli/utils');
-var config = require('./config');
+const http = require('q-io/http');
+const fs = require('q-io/fs');
+const versiony = require('versiony');
+
+const utils = require('./cli/utils');
+const config = require('./config');
 
 /** @exports github */
-var ns = {
+const ns = {
 
     /**
      * Initialize the module
      * @returns {github} the instance
      */
-    init: function () {
+    init() {
 
         // this is on the object for eaiser mocking
         this.exec = Q.denodeify(exec);
@@ -43,7 +45,7 @@ var ns = {
      * @param {Object} argv - the minimist arguments object
      * @throws CliError
      */
-    createRelease: function (argv) {
+    createRelease(argv) {
         utils.throwCliError(argv._[1] + ' currently unavailable, hopefully coming back soon', 1);
     },
 
@@ -52,13 +54,13 @@ var ns = {
      * @param {String} apiPath - path to desired GitHub API
      * @returns {Q.Promise} a promise that will be resolved with the result of the request
      */
-    getRequest: function (apiPath) {
-        var url = this.config.urlBase + apiPath;
-        return http.request(url).then(function (res) {
+    getRequest(apiPath) {
+        const url = this.config.urlBase + apiPath;
+        return http.request(url).then((res) => {
             // NOTE: this is all within this then() because the inner one needs
             // access to the res object and I wasn't sure how to do that if I returned
             // res.body.read() here and used chaining -- ARM
-            return res.body.read().then(function (content) {
+            return res.body.read().then((content) => {
                 return {
                     status: res.status,
                     data: JSON.parse(content),
@@ -73,7 +75,7 @@ var ns = {
      * @param {String} branch - branch name
      * @returns {Q.Promise} a promise that will be resolved with the results of the commits API
      */
-    getCommits: function (repo, branch) {
+    getCommits(repo, branch) {
         return this.getRequest('/repos/' + repo + '/commits?sha=' + branch);
     },
 
@@ -83,7 +85,7 @@ var ns = {
      * @param {String} number - pull request number
      * @returns {Q.Promise} a promise that will be resolved with the results of the commits API
      */
-    getPullRequest: function (repo, number) {
+    getPullRequest(repo, number) {
         return this.getRequest('/repos/' + repo + '/pulls/' + number);
     },
 
@@ -92,7 +94,7 @@ var ns = {
      * @param {String} repo - repsitory name (including owner)
      * @returns {Q.Promise} a promise that will be resolved with the results of the pulls API
      */
-    getPullRequests: function (repo) {
+    getPullRequests(repo) {
         return this.getRequest('/repos/' + repo + '/pulls');
     },
 
@@ -102,11 +104,11 @@ var ns = {
      * @param {String} sha - commit hash
      * @returns {Q.Promise} a promise that will be resolved with the pull request for the given SHA
      */
-    getPullRequestForSha: function (repo, sha) {
+    getPullRequestForSha(repo, sha) {
         console.info('Looking for PR on repository ' + repo + ' with HEAD at commit ' + sha);
-        return this.getPullRequests(repo).then(function (resp) {
+        return this.getPullRequests(repo).then((resp) => {
             var result = null;
-            resp.data.forEach(function (pr) {
+            resp.data.forEach((pr) => {
                 // If pull request is at specific commit
                 if (pr.head.sha === sha || pr.merge_commit_sha === sha) {
                     console.info('Found PR at commit: ' + pr.id);
@@ -124,7 +126,7 @@ var ns = {
      * @param {Object} pr - pull request information
      * @returns {String} version bump level comment (null if comment not found)
      */
-    getVersionBumpLevel: function (pr) {
+    getVersionBumpLevel(pr) {
         var match = pr.body.match(/#(MAJOR|MINOR|PATCH)#/);
 
         if (!match || match.length < 2) {
@@ -140,7 +142,7 @@ var ns = {
      * @param {Object} pr - pull request information
      * @returns {Boolean} whether or not version bump comment is present in pull request
      */
-    hasVersionBumpComment: function (pr) {
+    hasVersionBumpComment(pr) {
         return this.getVersionBumpLevel(pr) !== null;
     },
 
@@ -150,10 +152,10 @@ var ns = {
      * @param {String[]} requiredArgs - list of required arguments
      * @throws CliError
      */
-    verifyRequiredArgs: function (argv, requiredArgs) {
+    verifyRequiredArgs(argv, requiredArgs) {
         var errors = [];
 
-        requiredArgs.forEach(function (arg) {
+        requiredArgs.forEach((arg) => {
             if (!_.has(argv, arg)) {
                 errors.push(arg + ' argument is required');
             }
@@ -168,12 +170,12 @@ var ns = {
      * Determine if version is bumped
      * @param {Object} argv - the minimist arguments object
      */
-    versionBumped: function (argv) {
+    versionBumped(argv) {
         var self = this;
         this.verifyRequiredArgs(argv, ['repo', 'sha']);
 
         this.getPullRequestForSha(argv.repo, argv.sha)
-            .then(function (pr) {
+            .then((pr) => {
                 if (!self.hasVersionBumpComment(pr)) {
                     utils.throwCliError('Missing version bump comment', 1);
                 }
@@ -186,7 +188,7 @@ var ns = {
      * @param {String} bump - version bump level
      * @throws CliError
      */
-    bumpFiles: function (bump) {
+    bumpFiles(bump) {
 
         // fill in the correct number of spaces based on JSON_TABS env
         var numSpaces = parseInt(process.env.JSON_TABS || '4', 10);
@@ -221,8 +223,8 @@ var ns = {
      * Get the current branch (based on last commit) only valid for merge scenario, not PRs
      * @returns {Q.Promise} a promise resolved with the the name of the branch
      */
-    getBranch: function () {
-        return this.exec('git rev-parse --abbrev-ref HEAD').then(function (result) {
+    getBranch() {
+        return this.exec('git rev-parse --abbrev-ref HEAD').then((result) => {
             return result[0].replace('\n', '');
         });
     },
@@ -232,7 +234,7 @@ var ns = {
      * @param {String} branch - the branch to push to
      * @returns {Q.Promise} a promise resolved with the results of pushing the changes to origin
      */
-    pushChanges: function (branch) {
+    pushChanges(branch) {
         var cmd = 'git push origin ' + branch;
         console.info(cmd);
         return this.exec(cmd);
@@ -242,11 +244,11 @@ var ns = {
      * Commit changes to package.json
      * @returns {Q.Promise} a promise that is resolved when the files have been committed
      */
-    commitBumpedFiles: function () {
+    commitBumpedFiles() {
         var self = this;
         var promises = [];
-        ['package.json'].forEach(function (file) {
-            var promise = fs.exists(file).then(function (exists) {
+        ['package.json'].forEach((file) => {
+            var promise = fs.exists(file).then((exists) => {
                 if (exists) {
                     return self.exec('git add ' + file);
                 }
@@ -255,7 +257,7 @@ var ns = {
             promises.push(promise);
         });
 
-        return Q.allSettled(promises).then(function () {
+        return Q.allSettled(promises).then(() => {
             return self.exec('git commit -m "bump version"');
         });
     },
@@ -266,11 +268,11 @@ var ns = {
      * @param {Object[]} commits - the array of commits to go through
      * @returns {Q.Promsie} a promise resolved with the array of version bumps to be made
      */
-    getVersionBumps: function (repo, commits) {
+    getVersionBumps(repo, commits) {
         var self = this;
 
         var prPromises = [];
-        _.forEach(commits, function (commitObj, index) {
+        _.forEach(commits, (commitObj, index) => {
             // If commit was made by the CI system we can ignore all previous commits
             if (commitObj.commit.author.email === self.config.github.email) {
                 return false;
@@ -281,7 +283,7 @@ var ns = {
 
             // If commit is for a pull request merge
             if (matches) {
-                var prPromise = self.getPullRequest(repo, matches[1]).then(function (resp) {
+                var prPromise = self.getPullRequest(repo, matches[1]).then((resp) => {
                     return {
                         index: index,
                         resp: resp,
@@ -292,7 +294,7 @@ var ns = {
             }
         });
 
-        return Q.all(prPromises).then(function (resolutions) {
+        return Q.all(prPromises).then((resolutions) => {
             var responses = _(resolutions).sortBy('index').pluck('resp').pluck('data').value();
 
             // reverse it since we need to bump versions from oldest to newest
@@ -306,24 +308,24 @@ var ns = {
      * @param {String} branch - the branch to bump
      * @returns {Q.Promise} a promise resolved when bump is finished
      */
-    bumpVersionForBranch: function (repo, branch) {
+    bumpVersionForBranch(repo, branch) {
         var self = this;
         return this.getCommits(repo, branch)
-            .then(function (resp) {
+            .then((resp) => {
                 return self.getVersionBumps(repo, resp.data);
             })
-            .then(function (bumps) {
-                bumps.forEach(function (bump) {
+            .then((bumps) => {
+                bumps.forEach((bump) => {
                     self.bumpFiles(bump);
                 });
             })
-            .then(function () {
+            .then(() => {
                 return self.commitBumpedFiles(branch);
             })
-            .then(function () {
+            .then(() => {
                 return self.pushChanges(branch);
             })
-            .then(function (result) {
+            .then((result) => {
                 if (result.code > 0) {
                     utils.throwCliError('Failed to push changes to ' + branch + ': ' + result.stdout, 1);
                 }
@@ -335,19 +337,19 @@ var ns = {
      * @param {Object} argv - the minimist arguments object
      * @throws CliError
      */
-    bumpVersion: function (argv) {
+    bumpVersion(argv) {
         var self = this;
 
         this.verifyRequiredArgs(argv, ['repo']);
 
         this.getBranch()
-            .then(function (branch) {
+            .then((branch) => {
                 if (branch === null) {
                     utils.throwCliError('Unable to lookup branch', 1);
                 }
                 return branch;
             })
-            .then(function (branch) {
+            .then((branch) => {
                 return self.bumpVersionForBranch(argv.repo, branch);
             })
             .done();
@@ -358,7 +360,7 @@ var ns = {
      * @param {Ojbect} argv - the minimist arguments object
      * @throws CliError
     */
-    command: function (argv) {
+    command(argv) {
         if (argv._.length !== 2) {
             utils.throwCliError('Invalid command: ' + JSON.stringify(argv._), 1);
         }

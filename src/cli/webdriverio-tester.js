@@ -3,9 +3,11 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
 */
 
+'use strict';
+
 require('../typedefs');
 
-var tester = require('../webdriverio-tester')();
+const tester = require('../webdriverio-tester')();
 
 /**
  * Process command line arguments and execute library code

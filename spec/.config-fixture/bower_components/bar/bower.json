@@ -1,7 +1,0 @@
-{
-  "name": "bar",
-  "version": "2.3",
-  "dependencies": {
-    "bar-helper": "0.3-alpha"
-  }
-}

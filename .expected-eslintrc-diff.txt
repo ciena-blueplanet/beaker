@@ -1,0 +1,29 @@
+13c13
+<         "modules": false,
+---
+>         "modules": true,
+28c28,29
+<         "node": true
+---
+>         "browser": true,
+>         "node": true,
+29a31,33
+>     "plugins": [
+>         "react"
+>     ],
+81a86,100
+>         "react/display-name": 1,
+>         "react/jsx-boolean-value": [1, "always"],
+>         "react/jsx-no-undef": 1,
+>         "react/jsx-sort-props": 1,
+>         "react/jsx-sort-prop-types": 1,
+>         "react/jsx-uses-react": 1,
+>         "react/jsx-uses-vars": 1,
+>         "react/no-did-mount-set-state": 1,
+>         "react/no-did-update-set-state": 1,
+>         "react/no-multi-comp": 1,
+>         "react/no-unknown-property": 1,
+>         "react/prop-types": 1,
+>         "react/react-in-jsx-scope": 1,
+>         "react/self-closing-comp": 1,
+>         "react/wrap-multilines": 1,

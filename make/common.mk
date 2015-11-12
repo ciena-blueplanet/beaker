@@ -1,6 +1,6 @@
 #
 # Makefile to define some common beaker make targets
-# Copyright (c) 2015 Cyan, Inc. All rights reserved.
+# Copyright (c) 2015 Ciena Corporation. All rights reserved.
 #
 
 SHELL := /bin/bash
@@ -11,6 +11,8 @@ IS_BEAKER ?= 0
 JSON_TABS ?= 4
 export JSON_TABS
 
+ESLINT_FILES ?= ./Gruntfile.js src spec demo/js
+ESLINT_RULES_DIR ?= $(shell pwd)/node_modules/beaker/src/eslint-rules
 BEAKER_BIN ?= beaker
 export IS_BEAKER
 
@@ -30,12 +32,12 @@ build-mock:
 	$(ENV)MOCK_APIS=1 grunt webpack:build-dev
 
 lint:
-ifeq ($(IS_BEAKER), 1)
-	-$(ENV)cmp .eslintrc files/project-templates/common/.eslintrc || echo "warning '.eslintrc' and 'files/project-templates/common/.eslintrc' are different."
+ifeq ($(IS_BEAKER), 0)
+	-$(ENV)cmp .eslintrc node_modules/beaker/lib/.eslintrc || echo "warning '.eslintrc' is out of date, run 'make update-eslintrc' for latest version."
 else
-	-$(ENV)cmp .eslintrc node_modules/beaker/.eslintrc || echo "warning '.eslintrc' is out of date, run 'make update-eslintrc' for latest version."
+	$(ENV)bin/verify-eslintrc.sh
 endif
-	$(ENV)grunt lint
+	$(ENV)eslint --rulesdir=$(ESLINT_RULES_DIR) $(ESLINT_FILES)
 
 package-test:
 	$(HIDE) echo "WARNING: the package-test target is DEPRECATED, please remove it from your Makefile."
@@ -44,7 +46,7 @@ update-eslintrc:
 ifeq ($(IS_BEAKER), 1)
 	$(ENV)echo "For beaker you must manually update the '.eslintrc' file." 1>&2
 else
-	$(ENV)cp node_modules/beaker/.eslintrc .eslintrc
+	$(ENV)cp node_modules/beaker/lib/.eslintrc .eslintrc
 endif
 
 version-bumped:

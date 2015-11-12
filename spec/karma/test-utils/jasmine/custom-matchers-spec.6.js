@@ -5,9 +5,9 @@
 
 /* eslint-disable max-nested-callbacks */
 
-const _ = require('lodash');
-const React = require('react');
-const customMatchers = require('../../../../src/test-utils/jasmine/custom-matchers');
+import _ from 'lodash';
+import React from 'react';
+import {toDeepEqual, toBeStubComponent, toHaveCorrectPropTypes} from 'beaker/lib/jasmine/custom-matchers';
 
 describe('customMatchers', () => {
     let util, customEqualityTesters, matcher;
@@ -22,7 +22,7 @@ describe('customMatchers', () => {
     describe('.toDeepEqual()', () => {
         let actual, expected, result;
         beforeEach(() => {
-            matcher = customMatchers.toDeepEqual(util, customEqualityTesters);
+            matcher = toDeepEqual(util, customEqualityTesters);
             expected = {
                 first: 'Tony',
                 last: 'Stark',
@@ -99,7 +99,7 @@ describe('customMatchers', () => {
                 return fakeElement;
             });
 
-            matcher = customMatchers.toBeStubComponent(util, customEqualityTesters);
+            matcher = toBeStubComponent(util, customEqualityTesters);
         });
 
         describe('when classes match', () => {
@@ -160,7 +160,7 @@ describe('customMatchers', () => {
                 c: fn,
             };
 
-            matcher = customMatchers.toHaveCorrectPropTypes();
+            matcher = toHaveCorrectPropTypes();
         });
 
         describe('when no errors', () => {

@@ -3,75 +3,77 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
  */
 
-var path = require('path');
+'use strict';
+
+const path = require('path');
 
 /**
  * @namespace
  */
-var transplant = {};
+const transplant = {
 
-/**
- * @param {String} modulePath - the full path of the module consumer
- * @param {String} [extraDirs] - extra levels under spec/ where the specs really live
- * @param {Function} [reqFunc] - override what to ue for require (for testing)
- * @returns {transplant} - the instance
- */
-transplant.init = function (modulePath, extraDirs, reqFunc) {
-    this.modulePath = modulePath;
+    /**
+     * @param {String} modulePath - the full path of the module consumer
+     * @param {String} [extraDirs] - extra levels under spec/ where the specs really live
+     * @param {Function} [reqFunc] - override what to ue for require (for testing)
+     * @returns {transplant} - the instance
+     */
+    init(modulePath, extraDirs, reqFunc) {
+        this.modulePath = modulePath;
 
-    if (reqFunc === undefined) {
-        reqFunc = require;
-    }
+        if (reqFunc === undefined) {
+            reqFunc = require;
+        }
 
-    this.extraDirs = extraDirs;
-    this.reqFunc = reqFunc;
+        this.extraDirs = extraDirs;
+        this.reqFunc = reqFunc;
 
-    return this;
-};
+        return this;
+    },
 
+    /**
+     * Expand a relative path within the spec/ tree to the same
+     * path within the parallel src/ tree.
+     *
+     * @example
+     * //
+     * // Assuming the following directory structure:
+     * //
+     * // src/             spec/
+     * //  foo/             foo/
+     * //    bar/             bar/
+     * //     baz.js            baz-spec.js
+     * //
+     * //
+     * // The following would be true inside baz-spec.js
+     *
+     * var t = require('beaker/src/transplant')(__dirname);
+     * t.require('./baz') === require('../../../src/foo/bar/baz')
+     *
+     * @param {String} dstPath - The destination path relative to the spec/ tree
+     *
+     * @returns {object} the module located at dstPath transplanted to parallel src/ tree
+     */
+    require(dstPath) {
+        var parts = this.modulePath.split('spec');
 
-/**
- * Expand a relative path within the spec/ tree to the same
- * path within the parallel src/ tree.
- *
- * @example
- * //
- * // Assuming the following directory structure:
- * //
- * // src/             spec/
- * //  foo/             foo/
- * //    bar/             bar/
- * //     baz.js            baz-spec.js
- * //
- * //
- * // The following would be true inside baz-spec.js
- *
- * var t = require('beaker/src/transplant')(__dirname);
- * t.require('./baz') === require('../../../src/foo/bar/baz')
- *
- * @param {String} dstPath - The destination path relative to the spec/ tree
- *
- * @returns {object} the module located at dstPath transplanted to parallel src/ tree
- */
-transplant.require = function (dstPath) {
-    var parts = this.modulePath.split('spec');
+        if (parts.length < 2) {
+            throw new Error('Invalid modulePath "' + this.modulePath + '" no "spec" dir found!');
+        }
 
-    if (parts.length < 2) {
-        throw new Error('Invalid modulePath "' + this.modulePath + '" no "spec" dir found!');
-    }
+        var pathFromSpec = parts[parts.length - 1];
 
-    var pathFromSpec = parts[parts.length - 1];
+        // move up to the parent of spec/
+        var levels = pathFromSpec.split('/').length;
+        var dots = '';
 
-    // move up to the parent of spec/
-    var levels = pathFromSpec.split('/').length;
-    var dots = '';
+        for (var i = 0; i < levels; i++) {
+            dots = path.join(dots, '..');
+        }
 
-    for (var i = 0; i < levels; i++) {
-        dots = path.join(dots, '..');
-    }
-
-    var pathFromSrc = pathFromSpec.replace(this.extraDirs, '');
-    return this.reqFunc(path.join(this.modulePath, dots, 'src', pathFromSrc, dstPath));
+        var pathFromSrc = pathFromSpec.replace(this.extraDirs, '');
+        return this.reqFunc(path.join(this.modulePath, dots, 'src', pathFromSrc, dstPath));
+    },
 };
 
 /**

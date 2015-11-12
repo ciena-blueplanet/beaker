@@ -1,11 +1,13 @@
 /**
  * @author Adam Meadows [@job13er](https://github.com/job13er)
- * @copyright 2105 Cyan, Inc. All rights reserved.
+ * @copyright 2105 Ciena Corporation. All rights reserved.
  */
 
-var path = require('path');
-var loaders = require('./config/webpack/loaders');
-var resolve = require('./config/webpack/resolve');
+'use strict';
+
+const path = require('path');
+const loaders = require('./config/webpack/loaders');
+const resolve = require('./config/webpack/resolve');
 
 module.exports = {
     entry: {
@@ -30,8 +32,8 @@ module.exports = {
                 loader: path.join(process.cwd(), './config/karma/self-loader.js'),
             },
         ],
-        loaders: loaders,
+        loaders,
     },
 
-    resolve: resolve,
+    resolve,
 };

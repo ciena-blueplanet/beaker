@@ -3,6 +3,8 @@
  * @copyright 2015 Ciena Corporation. All rights reserved
  */
 
+'use strict';
+
 require('../typedefs');
 
 module.exports = {
@@ -13,7 +15,7 @@ module.exports = {
      * @param {Number} [exitCode] - the exit code for CLI command
      * @throws {CliError}
      */
-    throwCliError: function (message, exitCode) {
+    throwCliError(message, exitCode) {
         throw {
             message: message,
             exitCode: exitCode,
