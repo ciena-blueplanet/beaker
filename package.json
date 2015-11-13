@@ -1,6 +1,6 @@
 {
     "name": "beaker",
-    "version": "6.0.0",
+    "version": "6.0.1",
     "description": "Toolkit for building web interfaces",
     "keywords": [
         "tools",
@@ -92,8 +92,8 @@
         "nock": "^0.59.1",
         "postcss-loader": "^0.4.3",
         "raw-loader": "^0.5.1",
-        "react": "0.14.0",
-        "react-dom": "0.14.0",
+        "react": "0.14.1",
+        "react-dom": "0.14.1",
         "sass-loader": "^2.0.1",
         "style-loader": "^0.12.3",
         "webpack": "^1.11.0",
