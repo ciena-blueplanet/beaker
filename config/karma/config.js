@@ -17,6 +17,9 @@ var KARMA_BROWSER = process.env.KARMA_BROWSER || 'Chrome';
 var IS_BEAKER = process.env.IS_BEAKER === '1';
 var BEAKER_DIR = IS_BEAKER ? './' : 'node_modules/beaker/';
 var entryPoint = IS_BEAKER ? 'beaker-test-main.js' : 'test-main.js';
+if (process.env.TEST_FRAMEWORK === 'mocha') {
+    entryPoint = 'mocha-test-main.js';
+}
 var entryPointFull = path.join(BEAKER_DIR, 'config/karma', entryPoint);
 
 var preprocessors = {};
