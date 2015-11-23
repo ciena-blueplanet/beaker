@@ -1,4 +1,4 @@
-/* global beforeEach, jasmine */
+/* global beforeEach, chai */
 
 const customMatchers = require('./custom-matchers');
 
